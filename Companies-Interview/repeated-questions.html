@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interview Questions Overview</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5d667a;
+    --line: #e3e6ec; --head: #eef1f6; --accent: #2457d6;
+    --b3: #c2410c; --b3bg: #ffedd5; --b2: #1d4ed8; --b2bg: #dbeafe;
+    --chip: #f1f3f8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c; --card: #1a1f2b; --text: #e6e9f0; --muted: #9aa3b5;
+      --line: #2a3142; --head: #222939; --accent: #7aa2ff;
+      --b3: #fdba74; --b3bg: #3b2410; --b2: #93c5fd; --b2bg: #14264a;
+      --chip: #232a3a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 56px; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  p.sub { margin: 0 0 20px; color: var(--muted); }
+  .tools { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  input[type=search], select {
+    padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--card); color: var(--text); font: inherit;
+  }
+  input[type=search] { flex: 1 1 240px; }
+  .table-box {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    overflow: clip; /* clips rounded corners without becoming a scroll container, so sticky headers work */
+  }
+  @media (max-width: 700px) { .table-box { overflow-x: auto; } } /* small screens: scroll sideways instead */
+  thead th { position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 var(--line); }
+  table { width: 100%; border-collapse: collapse; min-width: 640px; }
+  th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
+  th:last-child, td:last-child { border-right: 0; }
+  th { background: var(--head); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--head); }
+  td.num, th.num { width: 48px; text-align: center; color: var(--muted); }
+  td.cnt, th.cnt { width: 80px; text-align: center; }
+  .badge { display: inline-block; min-width: 28px; padding: 2px 10px; border-radius: 999px; font-weight: 700; }
+  .c3 { color: var(--b3); background: var(--b3bg); }
+  .c2 { color: var(--b2); background: var(--b2bg); }
+  .c1 { color: var(--muted); background: var(--chip); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-block; padding: 2px 10px; border-radius: 6px; background: var(--chip);
+    border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 13px; white-space: nowrap;
+  }
+  .chip.tech { background: var(--b2bg); color: var(--b2); border-color: transparent; }
+  a.chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip small { color: var(--muted); }
+  code { background: var(--chip); padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .note { margin-top: 14px; color: var(--muted); font-size: 13px; }
+  .empty { display: none; padding: 24px; text-align: center; color: var(--muted); }
+  @media (max-width: 600px) { body { padding: 20px 16px 40px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Interview Questions by Count</h1>
+  <p class="sub">How many companies asked each question (default view: repeated questions only). <code>Q#</code> is the question number inside that company's file.</p>
+
+  <div class="tools">
+    <input type="search" id="q" placeholder="Search a question or company…" aria-label="Search">
+    <select id="min" aria-label="Minimum count">
+      <option value="2+">Count ≥ 2 (repeated)</option>
+      <option value="3">Count = 3</option>
+      <option value="2">Count = 2</option>
+      <option value="1">Count = 1</option>
+      <option value="all">All questions</option>
+    </select>
+    <select id="co" aria-label="Company">
+      <option value="">All companies</option>
+      <option>Algoworks</option>
+      <option>Deloitte</option>
+      <option>EInfochips</option>
+      <option>Hitachi</option>
+      <option>Irpgrammer Solutions</option>
+      <option>Kyndryl</option>
+      <option>Persistent Systems</option>
+      <option>TCS</option>
+      <option>TechM</option>
+      <option>UST</option>
+      <option>Wipro</option>
+    </select>
+  </div>
+
+  <div class="table-box">
+    <table id="t">
+      <thead>
+        <tr><th class="num">#</th><th>Question</th><th class="cnt">Count</th><th>Asked in</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">1</td><td>What is a cold start in AWS Lambda? How can you reduce it?</td><td class="cnt"><span class="badge c3">3</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q8</small></a><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q2</small></a><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q11</small></a></div></td></tr>
+        <tr><td class="num">2</td><td>Output question: event loop order (sync → microtask → macrotask)</td><td class="cnt"><span class="badge c3">3</span></td>
+          <td><div class="chips"><a class="chip" href="Hitachi-L1-Questions.md">Hitachi <small>Q4</small></a><a class="chip" href="Irpgrammer-Solutions-L1-Questions.md">Irpgrammer Solutions <small>Q2</small></a><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q11</small></a></div></td></tr>
+        <tr><td class="num">3</td><td>Output question: Promise <code>.then</code> / <code>.catch</code> chain</td><td class="cnt"><span class="badge c3">3</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q16</small></a><a class="chip" href="Irpgrammer-Solutions-L1-Questions.md">Irpgrammer Solutions <small>Q1</small></a><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q10 (different snippet)</small></a></div></td></tr>
+        <tr><td class="num">4</td><td>How do you monitor AWS / serverless apps? (CloudWatch, X-Ray)</td><td class="cnt"><span class="badge c3">3</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q9</small></a><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q3</small></a><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q10</small></a></div></td></tr>
+        <tr><td class="num">5</td><td>What are Promises and their states?</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q2</small></a><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">6</td><td><code>Promise.all</code> / <code>allSettled</code> – parallel async calls</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q3</small></a><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q6</small></a></div></td></tr>
+        <tr><td class="num">7</td><td>How do you improve slow query performance?</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q11</small></a><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q5</small></a></div></td></tr>
+        <tr><td class="num">8</td><td>AWS Step Functions – how one Lambda calls the next</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q8–9</small></a><a class="chip" href="UST-L1-Questions.md">UST <small>Q2</small></a></div></td></tr>
+        <tr><td class="num">9</td><td>How does Node.js handle high concurrency while single-threaded?</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q2</small></a><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q5</small></a></div></td></tr>
+        <tr><td class="num">10</td><td>How do you secure a Node.js API? (best practices, Helmet)</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q6</small></a><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q13</small></a></div></td></tr>
+        <tr><td class="num">11</td><td>JWT authentication / middleware to verify a token</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q5, Q9</small></a><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">12</td><td>Connecting to and working with a database in Node.js</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q4</small></a><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q12</small></a></div></td></tr>
+        <tr><td class="num">13</td><td>TypeScript <code>any</code> type (Kyndryl: <code>unknown</code> vs <code>any</code>)</td><td class="cnt"><span class="badge c2">2</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q14</small></a><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">14</td><td>What is Node.js?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">15</td><td>Difference: Monolith vs Microservices vs Serverless</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">16</td><td>How are you deploying Lambda functions?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">17</td><td>How to communicate between microservices?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q5</small></a></div></td></tr>
+        <tr><td class="num">18</td><td>What is SQS? Short polling vs Long polling</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q6</small></a></div></td></tr>
+        <tr><td class="num">19</td><td>How Lambda handles concurrency? How to check limits?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">20</td><td>What is SNS?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q10</small></a></div></td></tr>
+        <tr><td class="num">21</td><td>Difference between SQL and NoSQL</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q12</small></a></div></td></tr>
+        <tr><td class="num">22</td><td>What is the use of TypeScript?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q13</small></a></div></td></tr>
+        <tr><td class="num">23</td><td>Difference between <code>null</code> and <code>undefined</code></td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q15</small></a></div></td></tr>
+        <tr><td class="num">24</td><td>What is the output?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q17</small></a></div></td></tr>
+        <tr><td class="num">25</td><td>What is the output?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Algoworks-L1-Questions.md">Algoworks <small>Q18</small></a></div></td></tr>
+        <tr><td class="num">26</td><td>How can you improve Node.js application performance?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">27</td><td>How do you handle asynchronous operations in Node.js?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q2</small></a></div></td></tr>
+        <tr><td class="num">28</td><td>How do you identify if a query is taking a long time to execute?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">29</td><td>What is Indexing in a Database?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q6</small></a></div></td></tr>
+        <tr><td class="num">30</td><td>How do you calculate query cost?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Deloitte-L1-Questions.md">Deloitte <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">31</td><td>What are keys in DynamoDB?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Hitachi-L1-Questions.md">Hitachi <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">32</td><td>Write a JavaScript program to filter even numbers from an array and return their doubled values.</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Hitachi-L1-Questions.md">Hitachi <small>Q2</small></a></div></td></tr>
+        <tr><td class="num">33</td><td>What will be the output of the following code?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Hitachi-L1-Questions.md">Hitachi <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">34</td><td>async/await with rejected promise</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Irpgrammer-Solutions-L1-Questions.md">Irpgrammer Solutions <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">35</td><td>Design: URL shortener</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Irpgrammer-Solutions-L1-Questions.md">Irpgrammer Solutions <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">36</td><td>How would you design an architecture to upload large files (100MB–GB) to S3 and process them?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">37</td><td>In React, how do you share state between components without a common parent?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">38</td><td>How do you cache API responses in Redux?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q5</small></a></div></td></tr>
+        <tr><td class="num">39</td><td>What steps do you include in a CI/CD pipeline?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q6</small></a></div></td></tr>
+        <tr><td class="num">40</td><td>What is your testing approach? TDD or after coding?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">41</td><td>Can we use <code>try...catch</code> with <code>async/await</code>?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q8</small></a></div></td></tr>
+        <tr><td class="num">42</td><td>What is the use of <code>async</code> and <code>await</code>?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Kyndryl-L1-Questions.md">Kyndryl <small>Q9</small></a></div></td></tr>
+        <tr><td class="num">43</td><td>Event Loop in Node.js</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">44</td><td>Libuv</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q2</small></a></div></td></tr>
+        <tr><td class="num">45</td><td>Creating an Express Server</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">46</td><td>API Security Using HTTP Headers</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">47</td><td>Helmet</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q8</small></a></div></td></tr>
+        <tr><td class="num">48</td><td>Handling User Input in React</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q10</small></a></div></td></tr>
+        <tr><td class="num">49</td><td>React Hooks</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q11</small></a></div></td></tr>
+        <tr><td class="num">50</td><td>Performance Optimization in React</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Persistent-Systems-L1-Questions.md">Persistent Systems <small>Q12</small></a></div></td></tr>
+        <tr><td class="num">51</td><td>Difference between <code>find()</code> and <code>filter()</code></td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">52</td><td>What is Hoisting?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q2</small></a></div></td></tr>
+        <tr><td class="num">53</td><td>What is TDZ (Temporal Dead Zone)?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">54</td><td>What is Closure and its use?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">55</td><td>What is Function Currying?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q5</small></a></div></td></tr>
+        <tr><td class="num">56</td><td>Create a Node.js server using <code>http</code></td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q8</small></a></div></td></tr>
+        <tr><td class="num">57</td><td>Write a program to reverse all words from array in JS</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q9</small></a></div></td></tr>
+        <tr><td class="num">58</td><td>Write a program to compare two objects in JS</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q10</small></a></div></td></tr>
+        <tr><td class="num">59</td><td>What is Provisioned Concurrency?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q12</small></a></div></td></tr>
+        <tr><td class="num">60</td><td>Did you handle any production issues?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TCS-L1-Questions.md">TCS <small>Q13</small></a></div></td></tr>
+        <tr><td class="num">61</td><td>What is a Lambda function?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">62</td><td>What is a distributed environment?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">63</td><td>Write a simple Lambda function code</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q5</small></a></div></td></tr>
+        <tr><td class="num">64</td><td>How many parameters can we pass to a Lambda function?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q6</small></a></div></td></tr>
+        <tr><td class="num">65</td><td>How to call one Lambda function from another?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">66</td><td>How to do horizontal scaling in a database?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="TechM-L1-Questions.md">TechM <small>Q10</small></a></div></td></tr>
+        <tr><td class="num">67</td><td>What is git rebase ?</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="UST-L1-Questions.md">UST <small>Q1</small></a></div></td></tr>
+        <tr><td class="num">68</td><td>What is 403, 402 and 401, and 502</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="UST-L1-Questions.md">UST <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">69</td><td>Type-safe APIs using generics and conditional types</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q2</small></a></div></td></tr>
+        <tr><td class="num">70</td><td>Interface vs Type in TypeScript</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q3</small></a></div></td></tr>
+        <tr><td class="num">71</td><td>Rate limiting in Express</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q4</small></a></div></td></tr>
+        <tr><td class="num">72</td><td>Centralized error handling</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q6</small></a></div></td></tr>
+        <tr><td class="num">73</td><td>Highly available AWS architecture</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q7</small></a></div></td></tr>
+        <tr><td class="num">74</td><td>AWS Secrets Manager</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q8</small></a></div></td></tr>
+        <tr><td class="num">75</td><td>ECS vs EKS</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q9</small></a></div></td></tr>
+        <tr><td class="num">76</td><td>Streams in Node.js</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="Wipro-L1-Questions.md">Wipro <small>Q11</small></a></div></td></tr>
+        <tr><td class="num">77</td><td>Flatten a nested object into an array (recursion)</td><td class="cnt"><span class="badge c1">1</span></td>
+          <td><div class="chips"><a class="chip" href="EInfochips/L1-flatten-object.js">EInfochips</a></div></td></tr>
+      </tbody>
+    </table>
+    <div class="empty" id="empty">No matching questions.</div>
+  </div>
+
+  <p class="note">Some rows are the same topic asked with slightly different wording or code, not word-for-word identical.</p>
+
+  <h1 style="margin-top:40px">Company-wise Topics</h1>
+  <p class="sub">Topics covered in each company's interview round.</p>
+  <div class="tools"><input type="search" id="q2" placeholder="Search a company or topic…" aria-label="Search companies"></div>
+  <div class="table-box">
+    <table id="t2">
+      <thead>
+        <tr><th class="num">#</th><th>Company</th><th class="cnt">Questions</th><th>Technologies</th><th>Topics</th><th class="cnt">File</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">1</td><td><strong>Algoworks</strong></td><td class="cnt">18</td><td><div class="chips"><span class="chip tech">Node.js</span><span class="chip tech">JavaScript</span><span class="chip tech">TypeScript</span><span class="chip tech">AWS Lambda</span><span class="chip tech">AWS SQS</span><span class="chip tech">AWS SNS</span><span class="chip tech">AWS X-Ray</span><span class="chip tech">CloudWatch</span><span class="chip tech">SQL</span><span class="chip tech">NoSQL</span></div></td><td><div class="chips"><span class="chip">Node.js</span><span class="chip">Promises</span><span class="chip">Monolith vs Microservices vs Serverless</span><span class="chip">Lambda deployment</span><span class="chip">Microservice communication</span><span class="chip">SQS polling</span><span class="chip">Lambda concurrency</span><span class="chip">Cold vs warm Lambda</span><span class="chip">Serverless monitoring</span><span class="chip">SNS</span><span class="chip">Slow query performance</span><span class="chip">SQL vs NoSQL</span><span class="chip">TypeScript</span><span class="chip">any type</span><span class="chip">null vs undefined</span><span class="chip">Output questions</span></div></td><td><a class="chip" href="Algoworks-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">2</td><td><strong>Deloitte</strong></td><td class="cnt">7</td><td><div class="chips"><span class="chip tech">Node.js</span><span class="chip tech">SQL</span><span class="chip tech">Redis</span><span class="chip tech">PM2</span></div></td><td><div class="chips"><span class="chip">Node.js performance</span><span class="chip">Async handling</span><span class="chip">Promise methods</span><span class="chip">Finding slow queries</span><span class="chip">Query performance</span><span class="chip">Indexing</span><span class="chip">Query cost</span></div></td><td><a class="chip" href="Deloitte-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">3</td><td><strong>EInfochips</strong></td><td class="cnt">1</td><td><div class="chips"><span class="chip tech">JavaScript</span></div></td><td><div class="chips"><span class="chip">Flatten nested object (recursion)</span></div></td><td><a class="chip" href="EInfochips/L1-flatten-object.js">Open</a></td></tr>
+        <tr><td class="num">4</td><td><strong>Hitachi</strong></td><td class="cnt">4</td><td><div class="chips"><span class="chip tech">JavaScript</span><span class="chip tech">Node.js</span><span class="chip tech">AWS DynamoDB</span></div></td><td><div class="chips"><span class="chip">DynamoDB keys</span><span class="chip">Filter + double array program</span><span class="chip">this binding</span><span class="chip">Event loop output</span></div></td><td><a class="chip" href="Hitachi-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">5</td><td><strong>Irpgrammer Solutions</strong></td><td class="cnt">4</td><td><div class="chips"><span class="chip tech">JavaScript</span><span class="chip tech">Node.js</span><span class="chip tech">SQL</span></div></td><td><div class="chips"><span class="chip">Promise chain output</span><span class="chip">Event loop order</span><span class="chip">async/await output</span><span class="chip">URL shortener design</span></div></td><td><a class="chip" href="Irpgrammer-Solutions-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">6</td><td><strong>Kyndryl</strong></td><td class="cnt">10</td><td><div class="chips"><span class="chip tech">TypeScript</span><span class="chip tech">JavaScript</span><span class="chip tech">Node.js</span><span class="chip tech">React</span><span class="chip tech">Redux</span><span class="chip tech">Zustand</span><span class="chip tech">AWS S3</span><span class="chip tech">AWS Lambda</span><span class="chip tech">Git</span><span class="chip tech">CI/CD</span></div></td><td><div class="chips"><span class="chip">unknown vs any</span><span class="chip">Node.js concurrency</span><span class="chip">S3 large-file upload</span><span class="chip">React shared state</span><span class="chip">Redux API caching</span><span class="chip">CI/CD pipeline</span><span class="chip">TDD</span><span class="chip">try/catch with async/await</span><span class="chip">async/await</span><span class="chip">Promise output</span></div></td><td><a class="chip" href="Kyndryl-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">7</td><td><strong>Persistent Systems</strong></td><td class="cnt">12</td><td><div class="chips"><span class="chip tech">Node.js</span><span class="chip tech">Express</span><span class="chip tech">MongoDB</span><span class="chip tech">Mongoose</span><span class="chip tech">JWT</span><span class="chip tech">Helmet</span><span class="chip tech">React</span><span class="chip tech">libuv</span></div></td><td><div class="chips"><span class="chip">Event loop</span><span class="chip">libuv</span><span class="chip">Express server</span><span class="chip">Database connection</span><span class="chip">Middleware</span><span class="chip">API security</span><span class="chip">HTTP security headers</span><span class="chip">Helmet</span><span class="chip">JWT</span><span class="chip">React input handling</span><span class="chip">React hooks</span><span class="chip">React performance</span></div></td><td><a class="chip" href="Persistent-Systems-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">8</td><td><strong>TCS</strong></td><td class="cnt">13</td><td><div class="chips"><span class="chip tech">JavaScript</span><span class="chip tech">Node.js</span><span class="chip tech">AWS Lambda</span></div></td><td><div class="chips"><span class="chip">find vs filter</span><span class="chip">Hoisting</span><span class="chip">TDZ</span><span class="chip">Closure</span><span class="chip">Currying</span><span class="chip">Promise.all</span><span class="chip">Promise states</span><span class="chip">Node http server</span><span class="chip">Reverse words program</span><span class="chip">Compare objects</span><span class="chip">Lambda cold start</span><span class="chip">Provisioned concurrency</span><span class="chip">Production issues</span></div></td><td><a class="chip" href="TCS-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">9</td><td><strong>TechM</strong></td><td class="cnt">11</td><td><div class="chips"><span class="chip tech">AWS Lambda</span><span class="chip tech">AWS Step Functions</span><span class="chip tech">AWS X-Ray</span><span class="chip tech">Node.js</span><span class="chip tech">JavaScript</span><span class="chip tech">NoSQL / Sharding</span></div></td><td><div class="chips"><span class="chip">Lambda</span><span class="chip">Cold start</span><span class="chip">X-Ray</span><span class="chip">Distributed environment</span><span class="chip">Lambda code</span><span class="chip">Lambda parameters</span><span class="chip">Invoke Lambda from Lambda</span><span class="chip">Step Functions</span><span class="chip">Step Function config</span><span class="chip">DB horizontal scaling</span><span class="chip">Event loop output</span></div></td><td><a class="chip" href="TechM-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">10</td><td><strong>UST</strong></td><td class="cnt">3</td><td><div class="chips"><span class="chip tech">Git</span><span class="chip tech">AWS Step Functions</span><span class="chip tech">HTTP</span></div></td><td><div class="chips"><span class="chip">git rebase</span><span class="chip">Step Functions</span><span class="chip">HTTP status codes</span></div></td><td><a class="chip" href="UST-L1-Questions.md">Open</a></td></tr>
+        <tr><td class="num">11</td><td><strong>Wipro</strong></td><td class="cnt">13</td><td><div class="chips"><span class="chip tech">Node.js</span><span class="chip tech">Express</span><span class="chip tech">TypeScript</span><span class="chip tech">JWT</span><span class="chip tech">Prisma</span><span class="chip tech">Sequelize</span><span class="chip tech">Helmet</span><span class="chip tech">Worker Threads</span><span class="chip tech">Streams</span><span class="chip tech">AWS (EC2, ELB, RDS, S3, CloudFront, Route 53)</span><span class="chip tech">AWS Secrets Manager</span><span class="chip tech">AWS ECS / EKS</span><span class="chip tech">CloudWatch / X-Ray / CloudTrail</span></div></td><td><div class="chips"><span class="chip">JWT middleware</span><span class="chip">TS generics & conditional types</span><span class="chip">Interface vs type</span><span class="chip">Rate limiting</span><span class="chip">High concurrency</span><span class="chip">Centralized error handling</span><span class="chip">Highly available AWS</span><span class="chip">Secrets Manager</span><span class="chip">ECS vs EKS</span><span class="chip">AWS monitoring</span><span class="chip">Streams</span><span class="chip">Database operations</span><span class="chip">Security best practices</span></div></td><td><a class="chip" href="Wipro-L1-Questions.md">Open</a></td></tr>
+      </tbody>
+    </table>
+    <div class="empty" id="empty2">No matching companies.</div>
+  </div>
+</div>
+
+<script>
+  const rows = Array.from(document.querySelectorAll('#t tbody tr'));
+  const q = document.getElementById('q'), min = document.getElementById('min'), co = document.getElementById('co'), empty = document.getElementById('empty');
+  function matchCount(c, mode) {
+    if (mode === 'all') return true;
+    if (mode === '2+') return c >= 2;
+    return c === +mode;
+  }
+  rows.forEach(r => { r.dataset.cos = '|' + Array.from(r.querySelectorAll('.chip')).map(c => c.childNodes[0].textContent.trim()).join('|') + '|'; });
+  function apply() {
+    const text = q.value.trim().toLowerCase(), mode = min.value;
+    let shown = 0;
+    rows.forEach(r => {
+      const ok = r.textContent.toLowerCase().includes(text) &&
+                 matchCount(+r.querySelector('.badge').textContent, mode) &&
+                 (!co.value || r.dataset.cos.includes('|' + co.value + '|'));
+      r.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  }
+  q.addEventListener('input', apply);
+  min.addEventListener('change', apply);
+  co.addEventListener('change', apply);
+  apply();
+
+  const rows2 = Array.from(document.querySelectorAll('#t2 tbody tr'));
+  const q2 = document.getElementById('q2'), empty2 = document.getElementById('empty2');
+  q2.addEventListener('input', () => {
+    const text = q2.value.trim().toLowerCase();
+    let shown = 0;
+    rows2.forEach(r => { const ok = r.textContent.toLowerCase().includes(text); r.style.display = ok ? '' : 'none'; if (ok) shown++; });
+    empty2.style.display = shown ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>
