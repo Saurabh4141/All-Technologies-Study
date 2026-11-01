@@ -1,0 +1,162 @@
+What is Node.js?
+ -- Node.js is a JavaScript runtime that allows us to execute JavaScript outside the browser, such as on a server.
+ -- It uses the V8 JavaScript engine and supports asynchronous, non-blocking I/O
+
+
+*** JavaScript & Node.js Execution Order *** 
+
+┌───────────────────────────────────────┐
+│ 1. SYNCHRONOUS JAVASCRIPT             │
+│    ├── Normal statements              │
+│    ├── Function calls                 │
+│    ├── Loops                          │
+│    └── Synchronous callbacks          │
+└──────────────────┬────────────────────┘
+                   ▼
+┌──────────────────────────────────────┐           ===== > There Is No process.nextTick in JavaScript , So No 2nd Step in JavaScript
+│ 2. process.nextTick() QUEUE          │
+│    └── process.nextTick(callback)    │
+└──────────────────┬───────────────────┘
+                   ▼
+┌───────────────────────────────────────┐
+│ 3. MICROTASK QUEUE                    │
+│    ├── Promise.then()                 │
+│    ├── Promise.catch()                │
+│    ├── Promise.finally()              │
+│    ├── queueMicrotask()               │
+│    └── async/await continuations      │
+└──────────────────┬────────────────────┘
+                   ▼
+┌───────────────────────────────────────┐
+│ 4. EVENT LOOP                         │
+│                                       │
+│    ├── Timers                         │
+│    │   ├── setTimeout()               │
+│    │   └── setInterval()              │
+│    │                                  │
+│    ├── Pending callbacks              │
+│    ├── Idle / Prepare (internal)      │
+│    ├── Poll                           │
+│    │   └── I/O callbacks              │
+│    ├── Check                          │
+│    │   └── setImmediate()             │          ===== > There Is No setImmediate()  in JavaScript
+│    └── Close callbacks                │
+└───────────────────────────────────────┘
+
+
+
+=======================================================
+
+1. What Event Loop Does?
+==> The Event Loop manages when callbacks get a chance to execute in Node.js
+
+    It allows Node.js to handle asynchronous operations without blocking JavaScript from executing other code while those operations are in progress.
+
+
+2. How would you define the term I/O?
+
+==> I/O (Input/Output) refers to communication between an application and external resources, such as files, databases, networks, and devices. 
+Node.js supports asynchronous I/O, allowing it to handle other work while waiting for many I/O operations to complete.
+
+
+3. How do you handle asynchronous operations in Node.js?
+
+==> In Node.js, I handle asynchronous operations using Promises, async/await, and try/catch. These allow Node.js to handle operations like database queries, API requests, 
+and file operations without blocking the main JavaScript thread while waiting for I/O
+
+
+
+4. sync / microtask / macrotask ? 
+
+==> 
+    Synchronous: Normal code, function calls, loops.
+    Microtasks: Promise handlers (.then(), .catch(), .finally()), queueMicrotask(), and async/await continuations.
+    Macrotasks (tasks): setTimeout(), setInterval(), and other runtime-scheduled tasks.
+
+Example:
+
+    console.log("1. Sync");
+
+    setTimeout(() => {
+        console.log("3. Macrotask");
+    }, 0);
+
+    Promise.resolve().then(() => {
+        console.log("2. Microtask");
+    });
+
+    console.log("4. Sync");
+
+Output:
+    1. Sync
+    4. Sync
+    2. Microtask
+    3. Macrotask
+
+
+5. 
+
+PROMISE VS ASYNC FUNCTION
+=========================
+
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Feature                    | Promise                                                      | Async Function                                               |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Definition                 | An object representing the eventual success or failure       | A function that always returns a Promise.                    |
+|                            | of an operation.                                             |                                                              |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Purpose                    | Handles the result of an asynchronous operation.             | Makes asynchronous code easier to write and read.            |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Use Case                   | Handling asynchronous results or combining multiple          | Writing asynchronous functions, especially with              |
+|                            | Promises.                                                    | sequential operations.                                       |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Syntax                     | Promise.resolve("Hello")                                     | async function test() { return "Hello"; }                    |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| How to Get the Result      | Use .then() or await.                                        | Use await to get a Promise's fulfilled value.                |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Error Handling             | .catch()                                                     | try/catch or .catch() on the returned Promise.               |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Can It Be Used Without     | Yes.                                                         | Yes. An async function does not require await.               |
+| await?                     |                                                              |                                                              |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Does It Return a Promise?  | It is already a Promise object.                              | Yes, every time it is called.                                |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+| Function or Object?        | An object.                                                   | A function.                                                  |
++----------------------------+--------------------------------------------------------------+--------------------------------------------------------------+
+
+
+6. Why Do We Use Nginx as a Proxy Server? What is Nginx?
+ ==> Nginx is a web server that can also act as a reverse proxy, load balancer, and TLS termination point.
+    - In a typical deployment, Nginx receives incoming HTTP/HTTPS requests and forwards them to your Node.js application.
+
+  Why use Nginx instead of exposing Node.js directly?
++-----------------------+-----------------------------------------------------------------------+
+| Feature               | Explanation                                                           |
++-----------------------+-----------------------------------------------------------------------+
+| Reverse proxy         | Forwards incoming requests to the appropriate application.            |
++-----------------------+-----------------------------------------------------------------------+
+| Security              | Allows your Node.js application port to remain private instead of     |
+|                       | being directly exposed to the internet.                               |
++-----------------------+-----------------------------------------------------------------------+
+| HTTPS / SSL           | Can handle TLS certificates and HTTPS connections.                    |
++-----------------------+-----------------------------------------------------------------------+
+| Load balancing        | Distributes requests across multiple application instances.           |
++-----------------------+-----------------------------------------------------------------------+
+| Static files          | Can efficiently serve images, CSS, JavaScript, and other static       |
+|                       | assets.                                                               |
++-----------------------+-----------------------------------------------------------------------+
+| Multiple websites     | Routes different domains to different applications on the same VPS.   |
++-----------------------+-----------------------------------------------------------------------+
+| Request handling      | Can manage connection limits, request sizes, and timeouts.            |
++-----------------------+-----------------------------------------------------------------------+
+
+
+7. Storage in Node.js ?
+8. Closures in JavaScript ?
+
+====================================================================================================================================================
+
+
+9. What is Express.js?
+==> Express.js is a lightweight web framework for Node.js that simplifies building web servers and REST APIs.
+Node.js provides the runtime. Express.js makes handling HTTP requests, routing, middleware, and responses easier.
