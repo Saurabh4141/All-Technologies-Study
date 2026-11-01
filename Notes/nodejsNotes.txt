@@ -160,3 +160,136 @@ PROMISE VS ASYNC FUNCTION
 9. What is Express.js?
 ==> Express.js is a lightweight web framework for Node.js that simplifies building web servers and REST APIs.
 Node.js provides the runtime. Express.js makes handling HTTP requests, routing, middleware, and responses easier.
+
+
+10. What is Middleware?
+==> Middleware is a function that executes during the request-response cycle. It can access the request (req), the response (res), and the next() function.
+** Types of Middleware in Express.js
+-> Application-level, Router-level, Third-party, Error-handling
+
+** Purpose
+-> Logging, Authentication, Authorization, Validation, Parsing, Error handling, Rate limiting   
+
+
+11. Create a Node.js HTTP Server
+
+```
+    create server.js and write :
+
+    const http = require("http");
+
+    const server = http.createServer((req, res) => {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("Hello World!");
+    });
+
+    server.listen(3000, () => {
+        console.log("Server running on port 3000");
+    });
+
+    Run the server: node server.js
+
+```
+
+
+12. How do you create Express middleware to verify a JWT token?
+13. How do you implement centralized error handling in Express.js?
+
+14. Main components of an HTTP request ?
+==> An HTTP request is a message sent by a client to a server using methods such as GET, POST, PUT, PATCH, or DELETE to retrieve data or perform an operation.
+   -> Component : Method (GET, POST) , URL , Headers (Authorization: Bearer token), Body
+
+15. What is a REST API, how does it work, and how have you designed and implemented RESTful APIs in your projects? 
+    ==> REST API (Representational State Transfer API) is a way for applications to communicate with each other over HTTP using standard methods to perform operations on resources.
+    How an API works:
+        1. The client sends an HTTP request to an API endpoint.
+        2. The server receives the request and processes it using routing, middleware, and business logic.
+        3. The server interacts with a database if required.
+        4. The server returns an HTTP response containing a status code and, commonly, JSON data.
+
+            HTTP METHODS
+            ========================
+
+            +--------+------------------------------+--------------------------+
+            | Method | Purpose                      | Example                  |
+            +--------+------------------------------+--------------------------+
+            | GET    | Retrieve data                | Fetch users              |
+            | POST   | Create a resource            | Register a user          |
+            | PUT    | Replace an existing resource | Update a user completely |
+            | PATCH  | Partially update a resource  | Update a user's email    |
+            | DELETE | Delete a resource            | Delete a user            |
+            +--------+------------------------------+--------------------------+
+
+            REST API architecture and implementation:
+
+            In my Node.js and Express.js projects, I structure APIs using routes, middleware, controllers, services, and models.
+            - Routes: Define API endpoints and HTTP methods.
+            - Middleware: Handle authentication, authorization, validation, and request processing.
+            - Controllers: Handle incoming requests and send responses.
+            - Services: Contain business logic.
+            - Models: Interact with the database.
+            For example, GET /api/users retrieves users, while POST /api/users creates a new user. I use appropriate HTTP methods, validate incoming data, 
+            handle errors centrally, and return consistent JSON responses.
+
+
+
+16. Explain the Common HTTP status codes you used .
+
+            +--------+---------------------------+--------------------------------+
+            | Status | Meaning                   | When to Use                    |
+            +--------+---------------------------+--------------------------------+
+            | 200    | OK                        | Data retrieved or updated      |
+            |        |                           | successfully                   |
+            +--------+---------------------------+--------------------------------+
+            | 201    | Created                   | Resource created successfully  |
+            +--------+---------------------------+--------------------------------+
+            | 400    | Bad Request               | Missing or invalid input       |
+            +--------+---------------------------+--------------------------------+
+            | 401    | Unauthorized              | Missing or invalid JWT         |
+            +--------+---------------------------+--------------------------------+
+            | 402    | Payment Required          | Payment-related restrictions   |
+            |        |                           | in some APIs                   |
+            +--------+---------------------------+--------------------------------+
+            | 403    | Forbidden                 | User lacks permission          |
+            +--------+---------------------------+--------------------------------+
+            | 404    | Not Found                 | Requested resource not found   |
+            +--------+---------------------------+--------------------------------+
+            | 500    | Internal Server Error     | Unexpected server error        |
+            +--------+---------------------------+--------------------------------+
+            | 502    | Bad Gateway               | Invalid response from an       |
+            |        |                           | upstream server                |
+            +--------+---------------------------+--------------------------------+
+
+
+===========================================================================================================================================================================================================================
+
+17. How can you secure a Node.js API?
+    ==> I secure APIs using JWT authentication, input validation, HTTPS, rate limiting, secure database queries, and proper error handling.
+
+18. What is Helmet?
+    ==> Helmet is Express.js middleware that adds HTTP security headers to help protect applications against certain web vulnerabilities.
+
+19. What is API security using HTTP headers?
+    ==> HTTP security headers instruct browsers how to handle content securely. For example, Content-Security-Policy restricts content sources, 
+    and Strict-Transport-Security enforces HTTPS.
+
+20. What is rate limiting in Express?
+    ==> Rate limiting restricts the number of requests a client can make within a specified time. It helps prevent API abuse and brute-force attacks.
+
+21. What are Node.js security best practices?
+    ==> Validate inputs, hash passwords, use HTTPS, protect secrets, configure Helmet, implement rate limiting, update dependencies, and handle errors securely.
+
+22. Why is Node.js single-threaded?
+    ==> Node.js executes JavaScript on a main thread using the event loop, which simplifies handling asynchronous operations without 
+        creating a separate JavaScript thread for every request.
+
+23. If Node.js is single-threaded, how does it handle concurrency?
+    ==> Node.js uses **non-blocking I/O and the event loop**. While waiting for operations like database queries or file reads, it can process other requests instead of waiting.
+
+24. How does Node.js handle concurrency while single-threaded?
+    ==> When an asynchronous operation starts, Node.js can continue executing other code. When the operation completes, its callback 
+        or Promise continuation gets a chance to execute through the event loop and associated queues.
+
+25. How does Node.js handle high concurrency?
+    ==> Node.js handles many concurrent connections efficiently through non-blocking I/O. It avoids blocking the main thread while waiting for I/O operations. 
+        For CPU-intensive work, we can use worker threads or separate processes.
