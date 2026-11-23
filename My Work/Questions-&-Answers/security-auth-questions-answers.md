@@ -546,6 +546,122 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
     Interview tip: Helmet is only one layer; you still need auth, validation and rate limiting.
 
+---
+
+## More questions from revision PDFs (not yet asked in a real interview)
+
+Ordered by topic priority: questions from the most-asked topics come first.
+
+---
+
+29. Sessions vs JWT: what is the difference and when do you use each?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Both remember a logged-in user. The difference is where the login state is stored.
+    - Session: the server stores the user data (in memory, Redis or DB) and the client only gets a
+      session ID in a cookie. Stateful.
+    - JWT: the server signs a token that contains the user data (claims). The client sends it on
+      every request; the server just verifies the signature. Stateless.
+    - A JWT is signed, not encrypted. Anyone can decode and read the payload, so never put passwords
+      or secrets in it.
+
+    +-----------------+--------------------------------------------+--------------------------------------------+
+    | Point           | Session                                    | JWT                                        |
+    +=================+============================================+============================================+
+    | State stored    | On the server (Redis/DB)                   | Inside the token (client side)             |
+    +-----------------+--------------------------------------------+--------------------------------------------+
+    | Logout / revoke | Easy: delete the session                   | Hard: token is valid till it expires (use  |
+    |                 |                                            | short expiry + refresh token or a          |
+    |                 |                                            | blocklist)                                 |
+    +-----------------+--------------------------------------------+--------------------------------------------+
+    | Scaling         | Needs a shared store (Redis) across        | Any server can verify it with the key      |
+    |                 | servers                                    |                                            |
+    +-----------------+--------------------------------------------+--------------------------------------------+
+    | Best for        | Classic web apps, same domain,             | APIs, mobile apps, microservices           |
+    |                 | server-rendered                            |                                            |
+    +-----------------+--------------------------------------------+--------------------------------------------+
+
+    - Store tokens in httpOnly, Secure cookies where possible (safer from XSS than localStorage).
+
+    In short: Sessions = server remembers you (easy to revoke); JWT = token proves who you are
+    (stateless, good for APIs and microservices).
+
+---
+
+30. Why use bcrypt and not SHA-256 for passwords?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> SHA-256 is built to be fast. That is bad for passwords, because an attacker with a stolen DB can
+    try billions of guesses per second on a GPU.
+    - bcrypt is slow on purpose and has a cost factor (salt rounds). You can increase it as hardware
+      gets faster.
+    - bcrypt adds a random salt automatically, so two users with the same password get different
+      hashes. This defeats rainbow tables.
+    - Plain SHA-256 has no built-in salt and no work factor.
+    - Other good choices: argon2 (modern recommendation) and scrypt.
+
+    ```js
+    const bcrypt = require('bcrypt');
+
+    const hash = await bcrypt.hash(password, 12);     // 12 = cost (salt rounds)
+    const ok = await bcrypt.compare(password, hash);  // true / false
+    ```
+
+    In short: Password hashing must be slow and salted; bcrypt is, SHA-256 is not.
+
+---
+
+31. What is CORS?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> CORS (Cross-Origin Resource Sharing) is a browser security rule. By default, the browser blocks
+    a web page from reading responses from a different origin (different protocol, domain or port).
+    - Example: frontend on `http://localhost:3000` calling API on `http://localhost:5000` is
+      cross-origin.
+    - The server allows it by sending headers like `Access-Control-Allow-Origin`.
+    - For non-simple requests (PUT/DELETE, custom headers, JSON content type), the browser first
+      sends a preflight `OPTIONS` request.
+    - CORS is enforced only by browsers. Postman, curl or server-to-server calls ignore it, so CORS
+      is not an authentication mechanism.
+
+    ```js
+    const cors = require('cors');
+    app.use(cors({
+      origin: ['https://myapp.com'], // do not use '*' with credentials
+      credentials: true,
+    }));
+    ```
+
+    In short: CORS is a browser rule; the server uses response headers to say which other origins
+    may call it.
+
+---
+
+32. What is NoSQL injection and how do you prevent it?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> NoSQL injection is when a user sends query operators (like `$ne`, `$gt`, `$where`) instead of
+    plain values, and they go straight into a MongoDB query.
+    - Example attack on login: body is `{ "email": "a@b.com", "password": { "$ne": null } }`. The
+      query matches any password, so the attacker logs in.
+
+    ```js
+    // Vulnerable
+    User.findOne({ email: req.body.email, password: req.body.password });
+    ```
+
+    How to prevent:
+    1. Validate input types and shape (Joi, Zod, express-validator): password must be a string.
+    2. Sanitize: remove keys starting with `$` or containing `.` (e.g. `express-mongo-sanitize`).
+    3. Cast values: `String(req.body.email)`.
+    4. Use Mongoose schemas (they cast types) and keep `strictQuery` on.
+    5. Never use `$where` or build queries from raw user strings.
+    6. Compare passwords with bcrypt, not inside the query.
+
+    In short: Never pass raw user objects into queries; validate types and strip `$` operators.
+
 ======================================================================================================================================
 
 ## What to study first

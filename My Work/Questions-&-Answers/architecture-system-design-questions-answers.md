@@ -245,6 +245,231 @@ Ordered by priority: the question asked by the most interviewers comes first.
     Interview tip: use the STAR format (Situation, Task, Action, Result) and give numbers if you
     can.
 
+---
+
+## More questions from revision PDFs (not yet asked in a real interview)
+
+Ordered by topic priority: questions from the most-asked topics come first.
+
+---
+
+12. Serverless vs containers
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> Both run your code without managing physical servers, but in different ways.
+    - Serverless (AWS Lambda, Azure Functions): you upload functions; the cloud runs them per event
+      and scales them automatically. You pay per request/execution time.
+    - Containers (Docker on Kubernetes, ECS): you package the whole app with its runtime; it runs as
+      a long-lived process that you scale and configure.
+
+    +------------+--------------------------------------------+--------------------------------------------+
+    | Point      | Serverless                                 | Containers                                 |
+    +============+============================================+============================================+
+    | Unit       | Function                                   | Whole app/service                          |
+    +------------+--------------------------------------------+--------------------------------------------+
+    | Scaling    | Automatic, to zero                         | You configure (auto-scaling, replicas)     |
+    +------------+--------------------------------------------+--------------------------------------------+
+    | Cost       | Pay per use; cheap for low/spiky traffic   | Pay for running instances; cheaper for     |
+    |            |                                            | steady high traffic                        |
+    +------------+--------------------------------------------+--------------------------------------------+
+    | Cold start | Yes, first call can be slow                | No (process already running)               |
+    +------------+--------------------------------------------+--------------------------------------------+
+    | Limits     | Max run time, memory, no long connections  | Few limits, full control                   |
+    +------------+--------------------------------------------+--------------------------------------------+
+    | Good for   | Webhooks, cron jobs, event processing,     | Long-running APIs, WebSockets, complex     |
+    |            | small APIs                                 | apps                                       |
+    +------------+--------------------------------------------+--------------------------------------------+
+
+    In short: Serverless = no server management, pay per use, cold starts; containers = more
+    control, better for steady and long-running workloads.
+
+---
+
+13. What does a typical production Node.js architecture look like?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> A common setup:
+    1. Client (web/mobile) -> CDN for static files.
+    2. Load balancer / reverse proxy (Nginx, AWS ALB) with HTTPS.
+    3. Several stateless Node.js instances (PM2 cluster, Docker containers or Kubernetes pods).
+    4. Database (PostgreSQL/MySQL/MongoDB) with replicas and backups.
+    5. Redis for cache, sessions and rate limiting.
+    6. Message queue (RabbitMQ, Kafka, SQS, BullMQ) + worker processes for background jobs (emails,
+       reports).
+    7. Object storage (S3) for files.
+    8. Logging, monitoring and alerts (Winston/Pino, Prometheus/Grafana, ELK), and CI/CD pipeline.
+
+    Inside the app: layered code - routes -> controllers -> services -> data access
+    (models/repositories), plus middleware for auth, validation and error handling; config from
+    environment variables.
+
+    In short: CDN + load balancer + many stateless Node instances + DB + Redis + queue/workers +
+    monitoring.
+
+---
+
+14. Horizontal vs vertical scaling; how do you scale a Node.js app (stateless servers, Redis,
+   queues)?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Vertical scaling = make one machine bigger (more CPU/RAM). Simple, but has a hard limit and is a
+    single point of failure.
+    Horizontal scaling = add more machines/instances behind a load balancer. Almost no limit and
+    fault tolerant, but the app must be stateless.
+
+    How to scale a Node.js app:
+    - Use all CPU cores: Node runs JavaScript on one thread, so use the `cluster` module or PM2
+      cluster mode (one worker per core).
+    - Keep servers stateless: no sessions or uploads in local memory/disk. Store sessions in Redis,
+      files in S3, tokens as JWT.
+    - Add a load balancer in front of many instances (Nginx, ALB, Kubernetes).
+    - Cache hot data in Redis to reduce DB load.
+    - Move heavy or slow work to a queue (BullMQ, RabbitMQ, SQS) and process it with workers.
+    - Scale the DB: indexes, read replicas, connection pooling, sharding if needed.
+    - Use worker_threads for CPU-heavy tasks so the event loop is not blocked.
+
+    ```js
+    const cluster = require('cluster');
+    const os = require('os');
+
+    if (cluster.isPrimary) {
+      for (let i = 0; i < os.cpus().length; i++) cluster.fork();
+    } else {
+      require('./server'); // each worker runs the HTTP server
+    }
+    ```
+
+    In short: Vertical = bigger machine; horizontal = more machines. Scale Node by clustering,
+    stateless servers, Redis, queues and a load balancer.
+
+---
+
+15. What is a load balancer? Load-balancing strategies (round robin, least connections, IP hash)
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> A load balancer sits in front of many servers and spreads incoming requests across them.
+    Benefits: more capacity, no single point of failure, health checks (removes dead servers), and
+    SSL termination. Examples: Nginx, HAProxy, AWS ALB/NLB.
+
+    +----------------------+--------------------------------------------+--------------------------------------------+
+    | Strategy             | How it works                               | Good for                                   |
+    +======================+============================================+============================================+
+    | Round robin          | Send to servers one by one in turn         | Servers of equal power, similar requests   |
+    +----------------------+--------------------------------------------+--------------------------------------------+
+    | Weighted round robin | Stronger servers get more requests         | Mixed server sizes                         |
+    +----------------------+--------------------------------------------+--------------------------------------------+
+    | Least connections    | Send to the server with the fewest active  | Long or uneven requests (WebSockets,       |
+    |                      | connections                                | uploads)                                   |
+    +----------------------+--------------------------------------------+--------------------------------------------+
+    | IP hash              | Hash of client IP picks the server, so the | Sticky sessions                            |
+    |                      | same client goes to the same server        |                                            |
+    +----------------------+--------------------------------------------+--------------------------------------------+
+
+    Interview tip: sticky sessions (IP hash) are a workaround; better to keep servers stateless and
+    store sessions in Redis.
+
+    In short: A load balancer spreads traffic across servers; pick the strategy based on server
+    sizes and request patterns.
+
+---
+
+16. What is an API gateway? How is it different from a load balancer?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> An API gateway is a single entry point for all clients in a microservices system. It receives a
+    request and routes it to the right service.
+    It also handles common concerns in one place:
+    - Authentication / JWT check
+    - Rate limiting and throttling
+    - Request routing by path (`/users` -> user service, `/orders` -> order service)
+    - Request/response transformation, aggregation of several services
+    - Logging, monitoring, caching
+    Examples: Kong, AWS API Gateway, Nginx, Express Gateway.
+
+    +----------------+--------------------------------------------+--------------------------------------------+
+    | Point          | Load balancer                              | API gateway                                |
+    +================+============================================+============================================+
+    | Main job       | Spread traffic across copies of the same   | Route requests to different services       |
+    |                | service                                    |                                            |
+    +----------------+--------------------------------------------+--------------------------------------------+
+    | Works at       | Network level (L4) or HTTP (L7)            | Application/API level (L7)                 |
+    +----------------+--------------------------------------------+--------------------------------------------+
+    | Extra features | Health checks, SSL termination             | Auth, rate limiting, transformation, API   |
+    |                |                                            | keys, analytics                            |
+    +----------------+--------------------------------------------+--------------------------------------------+
+
+    They are often used together: client -> API gateway -> load balancer -> service instances.
+
+    In short: Load balancer = share load among identical servers; API gateway = smart front door
+    that routes and secures APIs.
+
+---
+
+17. REST vs GraphQL
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> Both are ways to build APIs.
+    - REST: many endpoints, one per resource (`GET /users/1`, `GET /users/1/posts`). Uses HTTP
+      methods and status codes.
+    - GraphQL: one endpoint (`POST /graphql`); the client sends a query saying exactly which fields
+      it needs.
+
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | Point              | REST                                       | GraphQL                                    |
+    +====================+============================================+============================================+
+    | Endpoints          | Many                                       | One                                        |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | Data returned      | Fixed by server (over/under-fetching       | Exactly what the client asks for           |
+    |                    | possible)                                  |                                            |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | Multiple resources | Often several requests                     | One request                                |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | HTTP caching       | Easy (GET + URLs)                          | Harder (usually POST)                      |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | Versioning         | /v1, /v2                                   | Evolve schema, deprecate fields            |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | Typing             | Optional (OpenAPI)                         | Strongly typed schema built in             |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+    | Watch out          | Over-fetching, many round trips            | N+1 queries (use DataLoader), complex      |
+    |                    |                                            | queries, rate limiting                     |
+    +--------------------+--------------------------------------------+--------------------------------------------+
+
+    ```graphql
+    query {
+      user(id: 1) { name posts { title } }
+    }
+    ```
+
+    In short: REST is simple and cache-friendly; GraphQL lets the client fetch exactly what it needs
+    in one request.
+
+---
+
+18. What is a webhook?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> A webhook is an HTTP callback: when an event happens in another system, that system sends an
+    HTTP POST to a URL you registered. It is "push" instead of you polling again and again.
+    - Example: Stripe/Razorpay calls `POST /webhooks/payment` when a payment succeeds; GitHub calls
+      your URL on a push.
+    Best practices:
+    - Verify the signature (HMAC header) so you know the request is genuine.
+    - Respond quickly with 2xx, then do heavy work in a queue.
+    - Make the handler idempotent: the sender may retry, so the same event can arrive twice (store
+      the event ID).
+
+    ```js
+    app.post('/webhooks/payment', express.raw({ type: 'application/json' }), (req, res) => {
+      // verify signature using req.body (raw) and the secret
+      res.sendStatus(200);
+      queue.add('payment', JSON.parse(req.body)); // process later
+    });
+    ```
+
+    In short: A webhook is the other service calling your API when an event happens; verify it,
+    reply fast, handle duplicates.
+
 ======================================================================================================================================
 
 ## What to study first

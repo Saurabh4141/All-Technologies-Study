@@ -1095,7 +1095,31 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-50. Explain Node.js and its event-driven model (what does event-driven programming mean?)
+50. What is libuv and what role does it play in Node.js?
+   *(Asked 1×: Persistent Systems)*
+
+==> libuv is a C library inside Node.js that gives it the event loop and async I/O.
+    - It runs the **event loop** (phases: timers, pending callbacks, poll, check, close).
+    - It talks to the OS for **async network I/O** (epoll on Linux, kqueue on macOS, IOCP on
+      Windows). Network sockets do NOT use the thread pool.
+    - It has a **thread pool** (default size 4, change with `UV_THREADPOOL_SIZE`) for work the OS
+      cannot do async: `fs`, `crypto` (pbkdf2, scrypt), `zlib`, `dns.lookup`.
+    - When the work finishes, libuv puts the callback in a queue and the event loop runs it on the
+      main JS thread.
+
+    ```js
+    // Runs on the libuv thread pool, main thread stays free
+    const crypto = require('crypto');
+    crypto.pbkdf2('pass', 'salt', 100000, 64, 'sha512', () => console.log('hash done'));
+    console.log('main thread not blocked');
+    ```
+
+    In short: V8 runs your JavaScript; libuv gives Node the event loop, async I/O and the thread
+    pool.
+
+---
+
+51. Explain Node.js and its event-driven model (what does event-driven programming mean?)
     *(Asked 1×: One97 Paytm)*
 
 ==> Event-driven programming means **code runs in response to events** (a request arrived, a file
@@ -1118,7 +1142,7 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-51. What are streams in Node.js?
+52. What are streams in Node.js?
     *(Asked 1×: Wipro)*
 
 ==> Streams let you **process data piece by piece (chunks)** instead of loading it all into memory
@@ -1144,6 +1168,1113 @@ Ordered by priority: the question asked by the most interviewers comes first.
     ```
 
     In short: streams = low memory + start working before all the data has arrived.
+
+---
+
+## More questions from revision PDFs (not yet asked in a real interview)
+
+Ordered by topic priority: questions from the most-asked topics come first.
+
+---
+
+53. Output: setTimeout(0) and setImmediate scheduled inside an fs.readFile callback — which prints
+   first?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Inside an I/O callback, **setImmediate always prints first**.
+    - The readFile callback runs in the **poll** phase.
+    - After poll comes the **check** phase, where setImmediate runs.
+    - setTimeout(0) waits for the **timers** phase of the next loop iteration.
+
+    ```js
+    const fs = require('fs');
+    fs.readFile(__filename, () => {
+      setTimeout(() => console.log('timeout'), 0);
+      setImmediate(() => console.log('immediate'));
+    });
+    // Output:
+    // immediate
+    // timeout
+    ```
+
+    Interview tip: In the main module (not inside I/O) the order of these two is NOT guaranteed — it
+    depends on process timing.
+
+---
+
+54. A route runs a 5-second synchronous loop. What happens to other requests (e.g. /health) during
+   that time?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> All other requests wait. Even `/health` does not respond for 5 seconds.
+    - JavaScript in Node runs on **one main thread**.
+    - A synchronous loop blocks the event loop, so no other callback, request or timer can run.
+    - Load balancers may think the server is dead because health checks time out.
+    - Fixes:
+    1. Move CPU-heavy work to **worker_threads** or a background job queue (e.g. BullMQ).
+    2. Split the work into small chunks with `setImmediate`.
+    3. Run more processes (cluster / PM2) — helps throughput, but each blocked process is still
+       stuck.
+
+    ```js
+    app.get('/slow', (req, res) => {
+      const end = Date.now() + 5000;
+      while (Date.now() < end) {} // blocks everything
+      res.send('done');
+    });
+    app.get('/health', (req, res) => res.send('ok')); // waits until /slow finishes
+    ```
+
+    In short: Blocking the event loop blocks the whole server, not just one request.
+
+---
+
+55. Polling vs Server-Sent Events (SSE) vs WebSocket: when do you use each?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> All three get fresh data to the client; they differ in direction and cost.
+
+    +-----------+-------------------------------------+--------------------------------------------+--------------------------------------------+
+    |           | Polling                             | SSE                                        | WebSocket                                  |
+    +===========+=====================================+============================================+============================================+
+    | How       | Client asks again every few seconds | One HTTP connection, server keeps pushing  | Persistent two-way connection              |
+    +-----------+-------------------------------------+--------------------------------------------+--------------------------------------------+
+    | Direction | Client → server (request/response)  | Server → client only                       | Both ways                                  |
+    +-----------+-------------------------------------+--------------------------------------------+--------------------------------------------+
+    | Data      | Any                                 | Text only (UTF-8)                          | Text and binary                            |
+    +-----------+-------------------------------------+--------------------------------------------+--------------------------------------------+
+    | Reconnect | N/A                                 | Built-in auto reconnect                    | You handle it (or use Socket.io)           |
+    +-----------+-------------------------------------+--------------------------------------------+--------------------------------------------+
+    | Use for   | Simple, rare updates (job status)   | Live feeds, notifications, AI token        | Chat, multiplayer games, collaborative     |
+    |           |                                     | streaming                                  | editing                                    |
+    +-----------+-------------------------------------+--------------------------------------------+--------------------------------------------+
+
+    In short: Rare updates → polling; server-only push → SSE; real-time two-way → WebSocket.
+
+---
+
+56. Socket.io vs plain WebSocket: what is the difference?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> WebSocket is a protocol; Socket.io is a library built on top of it with extra features.
+
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    |                                | Plain WebSocket (e.g. `ws`) | Socket.io                                  |
+    +================================+=============================+============================================+
+    | Type                           | Standard protocol           | Library (own protocol on top of WebSocket) |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    | Compatible                     | Any WebSocket client        | Needs a Socket.io client on the other side |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    | Auto reconnect                 | No                          | Yes                                        |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    | Fallback                       | No                          | HTTP long-polling fallback                 |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    | Rooms / namespaces             | Build yourself              | Built-in                                   |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    | Acknowledgements, named events | Build yourself              | Built-in                                   |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+    | Overhead                       | Lighter                     | A bit heavier                              |
+    +--------------------------------+-----------------------------+--------------------------------------------+
+
+    ```js
+    // Socket.io
+    io.on('connection', (socket) => {
+      socket.join('room1');
+      socket.on('chat', (msg) => io.to('room1').emit('chat', msg));
+    });
+    ```
+
+    In short: Use plain WebSocket for lightweight/standard needs; Socket.io when you want rooms,
+    reconnect and fallbacks out of the box.
+
+---
+
+57. How do you scale Socket.io across multiple servers?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Problem: each server only knows its own connected sockets, so a message emitted on server A does
+    not reach users on server B.
+    1. Use an **adapter** (e.g. `@socket.io/redis-adapter`) — servers share events via Redis
+       Pub/Sub, so `io.to(room).emit()` reaches all servers.
+    2. Use **sticky sessions** on the load balancer (needed when HTTP long-polling is used, because
+       one session's requests must hit the same server).
+    3. In Node cluster mode, use `@socket.io/sticky` + the cluster adapter.
+
+    ```js
+    const { createAdapter } = require('@socket.io/redis-adapter');
+    const { createClient } = require('redis');
+
+    const pub = createClient({ url: 'redis://localhost:6379' });
+    const sub = pub.duplicate();
+    await Promise.all([pub.connect(), sub.connect()]);
+    io.adapter(createAdapter(pub, sub));
+    ```
+
+    In short: Redis adapter + sticky sessions.
+
+---
+
+58. Why use Express if Node.js already has the http module?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> The `http` module is low-level; you must do everything by hand. Express adds the common pieces.
+    - **Routing** by method and path, with params (`/users/:id`).
+    - **Middleware** chain (auth, logging, CORS, body parsing).
+    - Helpers like `res.json()`, `res.status()`, `res.redirect()`.
+    - Central **error handling**.
+    - Huge ecosystem of middleware.
+
+    ```js
+    // Plain http
+    http.createServer((req, res) => {
+      if (req.method === 'GET' && req.url === '/users') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify([]));
+      }
+    }).listen(3000);
+
+    // Express
+    app.get('/users', (req, res) => res.json([]));
+    ```
+
+    In short: Express is a thin layer over http that saves boilerplate and organises code.
+
+---
+
+59. How do you read route params, query string, body and headers in Express? Why is req.body
+   undefined without express.json() (body-parser)?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Express puts each part of the request in its own place.
+    - Route params → `req.params` (`/users/:id` → `req.params.id`)
+    - Query string → `req.query` (`?page=2` → `req.query.page`, always a string)
+    - Body → `req.body`
+    - Headers → `req.headers['authorization']` or `req.get('Authorization')`
+    - The request body arrives as a **stream of raw bytes**. Express does not read it by default.
+      `express.json()` (built-in version of body-parser) reads the stream, parses JSON and sets
+      `req.body`. Without it, `req.body` is `undefined`.
+    - For HTML forms use `express.urlencoded({ extended: true })`; for files use multer.
+
+    ```js
+    app.use(express.json());
+
+    app.post('/users/:id', (req, res) => {
+      const id = req.params.id;
+      const page = req.query.page;
+      const token = req.get('Authorization');
+      const { name } = req.body;
+      res.json({ id, page, token, name });
+    });
+    ```
+
+    Interview tip: express.json() only parses when Content-Type is application/json.
+
+---
+
+60. Why do you get "Cannot set headers after they are sent to the client"?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> You tried to send a response **twice** for the same request. Once a response is sent, headers
+    cannot change.
+    - Common causes:
+    - Missing `return` after `res.send()` inside an `if`.
+    - Calling `next()` after sending a response.
+    - Sending in a callback and also after it.
+
+    ```js
+    // Bug
+    app.get('/user', (req, res) => {
+      if (!req.query.id) {
+        res.status(400).send('id required'); // no return
+      }
+      res.send('ok'); // second send -> error
+    });
+
+    // Fix
+    if (!req.query.id) return res.status(400).send('id required');
+    ```
+
+    In short: One request = one response. Use `return res...` to stop the function.
+
+---
+
+61. Express vs Fastify
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> Both are Node.js web frameworks.
+
+    +--------------+--------------------------------------------+--------------------------------------------+
+    |              | Express                                    | Fastify                                    |
+    +==============+============================================+============================================+
+    | Speed        | Good                                       | Faster (optimised routing and JSON         |
+    |              |                                            | serialisation)                             |
+    +--------------+--------------------------------------------+--------------------------------------------+
+    | Validation   | Add a library (Joi, zod)                   | Built-in JSON Schema validation            |
+    +--------------+--------------------------------------------+--------------------------------------------+
+    | Structure    | Middleware chain                           | Plugins + hooks with encapsulation         |
+    +--------------+--------------------------------------------+--------------------------------------------+
+    | Async errors | Express 5 forwards rejected promises;      | Native async/await support                 |
+    |              | Express 4 does not                         |                                            |
+    +--------------+--------------------------------------------+--------------------------------------------+
+    | Logging      | Add morgan/winston                         | Built-in Pino logger                       |
+    +--------------+--------------------------------------------+--------------------------------------------+
+    | Ecosystem    | Biggest, most tutorials                    | Smaller but growing                        |
+    +--------------+--------------------------------------------+--------------------------------------------+
+
+    In short: Express for simplicity and ecosystem; Fastify when performance and built-in schema
+    validation matter.
+
+---
+
+62. CommonJS vs ES Modules (require vs import)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Two module systems exist in Node.js.
+
+    +-----------------+--------------------------------+--------------------------------------------+
+    |                 | CommonJS                       | ES Modules                                 |
+    +=================+================================+============================================+
+    | Syntax          | `require()` / `module.exports` | `import` / `export`                        |
+    +-----------------+--------------------------------+--------------------------------------------+
+    | Loading         | Synchronous, at runtime        | Static, analysed before running (async     |
+    |                 |                                | loading)                                   |
+    +-----------------+--------------------------------+--------------------------------------------+
+    | Where it works  | Anywhere, even inside if       | Top level (dynamic `import()` for runtime) |
+    +-----------------+--------------------------------+--------------------------------------------+
+    | Top-level await | No                             | Yes                                        |
+    +-----------------+--------------------------------+--------------------------------------------+
+    | `__dirname`     | Available                      | Not available (use `import.meta.url` /     |
+    |                 |                                | `import.meta.dirname`)                     |
+    +-----------------+--------------------------------+--------------------------------------------+
+    | Enable          | Default in `.js`               | `.mjs` or `"type": "module"` in            |
+    |                 |                                | package.json                               |
+    +-----------------+--------------------------------+--------------------------------------------+
+    | Tree shaking    | No                             | Yes (static)                               |
+    +-----------------+--------------------------------+--------------------------------------------+
+
+    ```js
+    // CommonJS
+    const fs = require('fs');
+    module.exports = { add };
+
+    // ES Modules
+    import fs from 'fs';
+    export const add = (a, b) => a + b;
+    ```
+
+    In short: CommonJS is Node's old default; ES Modules are the JavaScript standard.
+
+---
+
+63. What happens when you require() the same file twice? (module caching)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> The file runs **only once**. Node caches it in `require.cache`; the second `require()` returns
+    the **same** `module.exports` object.
+    - So both variables point to the same function and share the same state.
+
+    ```js
+    // counter.js
+    let n = 0;
+    module.exports = () => ++n;
+
+    // app.js
+    const a = require('./counter');
+    const b = require('./counter');
+    console.log(a(), b(), a()); // 1 2 3
+    ```
+
+    - `a === b` is `true`, so `n` is shared.
+    - To force a reload: `delete require.cache[require.resolve('./counter')]` (rarely needed).
+
+    In short: require() caches modules, so a module behaves like a singleton.
+
+---
+
+64. What is npx?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> npx is a tool (comes with npm) that **runs a package's command** without installing it globally.
+    - If the package is installed locally, it runs the one in `node_modules/.bin`.
+    - If not, it downloads it temporarily and runs it.
+    - Good for one-time tools and for using a specific version.
+
+    ```bash
+    npx create-react-app my-app
+    npx nodemon app.js
+    npx eslint@8 .
+    ```
+
+    In short: npm installs packages; npx runs them.
+
+---
+
+65. Semantic versioning: what do ^ and ~ mean in package.json?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Version format is **MAJOR.MINOR.PATCH** (e.g. 1.2.3).
+    - MAJOR → breaking changes
+    - MINOR → new features, backward compatible
+    - PATCH → bug fixes
+
+    +----------+-----------------------+----------------+
+    | Spec     | Allows                | Example range  |
+    +==========+=======================+================+
+    | `^1.2.3` | Minor + patch updates | >=1.2.3 <2.0.0 |
+    +----------+-----------------------+----------------+
+    | `~1.2.3` | Patch updates only    | >=1.2.3 <1.3.0 |
+    +----------+-----------------------+----------------+
+    | `1.2.3`  | Exact version only    | 1.2.3          |
+    +----------+-----------------------+----------------+
+
+    Interview tip: For `0.x` versions `^` is stricter: `^0.2.3` allows only `<0.3.0`. The lock file
+    pins the exact installed versions.
+
+---
+
+66. npm install vs npm ci
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Both install dependencies, but in different ways.
+
+    +-------------------+------------------------------+--------------------------------------------+
+    |                   | npm install                  | npm ci                                     |
+    +===================+==============================+============================================+
+    | Uses              | package.json (and lock file) | package-lock.json only, exactly            |
+    +-------------------+------------------------------+--------------------------------------------+
+    | Updates lock file | Can update it                | Never; fails if it doesn't match           |
+    |                   |                              | package.json                               |
+    +-------------------+------------------------------+--------------------------------------------+
+    | node_modules      | Keeps existing, adds/updates | Deletes it first, clean install            |
+    +-------------------+------------------------------+--------------------------------------------+
+    | Add a package     | `npm install express`        | Not possible                               |
+    +-------------------+------------------------------+--------------------------------------------+
+    | Best for          | Local development            | CI/CD and production builds                |
+    +-------------------+------------------------------+--------------------------------------------+
+
+    In short: `npm ci` = fast, clean, reproducible install from the lock file.
+
+---
+
+67. What does idempotent mean? Which HTTP methods are idempotent?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Idempotent means calling the same request **once or many times leaves the server in the same
+    state**.
+    - Idempotent: **GET, PUT, DELETE, HEAD, OPTIONS** (GET/HEAD/OPTIONS are also "safe" — they don't
+      change data).
+    - Not idempotent: **POST** (each call can create a new record), **PATCH** (not guaranteed, e.g.
+      "increment by 1").
+    - Example: `DELETE /users/5` twice → user 5 is gone either way (second call may return 404, but
+      state is the same).
+    - Why it matters: safe to **retry** on network failure. For POST payments, use an
+      **Idempotency-Key** header.
+
+    In short: Same request repeated = same result on the server.
+
+---
+
+68. REST API design best practices: resource naming, versioning (/api/v1) and pagination
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Main rules for a clean REST API:
+    - **Naming**: use plural nouns, not verbs: `GET /users`, `GET /users/5`, `POST /users`. Nested:
+      `GET /users/5/orders`. Lowercase, hyphens.
+    - **HTTP methods** say the action: GET read, POST create, PUT replace, PATCH partial update,
+      DELETE remove.
+    - **Status codes**: 200 OK, 201 Created, 204 No Content, 400 Bad Request, 401 Unauthorized, 403
+      Forbidden, 404 Not Found, 500 Server Error.
+    - **Versioning**: put the version in the URL (`/api/v1/users`) so old clients keep working when
+      v2 changes things.
+    - **Pagination**: never return all rows.
+    - Offset: `?page=2&limit=20` — simple, slow on big tables.
+    - Cursor: `?cursor=abc&limit=20` — fast and stable for large/real-time data.
+    - **Filtering/sorting**: `?status=active&sort=-createdAt`.
+    - Consistent JSON error format.
+
+    ```js
+    // GET /api/v1/users?page=2&limit=20
+    app.get('/api/v1/users', async (req, res) => {
+      const page = Number(req.query.page) || 1;
+      const limit = Math.min(Number(req.query.limit) || 20, 100);
+      const users = await User.find().skip((page - 1) * limit).limit(limit);
+      res.json({ data: users, page, limit });
+    });
+    ```
+
+    In short: Nouns in URLs, verbs as HTTP methods, version in the path, always paginate.
+
+---
+
+69. What is a health check endpoint?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> A simple route (e.g. `GET /health`) that tells if the service is up.
+    - Used by load balancers, Kubernetes (liveness/readiness probes), Docker and monitoring tools.
+    - If it fails, traffic is stopped or the container is restarted.
+    - **Liveness**: is the process alive? **Readiness**: can it serve traffic (DB, Redis connected)?
+    - Keep it fast and don't put heavy logic in it.
+
+    ```js
+    app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
+    app.get('/ready', async (req, res) => {
+      try {
+        await db.query('SELECT 1');
+        res.json({ status: 'ready' });
+      } catch {
+        res.status(503).json({ status: 'not ready' });
+      }
+    });
+    ```
+
+    In short: An endpoint that tells infrastructure "I'm alive and ready".
+
+---
+
+70. What is API documentation (Swagger / OpenAPI)?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> Two related terms:
+    - **OpenAPI** is a standard format (YAML/JSON) to describe a REST API: endpoints, params,
+      request/response bodies, status codes, auth.
+    - **Swagger** is the set of tools for it — Swagger UI shows interactive docs where you can "Try
+      it out".
+    - In Node: `swagger-ui-express` to serve docs, `swagger-jsdoc` to build the spec from comments.
+    - Benefits: frontend/QA know the contract, client SDKs can be generated, easier onboarding.
+
+    ```js
+    const swaggerUi = require('swagger-ui-express');
+    const spec = require('./openapi.json');
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
+    ```
+
+    In short: OpenAPI is the spec; Swagger UI turns it into interactive docs.
+
+---
+
+71. Is Node.js a programming language or a framework?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Neither. Node.js is a **JavaScript runtime environment**.
+    - The language is **JavaScript**.
+    - Node.js = **V8 engine** (runs JS) + **libuv** (event loop, async I/O) + built-in modules (fs,
+      http, crypto...).
+    - It lets JavaScript run **outside the browser**, on servers.
+    - Frameworks like **Express, NestJS, Fastify** are built on top of Node.js.
+
+    In short: JavaScript is the language, Node.js is the runtime, Express is a framework.
+
+---
+
+72. What is the REPL in Node.js?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> REPL = **Read, Eval, Print, Loop**. It is the interactive Node shell.
+    - Start it by typing `node` in the terminal with no file.
+    - It reads your input, evaluates it, prints the result, and waits again.
+    - Useful to quickly test JS code or a module.
+    - Handy commands: `.help`, `.exit`, `.editor` (multi-line), `_` (last result). Press Ctrl+C
+      twice to quit.
+
+    ```bash
+    $ node
+    > 2 + 3
+    5
+    > _ * 2
+    10
+    > .exit
+    ```
+
+    In short: A quick playground to run JavaScript line by line.
+
+---
+
+73. What are compression and morgan middleware?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> Both are popular third-party Express middleware.
+    - **compression**: gzip/deflate/brotli-compresses the response body before sending it. Smaller
+      responses mean faster load and less bandwidth.
+    - **morgan**: an HTTP request logger. It logs one line per request (method, URL, status,
+      response time).
+    - Both are added with `app.use()`, usually near the top so they apply to every route.
+
+    ```js
+    const express = require('express');
+    const compression = require('compression');
+    const morgan = require('morgan');
+
+    const app = express();
+    app.use(compression());   // compress responses
+    app.use(morgan('dev'));   // GET /users 200 12.3 ms - 512
+    ```
+
+    In short: compression makes responses smaller; morgan logs every HTTP request.
+
+---
+
+74. What is a memory leak in Node.js? Common causes and how do you detect it?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> A memory leak is memory that is no longer needed but is still referenced, so the garbage
+    collector cannot free it. Heap usage keeps growing until the process slows down or crashes (out
+    of memory).
+    Common causes:
+    - Global variables or module-level arrays/maps/caches that keep growing.
+    - Event listeners added again and again (e.g. per request) and never removed.
+    - Timers (`setInterval`) that are never cleared.
+    - Closures holding references to large objects.
+    How to detect:
+    - Watch `process.memoryUsage().heapUsed` over time (keeps going up = leak).
+    - Run with `node --inspect`, open Chrome DevTools, take heap snapshots and compare them.
+    - Use tools like clinic.js, or APM tools (New Relic, Datadog); PM2 monitoring.
+
+    ```js
+    const cache = {};                       // leak: grows forever
+    app.get('/user/:id', (req, res) => {
+      cache[req.params.id] = new Array(1e5).fill('x');
+      res.send('ok');
+    });
+    ```
+
+    In short: a leak is unused memory still referenced; detect it with memoryUsage and heap
+    snapshots, fix it by removing references (bounded caches, removeListener, clearInterval).
+
+---
+
+75. What is heap memory, and how does garbage collection work in Node.js (V8)?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> - **Stack**: stores primitive values and function call frames; small and fast.
+    - **Heap**: stores objects, arrays, functions and closures (dynamic memory).
+    - V8 frees heap memory automatically with **garbage collection (GC)**: anything that is no
+      longer reachable from the roots (globals, current stack) is removed.
+    - The heap is split into generations:
+    - **Young generation (new space)**: new objects; cleaned often and fast (Scavenge). Most objects
+      die young.
+    - **Old generation (old space)**: objects that survived a few GCs; cleaned less often with
+      **Mark-Sweep-Compact** (mark reachable objects, sweep the rest, compact to remove gaps).
+    - The default old-space limit can be raised with `node --max-old-space-size=4096 app.js` (MB).
+
+    In short: objects live in the heap, and V8's generational GC frees whatever is no longer
+    reachable.
+
+---
+
+76. How do you debug a Node.js application?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> - `console.log` / `console.error` for quick checks.
+    - `node --inspect app.js` (or `--inspect-brk` to stop on the first line), then open
+      `chrome://inspect` in Chrome to use breakpoints, watch variables and the call stack.
+    - VS Code debugger: add a launch config (or use the JavaScript Debug Terminal) and set
+      breakpoints in the editor.
+    - Put a `debugger;` statement in code; execution pauses there when a debugger is attached.
+    - Read stack traces and use proper logs (winston/pino) in production.
+    - For performance/memory problems: `--inspect` with CPU profiles and heap snapshots, or
+      clinic.js.
+
+    ```bash
+    node --inspect-brk app.js   # then open chrome://inspect
+    ```
+
+    In short: use `--inspect` with Chrome DevTools or the VS Code debugger, breakpoints instead of
+    guessing with console.log.
+
+---
+
+77. Logging in Node.js: console vs winston / pino / morgan
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> | Tool | What it is | Use for |
+    +---------+--------------------------------------------+----------------------------------+
+    | ---     | ---                                        | ---                              |
+    +=========+============================================+==================================+
+    | console | Built-in, prints to stdout/stderr          | Quick local debugging            |
+    +---------+--------------------------------------------+----------------------------------+
+    | winston | Full-featured logger: levels, formats,     | App logs in production           |
+    |         | many transports (file, console, remote)    |                                  |
+    +---------+--------------------------------------------+----------------------------------+
+    | pino    | Very fast JSON logger, low overhead        | High-performance production logs |
+    +---------+--------------------------------------------+----------------------------------+
+    | morgan  | Express middleware for HTTP request logs   | Logging each request             |
+    +---------+--------------------------------------------+----------------------------------+
+
+    - `console` has no log levels to filter, no JSON structure, no log rotation, and `console.log`
+      writes synchronously in some cases, so it is not ideal for production.
+    - Real apps often use morgan (or pino-http) for request logs plus winston/pino for application
+      logs.
+
+    ```js
+    const pino = require('pino');
+    const logger = pino({ level: 'info' });
+    logger.info({ userId: 42 }, 'user logged in');
+    ```
+
+    In short: console for development; winston or pino for structured production logs; morgan for
+    HTTP request logs.
+
+---
+
+78. How do async errors reach the Express error handler (Express 4 vs Express 5)?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> - Express error handler = middleware with 4 arguments `(err, req, res, next)`.
+    - Synchronous `throw` inside a route is caught automatically in both versions.
+    - **Express 4**: a rejected promise / error in an `async` handler is NOT caught. You must
+      `try/catch` and call `next(err)` (or use a wrapper like `express-async-handler`). Otherwise
+      you get an unhandled rejection and the request hangs.
+    - **Express 5**: if an async handler returns a rejected promise, Express automatically forwards
+      it to the error handler (`next(err)` is called for you).
+
+    ```js
+    // Express 4
+    app.get('/user', async (req, res, next) => {
+      try {
+        const user = await User.findById(req.query.id);
+        res.json(user);
+      } catch (err) {
+        next(err);                     // forward manually
+      }
+    });
+
+    // Express 5: just throw / let it reject
+    app.get('/user', async (req, res) => {
+      const user = await User.findById(req.query.id);
+      res.json(user);
+    });
+
+    app.use((err, req, res, next) => {
+      res.status(500).json({ message: err.message });
+    });
+    ```
+
+    In short: Express 4 needs `next(err)` (try/catch or a wrapper) for async errors; Express 5
+    forwards rejected promises automatically.
+
+---
+
+79. What is util.promisify?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> - `util.promisify` converts a callback-style function (error-first callback `(err, result)`)
+    into a function that returns a Promise.
+    - Then you can use it with `async/await` instead of nested callbacks.
+    - Many core modules already have promise versions (`fs/promises`), but promisify is useful for
+      older libraries.
+
+    ```js
+    const util = require('util');
+    const fs = require('fs');
+
+    const readFile = util.promisify(fs.readFile);
+
+    async function main() {
+      const data = await readFile('a.txt', 'utf8');
+      console.log(data);
+    }
+    ```
+
+    In short: promisify turns an error-first callback function into a promise-returning one.
+
+---
+
+80. What is the libuv thread pool? Which tasks use it, and what is its default size?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> - libuv is the C library behind Node's event loop and async I/O.
+    - Some work cannot be done asynchronously by the OS, so libuv runs it on a small pool of
+      background threads: the **thread pool**.
+    - **Default size: 4 threads**. Change it with the `UV_THREADPOOL_SIZE` environment variable (set
+      before the pool is first used).
+    - Uses the thread pool:
+    - `fs` operations (readFile, writeFile ...)
+    - `crypto` heavy functions (`pbkdf2`, `scrypt`, `randomBytes` async)
+    - `zlib` (compression)
+    - `dns.lookup`
+    - Does NOT use the thread pool: network I/O (HTTP, TCP sockets, database connections). The OS
+      handles them asynchronously (epoll / kqueue / IOCP).
+
+    ```bash
+    UV_THREADPOOL_SIZE=8 node app.js
+    ```
+
+    In short: 4 background threads by default for fs, crypto, zlib and dns.lookup; network I/O does
+    not use them.
+
+---
+
+81. What is backpressure in streams?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> - Backpressure happens when data is produced (read) faster than it can be consumed (written).
+    - If not handled, data piles up in memory and memory usage grows a lot.
+    - `writable.write(chunk)` returns `false` when its internal buffer is full (above
+      `highWaterMark`). Then you should stop writing and wait for the `'drain'` event.
+    - `pipe()` and `pipeline()` handle backpressure automatically (pause the reader, resume on
+      drain).
+
+    ```js
+    readable.on('data', (chunk) => {
+      const ok = writable.write(chunk);
+      if (!ok) {
+        readable.pause();
+        writable.once('drain', () => readable.resume());
+      }
+    });
+    ```
+
+    In short: backpressure = slowing the fast producer down so the slow consumer is not flooded;
+    pipe/pipeline do it for you.
+
+---
+
+82. pipe() vs pipeline() in streams
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> | | pipe() | pipeline() |
+    +------------------+--------------------------------------------+--------------------------------------------+
+    | ---              | ---                                        | ---                                        |
+    +==================+============================================+============================================+
+    | Backpressure     | Handled                                    | Handled                                    |
+    +------------------+--------------------------------------------+--------------------------------------------+
+    | Error handling   | Errors are not forwarded; you need an      | One callback / promise gets the error from |
+    |                  | `'error'` handler on every stream          | any stream                                 |
+    +------------------+--------------------------------------------+--------------------------------------------+
+    | Cleanup on error | Streams are not destroyed automatically    | Destroys all streams on error              |
+    |                  | (possible leaks)                           |                                            |
+    +------------------+--------------------------------------------+--------------------------------------------+
+    | Style            | Chain `a.pipe(b).pipe(c)`                  | `pipeline(a, b, c, cb)` or `await          |
+    |                  |                                            | pipeline(...)` from `stream/promises`      |
+    +------------------+--------------------------------------------+--------------------------------------------+
+
+    ```js
+    const { pipeline } = require('stream/promises');
+    const fs = require('fs');
+    const zlib = require('zlib');
+
+    await pipeline(
+      fs.createReadStream('big.log'),
+      zlib.createGzip(),
+      fs.createWriteStream('big.log.gz')
+    );
+    ```
+
+    In short: both handle backpressure, but pipeline() also handles errors and cleanup, so prefer
+    it.
+
+---
+
+83. Are EventEmitter listeners synchronous or asynchronous? (include output: `e.on('x', () =>
+    console.log('1')); e.emit('x'); console.log('2');` → 1 2; also mention the two classic bugs:
+    emitting 'error' with no listener crashes the process, and adding listeners per request leaks
+    memory / MaxListenersExceededWarning)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> - **Synchronous.** `emit()` calls all listeners right away, one by one, in the order they were
+    added, and only then returns.
+    - So the output of the code below is `1` then `2`.
+    - If you want async behaviour inside a listener, use `setImmediate` / `process.nextTick` inside
+      it yourself.
+
+    ```js
+    const EventEmitter = require('events');
+    const e = new EventEmitter();
+
+    e.on('x', () => console.log('1'));
+    e.emit('x');
+    console.log('2');
+    // Output:
+    // 1
+    // 2
+    ```
+
+    Two classic bugs:
+    1. Emitting `'error'` with no `'error'` listener: Node throws the error and the process crashes.
+       Always add `e.on('error', handler)`.
+    2. Adding listeners inside a request handler (each request adds one more, never removed): memory
+       leak. After 10 listeners on one event Node prints `MaxListenersExceededWarning`. Fix: add
+       listeners once, use `once()`, or `removeListener()`/`off()`.
+
+    In short: emit() is synchronous; always handle 'error', and never keep adding listeners per
+    request.
+
+---
+
+84. What is clustering in Node.js? Cluster vs worker threads
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> - Node runs your JS on one thread, so one process uses one CPU core.
+    - **Cluster module**: the primary process forks several worker **processes** (usually one per
+      CPU core). They share the same server port, and incoming connections are distributed among
+      them. If a worker dies, the primary can fork a new one.
+    - Use `cluster.isPrimary` (`isMaster` is deprecated).
+
+    ```js
+    const cluster = require('cluster');
+    const os = require('os');
+    const http = require('http');
+
+    if (cluster.isPrimary) {
+      os.cpus().forEach(() => cluster.fork());
+      cluster.on('exit', () => cluster.fork());   // restart dead worker
+    } else {
+      http.createServer((req, res) => res.end(`pid ${process.pid}`)).listen(3000);
+    }
+    ```
+
+    +---------------+-------------------------------------------+--------------------------------------------+
+    |               | Cluster                                   | Worker threads                             |
+    +===============+===========================================+============================================+
+    | ---           | ---                                       | ---                                        |
+    +---------------+-------------------------------------------+--------------------------------------------+
+    | Runs as       | Separate processes                        | Threads inside one process                 |
+    +---------------+-------------------------------------------+--------------------------------------------+
+    | Memory        | Each has its own memory                   | Own JS heap, but can share memory          |
+    |               |                                           | (SharedArrayBuffer)                        |
+    +---------------+-------------------------------------------+--------------------------------------------+
+    | Communication | IPC messages                              | `postMessage`, shared memory               |
+    +---------------+-------------------------------------------+--------------------------------------------+
+    | Best for      | Scaling an HTTP server over all CPU cores | CPU-heavy tasks (image processing,         |
+    |               |                                           | hashing, big calculations) without         |
+    |               |                                           | blocking the event loop                    |
+    +---------------+-------------------------------------------+--------------------------------------------+
+
+    In short: cluster = more processes to handle more requests; worker threads = offload CPU-heavy
+    work inside one process.
+
+---
+
+85. exec vs spawn in child_process
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> | | exec | spawn |
+    +-------------+--------------------------------------------+--------------------------------------------+
+    | ---         | ---                                        | ---                                        |
+    +=============+============================================+============================================+
+    | Output      | Buffers the whole output, gives it in a    | Streams output (`stdout`/`stderr` streams) |
+    |             | callback                                   |                                            |
+    +-------------+--------------------------------------------+--------------------------------------------+
+    | Shell       | Runs the command in a shell (pipes, `&&`   | No shell by default (safer)                |
+    |             | work)                                      |                                            |
+    +-------------+--------------------------------------------+--------------------------------------------+
+    | Output size | Limited by `maxBuffer` (default 1 MB)      | No limit, good for large/long output       |
+    +-------------+--------------------------------------------+--------------------------------------------+
+    | Use for     | Small, quick commands                      | Long-running processes, big output         |
+    +-------------+--------------------------------------------+--------------------------------------------+
+
+    - Be careful with `exec` and user input: it runs in a shell, so it can allow command injection.
+    - Related: `execFile` (no shell, buffered) and `fork` (spawns a new Node process with an IPC
+      channel).
+
+    ```js
+    const { exec, spawn } = require('child_process');
+
+    exec('ls -l', (err, stdout) => console.log(stdout));
+
+    const ls = spawn('ls', ['-l']);
+    ls.stdout.on('data', (chunk) => console.log(chunk.toString()));
+    ```
+
+    In short: exec buffers the output (small commands); spawn streams it (big or long-running
+    processes).
+
+---
+
+86. What is PM2?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> PM2 is a production process manager for Node.js apps.
+    - Keeps the app alive: auto-restarts it if it crashes.
+    - Cluster mode: runs one instance per CPU core with load balancing (`-i max`), no code changes.
+    - Zero-downtime reload (`pm2 reload`).
+    - Logs and monitoring (`pm2 logs`, `pm2 monit`).
+    - Starts apps again after a server reboot (`pm2 startup`, `pm2 save`).
+    - Config in `ecosystem.config.js`.
+
+    ```bash
+    pm2 start app.js -i max --name api
+    pm2 logs api
+    pm2 reload api
+    ```
+
+    In short: PM2 keeps Node apps running in production with restarts, clustering, logs and
+    zero-downtime reloads.
+
+---
+
+87. What is the process object? (process.argv, process.cwd(), process.memoryUsage(), process.exit
+    codes)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> `process` is a global object (no `require` needed) that gives information about and control over
+    the current Node process.
+    - `process.argv`: command-line arguments array. `[0]` = node path, `[1]` = script path, the rest
+      are your args.
+    - `process.cwd()`: the directory from which node was started (current working directory).
+    - `process.memoryUsage()`: memory info in bytes (`rss`, `heapTotal`, `heapUsed`, `external`).
+    - `process.exit(code)`: ends the process. `0` = success, `1` (or any non-zero) = failure.
+    - Also: `process.env`, `process.pid`, `process.platform`, `process.nextTick()`, and events like
+      `process.on('exit')`, `'uncaughtException'`, `'SIGTERM'`.
+
+    ```js
+    // node app.js hello
+    console.log(process.argv[2]);                  // hello
+    console.log(process.cwd());                    // e.g. /home/me/project
+    console.log(process.memoryUsage().heapUsed);   // bytes
+    process.exit(1);                               // exit with error
+    ```
+
+    In short: process is the global handle to the running Node process: args, env, memory, cwd, exit
+    and signals.
+
+---
+
+88. What is process.env, and how do you load a .env file (dotenv / node --env-file)?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> - `process.env` is an object with the environment variables of the process (PORT, DB_URL,
+    secrets ...).
+    - Values are always **strings** (`process.env.PORT` is `"3000"`, convert with `Number()` when
+      needed).
+    - A `.env` file keeps these values for local development. Never commit it to Git (add it to
+      `.gitignore`).
+    - Two ways to load it:
+    1. **dotenv** package: `require('dotenv').config()` at the very top of the entry file.
+    2. **Node 20.6+**: built-in flag `node --env-file=.env app.js` (no package needed).
+
+    ```js
+    // .env
+    // PORT=3000
+    // DB_URL=mongodb://localhost/test
+
+    require('dotenv').config();
+    const port = Number(process.env.PORT) || 3000;
+    ```
+
+    In short: process.env holds config as strings; load .env with dotenv or `node --env-file=.env`.
+
+---
+
+89. What is graceful shutdown, and how do you implement it?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> Graceful shutdown = when the app is asked to stop (deploy, scale down, Ctrl+C), it finishes
+    current work cleanly instead of dying in the middle of requests.
+    Steps:
+    1. Listen for `SIGTERM` (sent by Docker/Kubernetes/PM2) and `SIGINT` (Ctrl+C).
+    2. Stop accepting new connections: `server.close()`.
+    3. Let in-flight requests finish.
+    4. Close resources: DB connections, Redis, message queues.
+    5. `process.exit(0)`, with a timeout that forces exit if cleanup hangs.
+
+    ```js
+    const server = app.listen(3000);
+
+    function shutdown() {
+      console.log('Shutting down...');
+      server.close(async () => {
+        await mongoose.connection.close();
+        process.exit(0);
+      });
+      setTimeout(() => process.exit(1), 10000).unref(); // force after 10s
+    }
+
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
+    ```
+
+    In short: on SIGTERM/SIGINT stop new requests, finish old ones, close DB connections, then exit.
+
+---
+
+90. Three ways to read a file with fs (sync, callback, promises). Why not use readFileSync in a
+    server?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> 1. **Sync**: `fs.readFileSync` blocks until the file is read.
+    2. **Callback**: `fs.readFile(path, cb)` with an error-first callback.
+    3. **Promises**: `fs.promises.readFile` (or `require('fs/promises')`) with `async/await`.
+
+    ```js
+    const fs = require('fs');
+    const fsp = require('fs/promises');
+
+    const a = fs.readFileSync('a.txt', 'utf8');            // 1. sync (blocking)
+
+    fs.readFile('a.txt', 'utf8', (err, data) => {          // 2. callback
+      if (err) return console.error(err);
+      console.log(data);
+    });
+
+    const b = await fsp.readFile('a.txt', 'utf8');         // 3. promises
+    ```
+
+    Why not `readFileSync` in a server:
+    - It blocks the single JS thread (event loop). While one file is being read, no other request
+      can be handled, so all users wait.
+    - It is fine at startup (loading config once) or in CLI scripts.
+    - For very large files use streams (`fs.createReadStream`) instead of reading everything into
+      memory.
+
+    In short: prefer the promise/callback versions in servers; sync blocks the event loop for every
+    user.
+
+---
+
+91. path.join vs path.resolve; why use __dirname instead of './'? (__dirname / __filename)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> | | path.join | path.resolve |
+    +----------------+--------------------------------------------+--------------------------------------------+
+    | ---            | ---                                        | ---                                        |
+    +================+============================================+============================================+
+    | What it does   | Joins segments with the correct separator  | Builds an absolute path                    |
+    |                | and normalizes                             |                                            |
+    +----------------+--------------------------------------------+--------------------------------------------+
+    | Result         | Can be relative                            | Always absolute                            |
+    +----------------+--------------------------------------------+--------------------------------------------+
+    | Starting point | Just the given segments                    | Processes right to left until an absolute  |
+    |                |                                            | path is formed; if none, starts from       |
+    |                |                                            | `process.cwd()`                            |
+    +----------------+--------------------------------------------+--------------------------------------------+
+
+    ```js
+    const path = require('path');
+
+    path.join('a', 'b', '../c');     // 'a/c'
+    path.resolve('a', 'b');          // '/current/working/dir/a/b'
+    path.resolve('/x', 'y');         // '/x/y'
+
+    // __dirname  = folder of the current file
+    // __filename = full path of the current file
+    const file = path.join(__dirname, 'data', 'users.json');
+    ```
+
+    Why `__dirname` instead of `'./'`:
+    - `'./'` in `fs` calls is relative to `process.cwd()` (where node was started), not to the file.
+      If you run `node src/app.js` from another folder, `'./data.json'` points to the wrong place.
+    - `__dirname` is always the folder of the current file, so the path works from anywhere.
+    - Note: `__dirname` / `__filename` exist in CommonJS. In ES modules use `import.meta.dirname` /
+      `import.meta.filename` (newer Node) or `fileURLToPath(import.meta.url)`.
+
+    In short: join just combines paths, resolve gives an absolute path; use __dirname so file paths
+    do not depend on where node was started.
 
 ======================================================================================================================================
 

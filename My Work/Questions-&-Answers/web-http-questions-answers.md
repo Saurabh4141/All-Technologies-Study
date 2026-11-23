@@ -254,6 +254,34 @@ Ordered by priority: the question asked by the most interviewers comes first.
     Fixes: compress/lazy-load images, set image width/height (helps CLS), code splitting, CDN,
     caching, `defer` scripts.
 
+---
+
+## More questions from revision PDFs (not yet asked in a real interview)
+
+Ordered by topic priority: questions from the most-asked topics come first.
+
+---
+
+11. What is a CDN, and what are its benefits?
+   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+
+==> A CDN (Content Delivery Network) is a network of servers spread around the world (edge servers)
+    that keep cached copies of your content. A user gets the content from the nearest edge server
+    instead of your main (origin) server.
+    - Typically used for static files: images, CSS, JS, videos, fonts. Can also cache some API
+      responses.
+    - Examples: Cloudflare, AWS CloudFront, Akamai.
+    Benefits:
+    - Faster load times (lower latency, content is closer to the user).
+    - Less load and bandwidth on your origin server.
+    - Better availability: if one edge goes down, others serve.
+    - Security: DDoS protection, HTTPS/TLS at the edge, WAF.
+    - Caching is controlled with headers like `Cache-Control`; use versioned file names
+      (`app.3f2a.js`) so new deploys are picked up.
+
+    In short: A CDN serves cached content from servers near the user - faster, cheaper and more
+    reliable.
+
 ======================================================================================================================================
 
 ## What to study first

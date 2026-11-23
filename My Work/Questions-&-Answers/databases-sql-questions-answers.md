@@ -314,6 +314,144 @@ Ordered by priority: the question asked by the most interviewers comes first.
     }
     ```
 
+---
+
+## More questions from revision PDFs (not yet asked in a real interview)
+
+Ordered by topic priority: questions from the most-asked topics come first.
+
+---
+
+15. What is the N+1 query problem and how do you fix it?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> You run 1 query to get a list, then 1 extra query for each item in the list. For 100 posts that
+    is 101 queries, which is slow.
+    - Common with ORMs (Sequelize, TypeORM, Prisma) and with Mongoose `populate` inside loops.
+
+    ```js
+    // N+1: 1 query for posts + 1 query per post
+    const posts = await Post.findAll();
+    for (const p of posts) {
+      p.author = await User.findByPk(p.userId);
+    }
+    ```
+
+    Fixes:
+    1. Use a JOIN / eager loading: `Post.findAll({ include: User })`.
+    2. Batch: collect IDs and run one `WHERE id IN (...)` query, then map results.
+    3. In MongoDB: one `populate` on the list query, or `$lookup` in an aggregation.
+    4. In GraphQL: use DataLoader to batch and cache lookups.
+
+    In short: Replace many small queries with one JOIN or one batched IN query.
+
+---
+
+16. Redis vs in-memory cache; what is the cache-aside pattern and cache invalidation?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
+   revision PDF)*
+
+==> A cache keeps frequently read data in fast memory so you hit the DB less.
+
+    +-----------------------+------------------------------------+--------------------------------------------+
+    | Point                 | In-memory (Map, node-cache)        | Redis                                      |
+    +=======================+====================================+============================================+
+    | Where                 | Inside the Node process            | Separate server                            |
+    +-----------------------+------------------------------------+--------------------------------------------+
+    | Speed                 | Fastest (no network)               | Very fast (small network hop)              |
+    +-----------------------+------------------------------------+--------------------------------------------+
+    | Shared across servers | No, each instance has its own copy | Yes, all instances share it                |
+    +-----------------------+------------------------------------+--------------------------------------------+
+    | Survives restart      | No                                 | Can (persistence options)                  |
+    +-----------------------+------------------------------------+--------------------------------------------+
+    | Extras                | None                               | TTL, pub/sub, rate limiting, sessions,     |
+    |                       |                                    | queues                                     |
+    +-----------------------+------------------------------------+--------------------------------------------+
+
+    Cache-aside (lazy loading), the most common pattern:
+    1. Read from cache.
+    2. Hit -> return it.
+    3. Miss -> read from DB, save to cache with a TTL, return it.
+
+    ```js
+    async function getUser(id) {
+      const cached = await redis.get(`user:${id}`);
+      if (cached) return JSON.parse(cached);
+
+      const user = await User.findById(id);
+      await redis.set(`user:${id}`, JSON.stringify(user), 'EX', 300); // 5 min TTL
+      return user;
+    }
+    ```
+
+    Cache invalidation (keeping cache in sync with DB):
+    - Set a TTL so stale data expires on its own.
+    - On update/delete, delete the cache key (`redis.del('user:1')`) so the next read reloads it.
+
+    In short: Use in-memory for a single instance, Redis when you have many instances; cache-aside =
+    check cache, else DB, then fill cache; invalidate with TTL plus delete-on-write.
+
+---
+
+17. MongoDB: when do you embed and when do you reference? (populate)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Embed = put related data inside the same document. Reference = store only the other document's
+    `_id` and look it up when needed.
+    - Embed when: data is read together, it is "one-to-few" (e.g. user addresses), and it does not
+      grow without limit.
+    - Reference when: "one-to-many" or "many-to-many" with large or growing data (e.g. user ->
+      orders, post -> thousands of comments), data is shared by many documents, or it is updated on
+      its own.
+    - A MongoDB document has a 16 MB size limit, so unbounded arrays must not be embedded.
+    - `populate()` in Mongoose replaces a referenced `_id` with the actual document (it runs an
+      extra query behind the scenes).
+
+    ```js
+    const postSchema = new mongoose.Schema({
+      title: String,
+      tags: [String],                                          // embedded
+      author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // reference
+    });
+
+    const post = await Post.findById(id).populate('author', 'name email');
+    ```
+
+    In short: Embed small data you read together; reference large, growing or shared data and use
+    populate to join it.
+
+---
+
+18. What is Mongoose? (schema, model, validation)
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> Mongoose is an ODM (Object Data Modeling) library for MongoDB in Node.js. MongoDB itself is
+    schema-less; Mongoose adds structure on top.
+    - Schema: defines fields, types, defaults and rules.
+    - Model: a class built from a schema, used to create, read, update and delete documents
+      (`User.find()`, `User.create()`).
+    - Validation: built-in rules like `required`, `min`, `max`, `enum`, `match`, `unique` (unique is
+      an index, not a validator), plus custom validators.
+    - Extras: middleware/hooks (`pre('save')`), virtuals, `populate`, timestamps, type casting.
+
+    ```js
+    const userSchema = new mongoose.Schema({
+      name:  { type: String, required: true, trim: true },
+      email: { type: String, required: true, unique: true, lowercase: true },
+      age:   { type: Number, min: 18 },
+      role:  { type: String, enum: ['user', 'admin'], default: 'user' },
+    }, { timestamps: true });
+
+    const User = mongoose.model('User', userSchema);
+    await User.create({ name: 'Saurabh', email: 'S@x.com', age: 25 });
+    ```
+
+    Interview tip: validation runs on `save()`/`create()` by default; for
+    `updateOne`/`findOneAndUpdate` pass `{ runValidators: true }`.
+
+    In short: Mongoose gives MongoDB schemas, models, validation and helpers like populate and
+    hooks.
+
 ======================================================================================================================================
 
 ## What to study first

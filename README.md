@@ -15,23 +15,23 @@ My interview preparation notes, organised by technology and company.
 
 ## My Work/Questions-&-Answers
 
-| File | Questions |
-|---|:-:|
-| `ai-llm-ml-questions-answers.md` | 80 |
-| `nodejs-questions-answers.md` | 51 |
-| `react-nextjs-questions-answers.md` | 37 |
-| `javascript-questions-answers.md` | 32 |
-| `security-auth-questions-answers.md` | 28 |
-| `docker-cicd-git-testing-questions-answers.md` | 25 |
-| `aws-questions-answers.md` | 22 |
-| `laravel-questions-answers.md` | 15 |
-| `databases-sql-questions-answers.md` | 14 |
-| `architecture-system-design-questions-answers.md` | 11 |
-| `php-questions-answers.md` | 10 |
-| `web-http-questions-answers.md` | 10 |
-| `python-questions-answers.md` | 8 |
-| `coding-dsa-questions-answers.md` | 7 |
-| `typescript-questions-answers.md` | 6 |
+| File | Real-interview questions | From revision PDFs |
+|---|:-:|:-:|
+| `ai-llm-ml-questions-answers.md` | 80 | – |
+| `nodejs-questions-answers.md` | 52 | 39 |
+| `react-nextjs-questions-answers.md` | 37 | – |
+| `javascript-questions-answers.md` | 32 | 1 |
+| `security-auth-questions-answers.md` | 28 | 4 |
+| `docker-cicd-git-testing-questions-answers.md` | 25 | – |
+| `aws-questions-answers.md` | 22 | – |
+| `laravel-questions-answers.md` | 15 | – |
+| `databases-sql-questions-answers.md` | 14 | 4 |
+| `architecture-system-design-questions-answers.md` | 11 | 7 |
+| `php-questions-answers.md` | 10 | – |
+| `web-http-questions-answers.md` | 10 | 1 |
+| `python-questions-answers.md` | 8 | – |
+| `coding-dsa-questions-answers.md` | 7 | – |
+| `typescript-questions-answers.md` | 6 | – |
 
-Each question shows how many times it was asked and by whom, followed by its answer (`==>`). Only questions from real interviews are included, so there is no jQuery file (all jQuery questions come from practice lists).
+Each question shows how many times it was asked and by whom, followed by its answer (`==>`). Real-interview questions come first, ordered by how often they were asked. After them, a "More questions from revision PDFs" section adds questions from two Node.js revision PDFs (Gaurav Sharma notes, Ajeet Yadav 120-question sheet) that were not already in the repo, ordered by topic priority. There is no jQuery file because every jQuery question comes from practice lists.
 

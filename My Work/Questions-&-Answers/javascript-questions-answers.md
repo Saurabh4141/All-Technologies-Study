@@ -793,6 +793,49 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
     Uses: reuse (partial application), cleaner function composition.
 
+---
+
+## More questions from revision PDFs (not yet asked in a real interview)
+
+Ordered by topic priority: questions from the most-asked topics come first.
+
+---
+
+33. Sequential vs parallel await: what is wrong with `await` inside a loop, and when should you use
+   Promise.all (and limit concurrency)?
+   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+
+==> `await` inside a `for` loop waits for each call to finish before starting the next one. If the
+    calls do not depend on each other, this is slow.
+    - Sequential: 5 calls x 200 ms = about 1000 ms.
+    - Parallel with `Promise.all`: all 5 start together = about 200 ms.
+    - Use sequential `await` only when each step needs the previous result, or when order/rate
+      really matters.
+    - `Promise.all` rejects as soon as one promise rejects. Use `Promise.allSettled` if you want
+      every result (success and failure).
+    - Do not fire 10,000 requests at once with `Promise.all`: you can overload the DB/API or hit
+      rate limits. Limit concurrency (process in batches, or use a library like `p-limit`).
+    - Note: `forEach(async ...)` does not wait at all. Use `for...of` (sequential) or `map` +
+      `Promise.all` (parallel).
+
+    ```js
+    // Slow: one after another
+    for (const id of ids) {
+      const user = await getUser(id);
+    }
+
+    // Fast: all at once
+    const users = await Promise.all(ids.map(id => getUser(id)));
+
+    // Limited concurrency: 5 at a time
+    import pLimit from 'p-limit';
+    const limit = pLimit(5);
+    const results = await Promise.all(ids.map(id => limit(() => getUser(id))));
+    ```
+
+    In short: Independent async work -> run in parallel with Promise.all; dependent work ->
+    sequential await; huge lists -> limit concurrency.
+
 ======================================================================================================================================
 
 ## What to study first
