@@ -15,4 +15,3 @@
 
 ## Round 2 (Technical interview)
 
-2. Familiarity with frameworks like React, Angular, or Vue.js for the front end, and Node.js, Express, or Django for the back end (no question wording given).

@@ -11,6 +11,5 @@
 
 ## Technical Interview, back-end skills
 
-1. Knowledge of server-side technologies like Node.js, Express, and databases (both SQL and NoSQL).
-2. Explain the architecture and implementation of a RESTful API you developed.
+1. Explain the architecture and implementation of a RESTful API you developed.
    - **Answer given by the candidate:** I explained the architecture and implementation of a RESTful API I had developed (no more detail given).

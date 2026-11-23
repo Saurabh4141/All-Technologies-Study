@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Technologies Question Priority</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#5d667a; --line:#e3e6ec; --head:#eef1f6;
+    --accent:#2457d6; --chip:#f1f3f8; --bar:#c9d6fb; --barfg:#2457d6; --tb:0px;
+    --kC:#1d4ed8; --kCbg:#dbeafe; --kO:#047857; --kObg:#d1fae5; --kY:#b91c1c; --kYbg:#fee2e2;
+    --kI:#7c3aed; --kIbg:#ede9fe; --kP:#92400e; --kPbg:#fef3c7; --kN:#475569; --kNbg:#e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12151c; --card:#1a1f2b; --text:#e6e9f0; --muted:#9aa3b5; --line:#2a3142; --head:#222939;
+            --accent:#7aa2ff; --chip:#232a3a; --bar:#26304a; --barfg:#7aa2ff;
+            --kC:#93c5fd; --kCbg:#14264a; --kO:#6ee7b7; --kObg:#0f2e25; --kY:#fca5a5; --kYbg:#3a1616;
+            --kI:#c4b5fd; --kIbg:#271c45; --kP:#fcd34d; --kPbg:#3a2c0c; --kN:#cbd5e1; --kNbg:#273040; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:0 16px 56px; background:var(--bg); color:var(--text);
+         font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:1280px; margin:0 auto; }
+  header { padding:28px 0 6px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  h2 { font-size:19px; margin:18px 0 2px; }
+  p.sub, p.meta { margin:0 0 12px; color:var(--muted); }
+  .toolbar { position:sticky; top:0; z-index:10; background:var(--bg); padding:10px 0; border-bottom:1px solid var(--line); }
+  .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
+  .tab { padding:5px 12px; border:1px solid var(--line); border-radius:999px; background:var(--card);
+         color:var(--text); font:inherit; font-size:14px; cursor:pointer; }
+  .tab span { color:var(--muted); font-size:12px; margin-left:4px; }
+  .tab.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .tab.on span { color:#e5ecff; }
+  .filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .filters input, .filters select { padding:7px 10px; border:1px solid var(--line); border-radius:8px;
+         background:var(--card); color:var(--text); font:inherit; font-size:14px; }
+  .filters input { flex:1 1 200px; min-width:160px; }
+  .filters button { padding:7px 12px; border:1px solid var(--line); border-radius:8px; background:var(--card);
+         color:var(--muted); font:inherit; font-size:14px; cursor:pointer; }
+  .legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:12px; color:var(--muted); align-items:center; }
+  .box { background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:clip; margin-top:14px; }
+  @media (max-width:900px) { .box { overflow-x:auto; } }
+  table { width:100%; border-collapse:collapse; min-width:860px; }
+  th,td { padding:11px 14px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); border-right:1px solid var(--line); }
+  th:last-child,td:last-child { border-right:0; }
+  thead th { position:sticky; top:var(--tb); z-index:5; background:var(--head); box-shadow:0 1px 0 var(--line);
+             font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+  tbody tr:last-child td { border-bottom:0; }
+  tbody tr:hover { background:var(--head); }
+  .c { text-align:center; }
+  td.pr { width:70px; color:var(--muted); font-weight:600; }
+  td.tp { font-weight:600; width:210px; }
+  td.tp small { display:block; font-weight:400; color:var(--muted); margin-top:2px; }
+  td.cnt { width:120px; }
+  td.by { width:250px; }
+  .bar { height:6px; border-radius:99px; background:var(--bar); margin:0 auto 4px; width:80px; overflow:hidden; }
+  .bar span { display:block; height:100%; background:var(--barfg); }
+  .sm { display:block; font-size:12px; color:var(--muted); font-weight:400; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { display:inline-block; padding:1px 8px; border-radius:6px; font-size:12.5px; white-space:nowrap; cursor:pointer;
+          user-select:none; border:1px solid transparent; }
+  .chip:hover { border-color:currentColor; }
+  .chip small { opacity:.75; }
+  .kC { color:var(--kC); background:var(--kCbg); } .kO { color:var(--kO); background:var(--kObg); }
+  .kY { color:var(--kY); background:var(--kYbg); } .kI { color:var(--kI); background:var(--kIbg); }
+  .kP { color:var(--kP); background:var(--kPbg); } .kN { color:var(--kN); background:var(--kNbg); }
+  ol.qs { margin:0; padding-left:20px; }
+  ol.qs li { margin:0 0 5px; }
+  ol.qs li .w { color:var(--muted); font-size:12.5px; }
+  ol.qs li b.n { font-size:11px; padding:0 6px; border-radius:99px; background:var(--chip); border:1px solid var(--line); margin-left:4px; font-weight:600; }
+  .empty { padding:28px; text-align:center; color:var(--muted); }
+  .note { margin-top:16px; color:var(--muted); font-size:13px; }
+  .toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px); background:#1d2330; color:#fff;
+           padding:9px 16px; border-radius:8px; font-size:14px; opacity:0; pointer-events:none; transition:.2s; z-index:50; max-width:90vw; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>All Technologies: Questions by Priority</h1>
+    <p class="sub" id="sub">Every technical question in this repo, grouped by technology and topic, duplicates merged.</p>
+  </header>
+
+  <div class="toolbar" id="toolbar">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="filters">
+      <input type="search" id="fq" placeholder="Search a topic or question…" aria-label="Search">
+      <select id="fsrc" aria-label="Source">
+        <option value="">All sources</option>
+        <option value="REAL">Real interviews only (no practice/notes)</option>
+        <option value="C">Companies-Interview (my L1 rounds)</option>
+        <option value="O">Online Fetched (GeeksforGeeks)</option>
+        <option value="Y">YouTube interviews</option>
+        <option value="I">Interview, company not named</option>
+        <option value="P">Practice lists</option>
+        <option value="N">NodeJs/questions &amp; programs</option>
+      </select>
+      <select id="fco" aria-label="Asked by"><option value="">Anyone</option></select>
+      <select id="fmin" aria-label="Minimum times asked">
+        <option value="0">Asked ≥ 0</option><option value="1">Asked ≥ 1</option>
+        <option value="2">Asked ≥ 2</option><option value="3">Asked ≥ 3</option><option value="5">Asked ≥ 5</option>
+      </select>
+      <button id="freset" type="button">Reset</button>
+    </div>
+    <div class="legend">
+      <span class="chip kC">Company L1</span><span class="chip kO">Online report</span><span class="chip kY">YouTube</span>
+      <span class="chip kI">Interview (no company)</span><span class="chip kP">Practice list</span><span class="chip kN">My NodeJs prep</span>
+    </div>
+  </div>
+
+  <h2 id="title"></h2>
+  <p class="meta" id="meta"></p>
+  <div class="box"><div id="out"></div></div>
+
+  <p class="note"><b>Priority</b> 1 is the topic asked most in real interviews (company rounds, online reports, YouTube interviews and the unnamed PHP/Laravel interviews).
+  Ties go to the topic more different interviewers asked, then to the one with more practice/notes questions.
+  <b>Questions asked</b> counts each (question, interviewer) pair once; practice lists and your NodeJs prep files are shown separately as "+N prep" and never raise the priority.
+  <b>Unique questions</b> merges the same question asked by several people into one line; the number after it is how many real interviewers asked it.
+  Click an "Asked by" chip to copy that source's questions for the topic.</p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- who asked (code -> [label, kind]) ----------
+   kind: C = Companies-Interview, O = Online Fetched Questions, Y = YouTube interview,
+         I = real interview without a company name, P = practice list, N = NodeJs/questions + NodeJs/programs (My Notes/ is not used) */
+const SRC = {
+  alg:["Algoworks","C"], del:["Deloitte","C"], einf:["EInfochips","C"], hit:["Hitachi","C"], irp:["Irpgrammer Solutions","C"],
+  kyn:["Kyndryl","C"], per:["Persistent Systems","C"], tcs:["TCS","C"], tm:["TechM","C"], ust:["UST","C"], wip:["Wipro","C"],
+  ast:["AST Consulting","O"], acc:["Accenture","O"], amex:["American Express","O"], baj:["Bajaj Finserv","O"], bit:["Bitwise Global","O"],
+  cap:["Capsitech","O"], deh:["Dehaat","O"], ez:["EZ Works","O"], fund:["Fundwave","O"], hash:["HashedIn by Deloitte","O"],
+  hyl:["Hyland Software","O"], inorg:["Inorg Global","O"], paytm:["One97 Paytm","O"], scro:["ScroBits Technologies","O"],
+  otcs:["TCS (online)","O"], tvs:["TechnoVerse Solutions","O"], tvt:["Technovert","O"], upe:["Upelars","O"], visa:["Visa","O"],
+  w3:["Web3Dev","O"], zs:["ZS","O"], rt:["rtCamp","O"],
+  y1:["Senior Node.js round (YT)","Y"], y2:["Deloitte (YT)","Y"], y3:["TCS/Infosys/Accenture short (YT)","Y"],
+  y4:["EarlyCoder 5-yr Node (YT)","Y"], y5:["Tech Mahindra (YT)","Y"], y6:["Senior Node Ep.32 (YT)","Y"],
+  a1:["20+ MNC AI interviews (YT)","Y"], a2:["Deloitte USI AI (YT)","Y"],
+  un:["Interview, no company","I"],
+  a3:["Simplilearn AI prep (YT)","P"], pr:["Practice list","P"], me:["My NodeJs prep","N"]
+};
+const REAL = new Set(["C","O","Y","I"]);
+
+/* ---------- all questions ----------
+   "## Tech", "### Topic", "- question ;; source codes" */
+const RAW = `
+## Node.js
+### Node.js basics, architecture & pros/cons
+- What is Node.js? ;; alg tvt
+- What is the difference between Node and Node.js? ;; y2
+- How does Node.js work (V8 engine, event-driven, non-blocking I/O)? ;; me
+- What are the drawbacks of Node.js? ;; baj
+- What are the pros and cons of Node.js? ;; me
+- What are LTS releases of Node.js? ;; me
+### Event loop & execution order
+- What is the event loop? How does it work and manage asynchronous operations? ;; per otcs fund hyl me
+- What are the phases of the Node.js event loop? ;; y1
+- Output: setTimeout vs Promise order ;; hit
+- Output: console.log / setTimeout / Promise.then / process.nextTick order ;; irp
+- Output: console.log, two Promise.then chains and setTimeout(0) (A D E C F B) ;; tm
+- Output: console.log('first'), setTimeout logging 'second', console.log('third') ;; y5
+### process.nextTick vs setImmediate vs setTimeout
+- What is the difference between process.nextTick() and setImmediate()? Which runs first? ;; y3 me
+- Why does process.nextTick() run before setImmediate()? ;; y3
+- What is the difference between setImmediate() and setTimeout()? ;; y5
+- Timer functions (setTimeout, setInterval, setImmediate) ;; me
+### Single thread, non-blocking I/O & concurrency
+- If Node.js is single-threaded, how does it handle concurrency? ;; kyn baj
+- Why is Node.js single-threaded? ;; baj me
+- How do you handle high concurrency (non-blocking code)? ;; wip
+- Why is Node.js able to handle many requests? Is Node.js multi-threaded? ;; y5
+- How would you define the term I/O? ;; baj
+### Handling asynchronous operations
+- How do you handle asynchronous operations in Node.js? ;; del
+- How do you implement asynchronous programming in Node.js? ;; y5
+- What do synchronous and asynchronous mean? ;; me
+- What are the two types of API functions in Node.js (synchronous vs asynchronous)? ;; me
+### Express.js, routing & creating a server
+- What is Express.js? ;; otcs tvt me
+- How do you create a server in Express.js? Write a basic Express server with an API endpoint ;; per y5 me
+- Create a Node.js server using the http module ;; tcs
+- Create an API using any backend framework (Node.js) ;; baj
+- Which framework have you used for Node.js in your projects / microservices? ;; y5
+- Explain routing in Express ;; me
+### Middleware
+- What is middleware? Write a custom middleware function ;; per otcs cap y4 me
+### REST APIs & HTTP methods
+- Explain REST APIs ;; otcs
+- How does an API work? ;; w3
+- Which REST API methods have you used (GET, POST, PUT, PATCH, DELETE)? ;; amex me
+- Explain the architecture and implementation of a RESTful API you developed ;; upe
+### Error handling
+- How do you implement centralized error handling in Express? ;; wip
+- How do you handle unexpected exceptions (uncaughtException / unhandledRejection)? ;; y5
+- How do you get the error object in a callback (error-first callbacks)? ;; y5
+### Performance & scaling
+- How can you improve Node.js application performance? ;; del
+- If 10k requests hit your API, how will you handle them efficiently? ;; amex
+- An API takes 10 seconds and must respond in 2–3 seconds. What steps do you take to optimize it? ;; y1
+### Database access from Node.js
+- Write sample code to connect a Node.js application to a database ;; per
+- How do you do database operations in Node.js? ;; wip
+- Write a GET API that queries MongoDB and finds the employee with a given id ;; baj
+### Modules, globals & npm
+- What is the difference between module.exports and exports? (purpose of module.exports) ;; y5 me
+- What is a circular dependency in Node.js? ;; y1
+- What are the globals / global object in Node.js? ;; y1 me
+- What is a module? ;; me
+- What are the Node.js built-in modules? ;; me
+- Which npm modules do you commonly use, and why that library (e.g. nodemon)? ;; y5 w3
+- What is the difference between dependencies and devDependencies? ;; me
+- What is the difference between package.json and package-lock.json? ;; me
+- What is package.json? ;; me
+- How do you install, update and delete a dependency? ;; me
+### Events & EventEmitter
+- Explain Node.js and its event-driven model (what does event-driven programming mean?) ;; paytm me
+- What is an EventEmitter in Node.js? ;; me
+- Events in Node.js ;; me
+### WebSockets & real-time (Socket.io)
+- Have you built real-time applications / used Socket.io? How did you integrate it? ;; y4 y6
+- What is the difference between an HTTP connection and a socket connection? ;; y4
+- How do you authenticate a socket connection? How do you pass the JWT? ;; y6
+- Does the socket handshake start from the front end or the back end? ;; y6
+- How do you validate the token when there is no middleware on the front end? ;; y6
+- Is passing the token directly in the socket payload secure? ;; y6
+- Which socket handshake objects can carry the token (e.g. auth, query)? ;; y6
+### Streams & Buffer
+- What are streams in Node.js? ;; wip
+- What is the Buffer class in Node.js? ;; me
+### Child processes
+- What is the difference between fork() and spawn()? ;; me
+
+## JavaScript
+### Promises & async/await
+- What are Promises? What is the use of async and await? ;; alg otcs hyl kyn cap me
+- What are the types / states of a Promise? ;; tcs
+- Can we use try...catch with async/await? ;; kyn
+- Does an async function work synchronously or asynchronously? ;; y4
+- How have you used promises in your backend? ;; w3
+- Output: Promise.resolve(1) .then(+1) .then(throw) .catch(() => 1) .then(+1) .then(log) ;; alg irp me
+- Output: Promise chain that logs, throws, catches and returns 10 ;; kyn
+- Output: async function that awaits a rejected promise inside try/catch, then .then(console.log(5)) ;; irp me
+### Promise.all / allSettled / race / any
+- What is the difference between the Promise methods (all, allSettled, race, any)? ;; del
+- How do you call multiple APIs simultaneously (Promise.all)? ;; tcs
+- What is the difference between Promise.all and Promise.allSettled? ;; y1 me
+### Callbacks & callback hell
+- What is a callback function? ;; y5 me
+- What is callback hell? (what do we call the problem of nesting many callbacks?) ;; y4 me
+- What is the difference between a Promise and a callback? ;; y4
+### Closures
+- What is a closure and what is it used for? ;; tcs hyl me
+- Write createBase(6) so that addSix(10) returns 16 ;; me
+- Use a closure to create a private counter ;; me
+### Hoisting, scope, TDZ & var/let/const
+- What is hoisting? ;; tcs me
+- What is the TDZ (Temporal Dead Zone)? ;; tcs
+- What is the difference between var, let and const? ;; otcs cap me
+### this, call/apply/bind & functions
+- Output: obj.greet assigned to a variable and called (this binding lost) ;; hit
+- Output: arrow function as object method returning this.name ;; me
+- How does the this keyword work? ;; me
+- Explain call, apply and bind ;; me
+- Arrow function vs normal function ;; me
+- What are the different types of functions in JavaScript? ;; fund cap
+### Currying
+- What is function currying? (e.g. multi(4)(5)) ;; tcs me
+### Array methods
+- What is the difference between find() and filter()? ;; tcs me
+- What is the difference between map, filter and reduce? ;; ez me
+- Do map, filter and reduce mutate the original array? ;; ez
+- Practical use cases of map, filter and reduce ;; ez
+- What is the difference between map and forEach? ;; me
+- What is the difference between for...in and for...of? ;; me
+- How do you empty an array? ;; me
+- Write polyfills for forEach, map, filter, reduce, every, some, indexOf, includes, find, findIndex, flat ;; me
+### Data types, storage & type coercion
+- What is the difference between null and undefined? ;; alg
+- Output: [] == false ;; alg
+- Output: undefined > 0 ;; alg
+- JavaScript data types and how values are stored ;; fund
+- How do you check if an object is an array? ;; me
+- How do you check if a number is an integer? ;; me
+### Objects: create & copy
+- Ways to create objects ;; me
+- Ways to copy an object; shallow copy vs deep copy ;; me
+### ES6+ features
+- What are the new features in ES6 and ES7? ;; me
+- Rest parameter vs spread operator ;; me
+### AJAX, fetch & HTTP requests
+- Write any one AJAX method ;; baj
+- Making HTTP requests with async/await in Node.js / Express ;; cap
+- Fetch an API so that it completes within 3 seconds (timeout) ;; cap
+
+## Coding / DSA
+### Array programs
+- Filter even numbers and return their doubled values ([1,2,3,4,5] gives [4,8]) ;; hit
+- Reverse all words in an array ;; tcs
+- Leaders in an array ;; a2
+- Remove duplicates from an array ;; me
+- Find / print duplicate elements in an array; check if an array has duplicates ;; me
+- Find the second largest and second smallest element ;; me
+- Reverse an array in place ;; me
+- Check if two arrays are equal ;; me
+- Find the intersection of two arrays ;; me
+- Find the union of two arrays ;; me
+- Insert / delete an element at a given position ;; me
+- Merge two arrays ;; me
+- Sort an array (bubble sort) ;; me
+- Implement Array.flat ;; me
+- Count distinct elements in every window of size k ;; me
+- Find the missing number in an integer array ;; me
+- Find a continuous sub-array whose sum equals a given number ;; me
+- Maximum consecutive ones (or zeros) in a binary array ;; me
+- Find all pairs whose sum equals a given number ;; me
+- Count occurrences of each element ;; me
+- Find a rotation with maximum Hamming distance ;; me
+- Convert an array into a multidimensional array ;; me
+- Add two arrays index by index (different lengths) ;; me
+### String programs
+- Longest repeated substring that appears at least twice ('banana' gives 'ana') ;; zs
+- Reverse each word in a sentence ;; me
+- Reverse a string ;; me
+- Check if a string is a palindrome ;; me
+- Count each character in a string ;; me
+- Print duplicate characters in a string ;; me
+- Check if two strings are anagrams ;; me
+- Check if two strings are k-anagrams ;; me
+- Check if a string is a rotated palindrome ;; me
+- Count the number of substrings in a string ;; me
+- Check for balanced brackets ;; me
+- Find all palindromic substrings ;; me
+- Longest substring with distinct characters ;; me
+- First k non-repeating characters in one traversal ;; me
+- Check if a repeated subsequence is present in a string ;; me
+- Reverse an integer ;; me
+### Object programs
+- Flatten a nested object into an array ;; einf me
+- Compare two objects ;; tcs
+### Data structures
+- Detect a loop / cycle in a linked list ;; zs
+
+## TypeScript
+### TypeScript basics: any vs unknown
+- What is the use of TypeScript? ;; alg
+- What is the any data type? ;; alg
+- What is the difference between unknown and any? ;; kyn
+### Interfaces, types & generics
+- Interface vs type in TypeScript ;; wip
+- Type-safe APIs using generics and conditional types ;; wip
+### TypeScript project
+- Create a TODO app on the MERN stack using TypeScript ;; w3
+
+## React / Next.js
+### React basics, JSX & components
+- What is React? ;; ez
+- Why ReactJS (listed in your resume)? ;; tvt
+- What is JSX? ;; ez
+- How are components created in React? ;; ast cap
+- Functional vs class components: which do you use? ;; amex fund
+- What are stateless and stateful components? Give examples ;; amex
+### Hooks
+- What hooks are available in React and what are their use cases? How do they differ from class lifecycle methods? ;; per otcs cap pr
+- Advanced hooks ;; cap
+- useEffect: managing side effects, and why cleanup is needed (listeners, timers, API calls, AbortController) ;; ez pr
+- How do you handle asynchronous data fetching with hooks? ;; pr
+### Component lifecycle
+- Explain the React component lifecycle in detail, with scenarios for each phase ;; amex ez fund
+- Explain componentDidMount and componentWillUnmount with code ;; amex
+### Virtual DOM, rendering & reconciliation
+- What is the Virtual DOM and why is it useful? ;; ez otcs
+- Why is React considered fast? ;; ast
+- What is React's rendering process? ;; w3
+- What is React's reconciliation algorithm and how does it affect performance? ;; pr
+- What is the key prop and why is it important? ;; ez
+### Props, state & data flow
+- What is the difference between state and props? ;; ez
+- How do you transfer data between components? ;; amex
+- What is prop drilling? ;; ez
+### State management (Context, Redux)
+- How do you share state between components without a common parent? ;; kyn
+- How do you cache API responses in Redux? ;; kyn
+- What is middleware in React (Redux middleware)? Have you used any? ;; amex
+- State management (advanced) ;; cap
+- What is the Context API and how does it manage global state? ;; pr
+### Performance & memoization
+- How can you improve the performance of a React application (large lists, complex UIs)? ;; per pr
+- What is lazy loading? Ways to implement it; component-level vs data-level ;; ez
+- useCallback, React.memo, preventing re-renders: when does memoization make sense? ;; ez pr
+- The marketing team says the website is slow. How will you debug and fix it? ;; ez
+### Forms
+- Write a React example that handles user input and shows the submitted value ;; per
+- Controlled vs uncontrolled components ;; ez pr
+### Routing
+- How does routing work in React? Why do we need React Router DOM? ;; ez w3 fund
+### Patterns: HOC, error boundaries, fragments, portals
+- What are Higher-Order Components (HOCs)? How are they different from render props? ;; ast pr
+- How do you handle error boundaries? What are the limitations? ;; pr
+- What are React Fragments and when should you use them? ;; pr
+- What are React Portals? ;; pr
+### Next.js
+- What is Next.js? ;; ast fund
+- Difference between React and Next.js; why is Next.js better? ;; ast ez w3
+- SSR, SSG, CSR; why Next.js is better for SEO; file-based routing, App Router and 'use client' ;; ez
+- What is CSR (Client-Side Rendering)? ;; ez
+- What is hydration? Why do hydration mismatch errors happen? ;; ez
+### React coding tasks
+- Counter app with useState (plus and minus buttons) ;; cap me
+- Piano tiles: 8 tiles that expand vertically when clicked (map + useState toggle) ;; scro
+
+## Security & Auth
+### JWT
+- What is JWT and how is it used for authentication and authorization? ;; per amex otcs me
+- What is the structure of a JWT? ;; y1
+- How do you verify a JWT? Is it decrypted? ;; y1
+- What is the difference between jwt.decode and jwt.verify? ;; y1
+- An attacker changes the user id inside a copied JWT from 123 to 456. How does JWT stop this? ;; y1
+- How do you protect your APIs from unauthorized access? ;; y1
+- Create a middleware to verify a JWT token ;; wip
+- Which library did you use for authentication (jsonwebtoken)? Other than JWT, which module (Passport)? ;; w3 y4
+### Access & refresh tokens, token storage
+- Tokens expire every 20 minutes and users get logged out. How do you keep them logged in? ;; y6
+- How will the front end know the token expired? Will you make a separate refresh-token API? ;; y6
+- When should the front end call the refresh API (polling every 5 minutes is wasteful)? ;; y6
+- Where should the front end store tokens (access vs refresh)? Why? ;; y6
+- If the token is in a cookie, it is sent with every request, even from another domain. How do you handle that? ;; y6
+- Why is the access token's expiry shorter than the refresh token's? ;; y6
+- How would a token get stolen? ;; y6
+- Logging out in one browser tab: how do you log the user out of all other tabs (React)? ;; amex
+### Authentication vs authorization
+- What is the difference between authentication and authorization? ;; cap deh
+### API security best practices
+- How can you secure a Node.js API? What best practices should be followed? ;; per wip tvs
+- How will you make a new application secure from scratch? ;; y4
+- What is your approach to make a secure back end? ;; y4
+- How do you ensure your code has no security flaws? ;; y5
+### Security headers & Helmet
+- How can HTTP headers be used to improve API security? ;; per
+- What is Helmet? ;; per
+### Rate limiting
+- How do you implement rate limiting in Express? ;; wip tvs
+### XSS & CSRF
+- What is an XSS attack? ;; y6
+- How can we prevent XSS attacks? ;; y6
+- How do you stop cookies being attached to requests from another domain (CSRF token, SameSite)? ;; y6
+- Have you implemented CSRF tokens? ;; y6
+
+## Databases & SQL
+### Query optimization
+- How do you improve slow query performance? What tools or techniques do you use? ;; alg del un pr
+- How do you identify if a query is taking a long time to execute? ;; del
+- A SQL statement performs poorly in production. How do you find the root cause and fix it? ;; y5
+### Indexing
+- What is indexing in a database? ;; del
+- A query uses three columns. Do you just add indexes to them, or what is your first step? ;; y1
+- id is the primary key but you search by name or age. Will the primary index help? ;; y1
+- How does MySQL handle indexes, and what types of indexes exist? ;; pr
+- How do you implement Full-Text Search in MySQL, and what are its limits? ;; pr
+### Query execution plan & cost
+- How do you calculate query cost? ;; del
+- What is the query execution plan? ;; y1
+- What is EXPLAIN in MySQL and how do you read its output? ;; pr
+### SQL vs NoSQL
+- What is the difference between SQL and NoSQL? ;; alg
+### Scaling, replication & partitioning
+- How do you do horizontal scaling in a database? ;; tm
+- What is MySQL replication? How do you set up master-slave? ;; pr
+- What are common strategies for partitioning tables? ;; pr
+### Writing SQL: duplicates, joins, unions, relations
+- Delete duplicate records from a table ;; un
+- JOINs vs subqueries: performance ;; pr
+- UNION vs UNION ALL ;; pr
+- Implement a many-to-many relationship using a junction table ;; pr
+- How does MySQL handle foreign key constraints? ;; pr
+### Stored procedures, triggers & views
+- Write a stored procedure ;; un
+- What are stored procedures? Pros and cons ;; pr
+- What are triggers and how are they used? ;; pr
+- What is a view and how does it simplify queries? ;; pr
+### Transactions, ACID & locking
+- What are transactions and how do you keep data integrity? ;; pr
+- What are the ACID properties? ;; pr
+- How does MySQL handle locking and concurrency? ;; pr
+### Storage engines & data types
+- InnoDB vs MyISAM ;; pr
+- CHAR vs VARCHAR ;; pr
+- How does MySQL handle NULL values? Common pitfalls ;; pr
+### Backup & recovery
+- How do you back up a MySQL database and plan for recovery? ;; pr
+### MongoDB
+- MongoDB aggregation and $lookup ;; cap
+### Redis & caching
+- Why do we use Redis? ;; y4
+
+## AWS
+### Lambda basics & deployment
+- What is a Lambda function? ;; tm
+- Write a simple Lambda function ;; tm
+- How are you deploying Lambda functions? ;; alg
+- How many parameters can we pass to a Lambda function? ;; tm
+- How do you call one Lambda function from another? ;; tm
+### Lambda cold start
+- What is a cold start? How can you tackle it? ;; tcs tm
+- Cold vs warm Lambda functions ;; alg
+### Lambda concurrency
+- How does Lambda handle concurrency? How do you check the limits? ;; alg
+- What is Provisioned Concurrency? ;; tcs
+### Step Functions
+- What is a Step Function? ;; tm
+- Write a Step Function config that calls 2 Lambda functions in sequence ;; tm
+- In a Step Function, how is the second function called? ;; ust
+### Monitoring (CloudWatch, X-Ray)
+- How do you monitor production in serverless? ;; alg
+- What is X-Ray tracing? ;; tm
+- How do you monitor AWS applications? ;; wip
+### SQS & SNS
+- What is SQS? Short polling vs long polling ;; alg
+- What is SNS? ;; alg
+### DynamoDB
+- What are keys in DynamoDB? ;; hit
+### S3 & large file uploads
+- Design an architecture to upload large files (100 MB–GB) to S3 and process them ;; kyn
+### High availability, secrets & containers
+- How do you design a highly available AWS architecture? ;; wip
+- What is AWS Secrets Manager? ;; wip
+- ECS vs EKS ;; wip
+
+## Architecture & System Design
+### Microservices, serverless & distributed systems
+- Monolith vs microservices vs serverless ;; alg
+- What are microservices and why do we prefer them? ;; y4
+- How do microservices communicate? ;; alg
+- What is a distributed environment? ;; tm
+- What is a circuit breaker? ;; y1
+### System design scenarios
+- Design a URL shortener ;; irp
+- Design large-file upload to S3 with processing ;; kyn
+- Image upload feature: React front end, Node.js back end, MongoDB. API endpoints, data flow and schema ;; bit
+### MERN stack
+- What is the MERN stack? Explain its architecture ;; otcs tvt
+### MVC & code structure
+- What is MVC architecture? ;; y4
+### Production issues
+- Did you handle any production issues? ;; tcs
+
+## Docker, CI/CD, Git & Testing
+### CI/CD & deployment
+- What steps do you include in a CI/CD pipeline? ;; kyn
+- What does a basic CI/CD workflow look like? (whiteboard) ;; visa
+- CI/CD, test automation and code review processes ;; hyl
+- Do you configure CI/CD pipelines? ;; y5
+- How do you deploy your applications / microservices? ;; y5
+- What is DevOps and which tools are used? ;; hash
+### Docker
+- Have you worked on Docker? Explain ;; y4
+- Docker architecture ;; inorg
+- What is a Docker registry? ;; inorg
+- Virtualization vs containerization ;; inorg
+- Write a Dockerfile for a Node.js application ;; inorg
+- What is a Docker volume? ;; rt
+- Docker image vs container ;; rt
+- Docker vs Kubernetes ;; visa
+- Common Docker commands ;; hash
+### Git
+- What is git rebase? ;; ust
+- How do you resolve merge conflicts in Git? ;; amex
+- What is the difference between Git and GitHub? ;; hash rt
+- Can we use Git without GitHub? ;; rt
+- Where does Git store data? ;; rt
+- Common and advanced Git commands ;; hash un
+### Testing & code quality
+- What is your testing approach: TDD or after coding? ;; kyn
+- Which unit testing frameworks have you used in Node.js? ;; y5
+- How do you ensure code quality (no bugs)? ;; y5
+- What is code reusability? ;; y4
+
+## Web & HTTP
+### HTTP status codes
+- What are 401, 402, 403 and 502? Common status codes you use ;; ust me
+### HTTP basics
+- What is HTTP? ;; tvt
+- Difference between HTTP and HTTPS ;; un
+### Browser & page loading
+- What happens when you type google.com and press Enter? (cache, critical rendering path, render-blocking JS) ;; ez
+- Normal script vs async vs defer: how do scripts affect rendering? ;; ez
+### Web performance
+- Performance tools (React Profiler, Lighthouse, GTmetrix) and metrics FCP, LCP, CLS ;; ez
+### Web servers (Nginx, Apache)
+- Why do we use Nginx as a proxy server? ;; paytm
+- Nginx server vs Apache server ;; un
+### Browser storage
+- localStorage vs sessionStorage vs cookies ;; me
+### HTML & CSS
+- Difference between span and div ;; un
+- What is a pseudo-class in CSS? ;; un
+
+## AI / LLM / ML
+### Transformers, attention & LLM basics
+- How do Transformers work in LLMs? Explain end to end with a sentence ;; acc a1
+- How does the attention mechanism work? ;; a1
+- Self-attention, encoder and decoder: their roles ;; zs
+- What is Softmax in LLMs? ;; a1
+- What is context, and what is the context window? ;; a1
+- How do tokens, attention and context affect an LLM? ;; a3
+- What kinds of LLM models are available in the market? ;; acc
+### Sampling: Top-K, Top-P, Temperature
+- What are Top-K, Top-P and Temperature? ;; zs a1
+### Embeddings & similarity search
+- What are embeddings and the embedding matrix? ;; a1
+- What do 1536 or 3072 mean in embeddings? ;; a1
+- What is similarity search? What is cosine similarity? ;; a1 a2
+- How do embeddings enable semantic search? ;; a3
+### RAG basics
+- Explain step by step how RAG works behind the scenes ;; acc zs
+- Why do we need RAG? ;; acc
+- Why use RAG if we can just upload a document to ChatGPT / Gemini? ;; a2
+- What is RAG and how did you use it in your project? ;; acc
+- What is RAG, and how do you stop it from hallucinating? ;; a1
+- What do you store in the vector database? (vector database concepts) ;; acc zs
+- Procedure to build a notebook-based RAG application ;; zs
+- What do Top-N and Top-K mean (retrieval)? ;; a2
+- How would you build a RAG system on top of company documents? ;; a3
+- How do you improve poor retrieval in a RAG system? ;; a3
+### Advanced RAG
+- Which chunking strategy is the best? ;; a1
+- What are Graph RAG, Agentic RAG, Adaptive RAG and Corrective RAG? ;; a1
+- What are citation, grounding and abstaining in RAG? ;; a1
+- Hybrid RAG, multimodal agents and MoE LLaVA ;; zs
+### Evaluation & metrics
+- How do you evaluate / test a RAG system? Which metrics or scores? ;; a1 a2
+- What are BLEU and ROUGE scores? ;; a2
+- LLM benchmarks: MMLU, HELM, HumanEval, Big-Bench ;; zs
+- How do you ensure the quality of the output in your system? ;; acc
+- Write a function that checks output quality or similarity score ;; acc
+- Which metrics would you focus on to improve model performance? ;; acc
+- How do you evaluate an LLM application before release? ;; a3
+### Prompt engineering
+- Explain prompting techniques ;; acc
+- What are zero-shot and few-shot prompting? ;; a1
+- What is Chain of Thought (CoT) reasoning? ;; zs
+- How do you manage prompt versioning? ;; a1
+- How do you evaluate and optimize a prompt? ;; a1
+- What is context engineering? ;; a1
+- Explain in-context learning: how do LLMs adapt without fine-tuning? ;; a3
+- How do you make prompts and outputs reliable? ;; a3
+### AI agents & multi-agent systems
+- What is an AI agent, actually? ;; a1
+- Generative AI vs Agentic AI ;; acc a2
+- Is your system single-agent or multi-agent? ;; acc
+- Can multiple agents work in parallel on different tasks? ;; acc
+- Why is routing required in a multi-agent system? ;; acc
+- Bottlenecks of AI agents; how do you manage a multi-agent architecture? ;; a1
+- Which model would you use and how would you orchestrate agents? ;; a2
+- When should you use a workflow instead of an agent? ;; a3
+- With 100 tools, how do you stop the tools from hallucinating? ;; a1
+- How often do tools fail in production, and how do you find which tool fails? ;; a1
+- What is the role of Pydantic? ;; a1
+- How do you implement tool calls safely? ;; a3
+### Frameworks: LangChain, LangGraph, CrewAI, MCP
+- Which framework did you use (LangChain or CrewAI) and why? ;; acc
+- What are the components of CrewAI? ;; acc
+- Can agents work asynchronously in CrewAI? ;; acc
+- Which CrewAI tools have you used (SerperDevTool, EXA Search Tool)? ;; acc
+- What does the EXA Search Tool do, and how did you integrate it? ;; acc
+- Write code to use the EXA Search Tool ;; acc
+- Have you heard about MCP (Model Context Protocol)? ;; acc
+- We already have APIs. Why was MCP introduced? ;; a2
+- MCP vs LangGraph vs LangChain: which is better? ;; a2
+- How can LangGraph and MCP be used together? ;; a2
+- LangGraph: what are nodes and edges? ;; a2
+### AI security
+- What is prompt injection? ;; a1
+- How do you defend against prompt injection (XML tags, delimiters)? ;; a1 a3
+- What is a jailbreak? ;; a1
+- What are guardrails and how do they help in agent architecture? ;; a1
+- How do you handle RBAC and tool-calling security? ;; a1
+- How do you secure RAG? ;; a1
+- How can employees get answers from an enterprise LLM without uploading highly secured documents? ;; a2
+### Fine-tuning
+- Fine-tuning vs RAG vs prompting ;; a1
+- How do LoRA and QLoRA reduce fine-tuning costs? ;; a3
+### LLM apps in production (cost, latency, deployment)
+- Token costs grow with usage. How do you keep agent costs under control? ;; a1
+- What is system prompt caching and how does it help? ;; a1
+- How do you reduce the latency and cost of LLMs? ;; a3
+- Hosted vs self-hosted models: how do you choose? ;; a3
+- How do you deploy a model as a reliable API? ;; a3
+- AWS Bedrock: experience and use ;; zs
+- Challenges when turning an AI POC into a production system ;; a2
+- The API returns HTTP 200 but the AI answer is wrong. How do you fix it? ;; a3
+- A chatbot gives customers wrong information. How would you fix it? ;; a3
+- How do you detect and respond to model drift? ;; a3
+- How do you make AI releases reproducible and reversible? ;; a3
+### AI system design scenarios
+- 10 crore daily payments, 1% fail or double-transfer, "Ravi" vs "Ravi K": solve with probabilistic and deterministic methods ;; a1
+- Design an AI system for customer support ;; a3
+- How would you deploy a multilingual chatbot in Oracle Digital Assistant? ;; acc
+- How do you make sure an ODA intent gives the correct answer? ;; acc
+### ML fundamentals
+- How does machine learning actually work? ;; a2
+- Regression vs classification; name some algorithms ;; acc
+- What is overfitting? How do you detect and reduce it? ;; acc a3
+- Decision Trees vs Random Forest vs XGBoost ;; a2
+- What are precision and recall (and F1)? When would you use recall? ;; a2 a3
+- Generator and Discriminator in GANs ;; zs
+- What does an AI engineer deliver? How do AI, ML and Data Science differ? ;; a3
+- Supervised, unsupervised or reinforcement learning: how do you choose? ;; a3
+- How do you prepare data without data leakage? ;; a3
+- Why use training, validation and test sets? ;; a3
+- How do you handle imbalanced classification? ;; a3
+- How do you choose the first model for a new problem? ;; a3
+- How do you assess fairness and explain a model's decisions? ;; a3
+### Neural networks & deep learning
+- What are backpropagation and forward propagation? ;; a2
+- How does the change of derivatives work in backpropagation? ;; a2
+- What are neurons? ;; a2
+- How do backpropagation and gradient descent work together? ;; a3
+- Why choose U-Net++ instead of YOLO? ;; a2
+
+## Python
+### Python basics
+- What are the data structures in Python? ;; acc
+- Mutable vs immutable types in Python ;; a1
+- What is a closure in Python? ;; a1
+### Python coding
+- Read a CSV and fill null values with the median ;; acc
+- Python + SQLite: employees with more than 3 leave requests last month ;; acc
+- Union of three lists ;; a2
+- Merge two hash maps, keeping only distinct keys ;; a2
+- Flatten a nested list so an ML model can use it ;; a2
+
+## PHP
+### Array & string programs
+- Multidimensional array and string function programs ;; un
+- Define an array, unset an element, then implode it ;; un
+- Get the 2nd highest number from an array without built-in functions ;; un
+- Array and string logic questions without built-in functions ;; un
+### Sessions, cookies & GET/POST
+- Flow of a cookie ;; un
+- Flow of a session ;; un
+- Where are session files stored? ;; un
+- GET vs POST ;; un
+- How does session management work, and how do you prevent session hijacking? ;; pr
+### Errors & error handling
+- Errors in PHP ;; un
+- How does PHP error reporting work, and how do you set it per environment? ;; pr
+- What error handling strategies exist and when do you use each? ;; pr
+### OOP, namespaces & autoloading
+- Can we inherit a final class / method in PHP? ;; un
+- What are magic methods? Examples ;; pr
+- Pros and cons of PHP traits ;; pr
+- What are namespaces and why use them? ;; pr
+- How does autoloading work? How does PSR-4 relate? ;; pr
+- Dependency Injection in PHP ;; pr
+### Operators & type juggling
+- == vs === in PHP ;; pr
+- How does PHP type juggling work, and what are the pitfalls? ;; pr
+### Generators, closures, SPL & streams
+- What are generators and how do they help performance? ;; pr
+- What are closures in PHP? ;; pr
+- What is the SPL (Standard PHP Library)? ;; pr
+- Streams in PHP: reading and writing data ;; pr
+### Includes, JSON & async
+- require vs include; require_once vs include_once ;; pr
+- Handling JSON in PHP and common encode/decode pitfalls ;; pr
+- How does PHP handle asynchronous processing? ;; pr
+### Security & performance
+- How do you secure a PHP app against SQL injection, XSS and CSRF? ;; pr
+- Benefits and risks of eval() ;; pr
+- How do you optimize PHP code for performance? ;; pr
+
+## Laravel
+### Request lifecycle
+- How does a Laravel request flow? ;; un
+- URL request flow ;; un
+### Security
+- Cross-site attacks (XSS / CSRF): how do they work and how do you handle them? ;; un
+- How will you secure your application? ;; un
+- What types of security have you used in your app? ;; un
+- Where should sensitive files be saved for security? ;; un
+- How does Laravel handle CSRF protection? Best practices ;; pr
+- How do you handle file uploads securely? ;; pr
+### Authentication, Sanctum & tokens
+- How do you store data in a Sanctum token? ;; un
+- Types of authentication after user login ;; un
+- How do tokens work? ;; un
+- How do you handle user authentication in a Laravel API? ;; pr
+### Rate limiting
+- How does the rate limiter work? ;; un
+- How does Laravel API rate limiting work, and how do you customize it per endpoint? ;; pr
+### Middleware
+- What is middleware? Give an example ;; un
+- How do you write custom middleware, and what are common use cases? ;; pr
+### Facades, service container & traits
+- What is a facade in Laravel? ;; un
+- Laravel traits and the service container ;; un
+- How do facades work under the hood? ;; pr
+- Explain the service container and dependency injection ;; pr
+### Error handling
+- How do you handle errors in Laravel? ;; un
+### Localization
+- Localization in Laravel ;; un
+### Validation, policies & gates
+- What are Form Requests and how do they help validation? ;; pr
+- Policies vs gates ;; pr
+### Database: Eloquent, Query Builder, migrations
+- Query Builder vs Eloquent ORM ;; pr
+- Managing migrations and seeds in a team ;; pr
+- How do soft deletes work, and what are the implications? ;; pr
+### Queues, events & scheduler
+- How do queues work for background tasks? ;; pr
+- Event broadcasting for real-time apps ;; pr
+- Laravel Scheduler vs cron jobs ;; pr
+### Performance, caching & scaling
+- How do you optimize Laravel for large-scale deployments? ;; pr
+- How does Laravel caching work, and what strategies exist? ;; pr
+- How do you implement multi-tenancy? ;; pr
+### Testing & assets
+- Using Laravel's built-in testing tools ;; pr
+- Pros and cons of Laravel Mix for asset compilation ;; pr
+
+## jQuery
+### Events
+- How does event delegation work, and why is it useful for dynamic elements? ;; pr
+- .bind() vs .live() vs .delegate() vs .on() ;; pr
+- Optimizing frequent events like scroll and resize ;; pr
+### AJAX & Deferred
+- What is $.ajax()? Handling success, error and complete ;; pr
+- Cross-domain requests with jQuery and their security implications ;; pr
+- What are Deferred objects? ;; pr
+- How does jQuery handle AJAX caching? ;; pr
+### DOM manipulation & performance
+- How do you optimize jQuery code on large DOMs? ;; pr
+- Manipulating the DOM without causing reflows ;; pr
+- .append() vs .prepend() vs .before() vs .after() ;; pr
+- Adding, removing and toggling CSS classes ;; pr
+- Working with HTML5 data attributes ;; pr
+### Utilities & chaining
+- $.extend() for object merging and its options ;; pr
+- How does chaining work, and why is it powerful? ;; pr
+- What is $.proxy() and when do you use it? ;; pr
+### Forms, cookies, animations & plugins
+- Form validation with jQuery: best practices ;; pr
+- Working with cookies in jQuery: pitfalls ;; pr
+- How do animations work, and what about performance? ;; pr
+- Making an element draggable or sortable ;; pr
+- What are jQuery plugins, and how do you write a basic one? ;; pr
+`;
+
+/* ---------- parse ---------- */
+const DB = [];   // {tech, topic, q, src:[codes]}
+let curTech = "", curTopic = "";
+RAW.split("\n").forEach(line => {
+  line = line.trim();
+  if (!line) return;
+  if (line.startsWith("## ")) { curTech = line.slice(3).trim(); return; }
+  if (line.startsWith("### ")) { curTopic = line.slice(4).trim(); return; }
+  if (line.startsWith("- ")) {
+    const [q, codes] = line.slice(2).split(" ;; ");
+    const src = (codes || "").trim().split(/\s+/).filter(Boolean);
+    src.forEach(c => { if (!SRC[c]) console.warn("Unknown source code", c, "in", q); });
+    DB.push({ tech: curTech, topic: curTopic, q: q.trim(), src });
+  }
+});
+const TECHS = [...new Set(DB.map(d => d.tech))];
+const ALL = "All technologies";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DEFAULT_TECH = "Node.js";
+let tech = DEFAULT_TECH;
+
+$('sub').textContent = DB.length + " unique technical questions in " + new Set(DB.map(d => d.tech + "|" + d.topic)).size +
+  " topics across " + TECHS.length + " technologies, collected from Companies-Interview, Online Fetched Questions, YouTube, " +
+  "PHP / Laravel / MySQL / jQuery / React / Web-General lists, and your NodeJs/questions and NodeJs/programs files. Duplicates are merged.";
+
+// "asked by" dropdown
+[...new Set(Object.values(SRC).map(s => s[0]))].sort((a, b) => a.localeCompare(b)).forEach(l => {
+  const o = document.createElement('option'); o.value = l; o.textContent = l; $('fco').appendChild(o);
+});
+
+
+function keepSrc(code, src, who) {
+  const [label, kind] = SRC[code];
+  if (who && label !== who) return false;
+  if (!src) return true;
+  if (src === "REAL") return REAL.has(kind);
+  return kind === src;
+}
+
+function build() {
+  const src = $('fsrc').value, who = $('fco').value, q = $('fq').value.trim().toLowerCase();
+  // filter each question's sources, drop questions with none left
+  const rows = DB.map(d => ({ ...d, src: d.src.filter(c => keepSrc(c, src, who)) })).filter(d => d.src.length);
+  // group: tech|topic
+  const G = new Map();
+  rows.forEach(d => {
+    const k = d.tech + "\u0000" + d.topic;
+    if (!G.has(k)) G.set(k, { tech: d.tech, topic: d.topic, qs: [], asked: 0, prep: 0, who: new Map() });
+    const g = G.get(k);
+    const real = d.src.filter(c => REAL.has(SRC[c][1])).length;
+    g.qs.push({ q: d.q, src: d.src, real, prep: d.src.length - real });
+    g.asked += real; g.prep += d.src.length - real;
+    d.src.forEach(c => {
+      const w = g.who.get(c) || { n: 0, qs: [] };
+      w.n++; w.qs.push(d.q); g.who.set(c, w);
+    });
+  });
+  const groups = [...G.values()];
+  groups.forEach(g => {
+    g.people = new Set([...g.who.keys()].filter(c => REAL.has(SRC[c][1])).map(c => SRC[c][0])).size;
+    g.qs.sort((a, b) => b.real - a.real || b.prep - a.prep);
+  });
+  return { groups, q };
+}
+
+function render() {
+  const { groups, q } = build();
+  const minA = +$('fmin').value;
+
+  // tabs with totals (unique questions per tech under current source filter)
+  const per = {};
+  groups.forEach(g => { per[g.tech] = (per[g.tech] || 0) + g.qs.length; });
+  const total = Object.values(per).reduce((a, b) => a + b, 0);
+  const tabList = [[ALL, total], ...TECHS.filter(t => per[t]).map(t => [t, per[t]])];
+  if (!tabList.some(([t]) => t === tech)) tech = ALL;
+  $('tabs').innerHTML = tabList.map(([t, n]) =>
+    `<button class="tab${t === tech ? ' on' : ''}" data-t="${esc(t)}" role="tab">${esc(t)} <span>${n}</span></button>`).join('');
+  $('tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { tech = b.dataset.t; render(); }));
+
+  let list = groups.filter(g => (tech === ALL || g.tech === tech) && g.asked >= minA &&
+    (!q || g.topic.toLowerCase().includes(q) || g.tech.toLowerCase().includes(q) || g.qs.some(x => x.q.toLowerCase().includes(q))));
+  list.sort((a, b) => b.asked - a.asked || b.people - a.people || b.prep - a.prep || a.topic.localeCompare(b.topic));
+
+  $('title').textContent = tech;
+  const nQ = list.reduce((n, g) => n + g.qs.length, 0), nA = list.reduce((n, g) => n + g.asked, 0);
+  $('meta').textContent = list.length + " topics, " + nQ + " unique questions, asked " + nA +
+    " times in real interviews. Topic asked most comes first.";
+  if (!list.length) { $('out').innerHTML = '<div class="empty">No topics match these filters.</div>'; syncSticky(); return; }
+
+  const mx = Math.max(1, ...list.map(g => g.asked));
+  $('out').innerHTML = '<table><thead><tr><th class="c">Priority</th><th>Topic</th><th class="c">Questions asked</th>' +
+    '<th>Asked by</th><th>Unique questions</th></tr></thead><tbody>' +
+    list.map((g, i) => {
+      const chips = [...g.who.entries()].sort((a, b) =>
+          (REAL.has(SRC[b[0]][1]) - REAL.has(SRC[a[0]][1])) || b[1].n - a[1].n || SRC[a[0]][0].localeCompare(SRC[b[0]][0]))
+        .map(([c, w]) => {
+          const [label, kind] = SRC[c];
+          return `<span class="chip k${kind}" role="button" tabindex="0" data-q="${esc(w.qs.join('\n'))}" ` +
+            `title="${esc('Click to copy:\n' + w.qs.join('\n'))}">${esc(label)}${w.n > 1 ? ` <small>×${w.n}</small>` : ''}</span>`;
+        }).join('');
+      const qs = g.qs.map(x => {
+        const by = x.src.map(c => SRC[c][0]).join(', ');
+        return `<li>${esc(x.q)}${x.real > 1 ? `<b class="n" title="asked by ${x.real} real interviewers">${x.real}×</b>` : ''}` +
+          ` <span class="w">— ${esc(by)}</span></li>`;
+      }).join('');
+      return `<tr><td class="c pr">${i + 1}</td>` +
+        `<td class="tp">${esc(g.topic)}${tech === ALL ? `<small>${esc(g.tech)}</small>` : ''}</td>` +
+        `<td class="c cnt"><div class="bar"><span style="width:${Math.round(100 * g.asked / mx)}%"></span></div><b>${g.asked}</b>` +
+        `<span class="sm">${g.people} interviewer${g.people === 1 ? '' : 's'}</span>` +
+        (g.prep ? `<span class="sm">+${g.prep} prep</span>` : '') + `</td>` +
+        `<td class="by"><div class="chips">${chips}</div></td><td><ol class="qs">${qs}</ol></td></tr>`;
+    }).join('') + '</tbody></table>';
+  syncSticky();
+}
+
+/* click a chip -> copy that source's questions for the topic */
+let toastTimer;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
+  } catch (e) { return false; }
+}
+function onChip(e) {
+  const chip = e.target.closest && e.target.closest('.chip');
+  if (!chip || !chip.dataset.q) return;
+  if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  const n = chip.dataset.q.split('\n').length;
+  copyText(chip.dataset.q).then(ok => toast(ok ? (n > 1 ? 'Copied ' + n + ' questions' : 'Question copied') : 'Copy failed: select the text manually'));
+}
+$('out').addEventListener('click', onChip);
+$('out').addEventListener('keydown', onChip);
+
+function syncSticky() { document.documentElement.style.setProperty('--tb', $('toolbar').offsetHeight + 'px'); }
+if ('ResizeObserver' in window) new ResizeObserver(syncSticky).observe($('toolbar'));
+window.addEventListener('resize', syncSticky);
+
+['fq', 'fsrc', 'fco', 'fmin'].forEach(id => $(id).addEventListener(id === 'fq' ? 'input' : 'change', render));
+$('freset').addEventListener('click', () => {
+  $('fq').value = ''; $('fsrc').value = ''; $('fco').value = ''; $('fmin').value = '0'; tech = DEFAULT_TECH; render();
+});
+render();
+</script>
+</body>
+</html>

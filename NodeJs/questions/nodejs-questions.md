@@ -1,10 +1,5 @@
 # Node.js & JavaScript – Questions
 
-**Versions noted:**
-- nodejs (lts: 18.12.0) (current: 19.0.0) (used: 14.15)
-- mongodb (current: 6.0) (used: 4.6)
-- elasticsearch (current 8.4) (used: 7.5)
-
 **Topics:** hoisting, closure, arrow function, callbacks, promises, async/await, ES6, array methods, var/let/const, call/apply/bind, event loop, EventEmitter, built-in modules, npm
 
 ---

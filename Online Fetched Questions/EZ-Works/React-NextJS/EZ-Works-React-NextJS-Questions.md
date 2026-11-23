@@ -21,16 +21,15 @@
 8. What is CSR (Client Side Rendering)?
 9. Controlled vs uncontrolled components.
 10. How does routing work in React? Basic understanding of React Router.
-11. Assignment discussion: component structure, data flow, why certain approaches were chosen, and what improvements could be made.
 
 ## Round 2 (Advanced frontend and system understanding, ~35-40 min)
 
-12. What happens when you type google.com and press Enter? (follow-ups: browser cache, what can be cached, critical rendering path, render-blocking JavaScript)
-13. Difference between normal script, async and defer; how scripts affect rendering.
-14. Difference between React and Next.js. Why is Next.js better for SEO? SSR, SSG, CSR concepts, file-based routing, App Router and use client.
-15. What is hydration in Next.js / React? (follow-ups: hydration mismatch and why hydration errors occur)
-16. Scenario: the marketing team says the website is slow. How will you debug and fix it?
-17. What is lazy loading? Different ways to implement it; component-level vs data-level lazy loading.
-18. useCallback, React.memo, preventing unnecessary re-renders, when memoization makes sense.
-19. Why is cleanup needed in useEffect (event listeners, intervals/timeouts, API calls)? Cancelling API calls with AbortController.
-20. Performance tools: React Profiler, Lighthouse, GTmetrix; metrics FCP, LCP, CLS.
+11. What happens when you type google.com and press Enter? (follow-ups: browser cache, what can be cached, critical rendering path, render-blocking JavaScript)
+12. Difference between normal script, async and defer; how scripts affect rendering.
+13. Difference between React and Next.js. Why is Next.js better for SEO? SSR, SSG, CSR concepts, file-based routing, App Router and use client.
+14. What is hydration in Next.js / React? (follow-ups: hydration mismatch and why hydration errors occur)
+15. Scenario: the marketing team says the website is slow. How will you debug and fix it?
+16. What is lazy loading? Different ways to implement it; component-level vs data-level lazy loading.
+17. useCallback, React.memo, preventing unnecessary re-renders, when memoization makes sense.
+18. Why is cleanup needed in useEffect (event listeners, intervals/timeouts, API calls)? Cancelling API calls with AbortController.
+19. Performance tools: React Profiler, Lighthouse, GTmetrix; metrics FCP, LCP, CLS.

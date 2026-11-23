@@ -19,4 +19,3 @@
 
 ## Round 2 (Machine round, 30-45 min, hands-on)
 
-6. Questions on the candidate's submitted Next.js project, plus practical problem-solving (no specific questions written).

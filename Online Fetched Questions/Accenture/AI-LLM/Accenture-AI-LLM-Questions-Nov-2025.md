@@ -11,16 +11,14 @@
 
 ## Technical Round (1 hour)
 
-1. Explain your engineering project – problem statement and your role.
-2. Explain your current project – problem statement and your role.
-3. Write Python code to read a CSV and impute null values with the median.
-4. Write Python + SQLite query to find employees with more than 3 leave requests in the previous month.
-5. Explain prompting techniques.
-6. Difference between regression and classification – name some algorithms.
-7. What is overfitting?
-8. How would you deploy a multilingual chatbot in ODA (Oracle Digital Assistant)?
-9. What is RAG and how did you use it in your project?
-10. Which metrics would you focus on to improve model performance?
-11. What kind of LLM models are available in the market?
-12. What are the data structures in Python?
-13. How would you ensure an intent in ODA gives the correct answer? What precautions would you take?
+1. Write Python code to read a CSV and impute null values with the median.
+2. Write Python + SQLite query to find employees with more than 3 leave requests in the previous month.
+3. Explain prompting techniques.
+4. Difference between regression and classification – name some algorithms.
+5. What is overfitting?
+6. How would you deploy a multilingual chatbot in ODA (Oracle Digital Assistant)?
+7. What is RAG and how did you use it in your project?
+8. Which metrics would you focus on to improve model performance?
+9. What kind of LLM models are available in the market?
+10. What are the data structures in Python?
+11. How would you ensure an intent in ODA gives the correct answer? What precautions would you take?

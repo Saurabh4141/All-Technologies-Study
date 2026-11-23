@@ -14,13 +14,12 @@
 
 ## Round 2 (online, 1 hr, HackerRank)
 
-2. 17 Node.js questions and 1 programming question (the individual questions are not listed in the report).
 
 ## Round 3 (Technical Interview I, 1 hr)
 
-3. Write down Node.js code for getting requests where you have to query the MongoDB database and find the employee with the id.
-4. Why is Node.js single-threaded?
-5. If Node.js is single-threaded, then how does it handle concurrency?
-6. How would you define the term I/O?
-7. The drawback of Node.js.
+2. Write down Node.js code for getting requests where you have to query the MongoDB database and find the employee with the id.
+3. Why is Node.js single-threaded?
+4. If Node.js is single-threaded, then how does it handle concurrency?
+5. How would you define the term I/O?
+6. The drawback of Node.js.
    - **Answer given by the candidate:** Not suitable for heavy computational tasks.

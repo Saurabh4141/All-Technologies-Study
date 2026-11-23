@@ -75,34 +75,6 @@ clouser();
 
 
 
-// for (let i = 0; i < buckets.length; i++) {
-//     output[0].push(buckets[i].key);
-//     if( i == 0){
-//         for (let j = 0; j < department.buckets.length; j++) {
-//             output[j + 1] = []
-//             output[j+1].push(department.buckets[j].key)
-//             output[j+1].push(department.buckets[j].doc_count)
-
-//         }
-//     }
-// }
-
-
-
-// if (i == 0) {
-//     ele.department.buckets.forEach((item, j) => {
-//         output[j + 1] = []
-//         output[j + 1].push(item.key)
-//         output[j + 1].push(item.doc_count)
-//     })
-// } else {
-//     ele.department.buckets.forEach((item, j) => {
-//         output[i][j + 1 + 1] = item.doc_count
-//     })
-
-// }
-
-// console.log(output);
 
 
 

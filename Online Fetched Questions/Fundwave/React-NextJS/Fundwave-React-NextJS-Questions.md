@@ -11,4 +11,4 @@
 
 ## Round 2 (Technical, about 1 hour)
 
-1. React, Next.js, routing, class components, and React component lifecycles.
+1. Next.js, routing, class components, and React component lifecycles.

@@ -6,23 +6,23 @@ Layout: `Company/Technology/Company-Technology-Questions.md`. Every file has the
 
 | Company | Technology | Questions | File |
 |---|---|:-:|---|
-| AST Consulting | React-NextJS | 6 | [AST-Consulting-React-NextJS-Questions.md](AST-Consulting/React-NextJS/AST-Consulting-React-NextJS-Questions.md) |
-| Accenture | AI-LLM | 23 | [Accenture-AI-LLM-Questions-Dec-2025.md](Accenture/AI-LLM/Accenture-AI-LLM-Questions-Dec-2025.md) |
-| Accenture | AI-LLM | 13 | [Accenture-AI-LLM-Questions-Nov-2025.md](Accenture/AI-LLM/Accenture-AI-LLM-Questions-Nov-2025.md) |
+| AST Consulting | React-NextJS | 5 | [AST-Consulting-React-NextJS-Questions.md](AST-Consulting/React-NextJS/AST-Consulting-React-NextJS-Questions.md) |
+| Accenture | AI-LLM | 19 | [Accenture-AI-LLM-Questions-Dec-2025.md](Accenture/AI-LLM/Accenture-AI-LLM-Questions-Dec-2025.md) |
+| Accenture | AI-LLM | 11 | [Accenture-AI-LLM-Questions-Nov-2025.md](Accenture/AI-LLM/Accenture-AI-LLM-Questions-Nov-2025.md) |
 | American Express | Authentication-JWT | 2 | [American-Express-Authentication-JWT-Questions.md](American-Express/Authentication-JWT/American-Express-Authentication-JWT-Questions.md) |
 | American Express | Docker-CICD-Git | 1 | [American-Express-Docker-CICD-Git-Questions.md](American-Express/Docker-CICD-Git/American-Express-Docker-CICD-Git-Questions.md) |
 | American Express | Node.js | 2 | [American-Express-Node.js-Questions.md](American-Express/Node.js/American-Express-Node.js-Questions.md) |
 | American Express | React-NextJS | 7 | [American-Express-React-NextJS-Questions.md](American-Express/React-NextJS/American-Express-React-NextJS-Questions.md) |
 | Bajaj Finserv | JavaScript | 1 | [Bajaj-Finserv-JavaScript-Questions.md](Bajaj-Finserv/JavaScript/Bajaj-Finserv-JavaScript-Questions.md) |
-| Bajaj Finserv | Node.js | 7 | [Bajaj-Finserv-Node.js-Questions.md](Bajaj-Finserv/Node.js/Bajaj-Finserv-Node.js-Questions.md) |
-| Bitwise Global | Full-Stack-MERN | 2 | [Bitwise-Global-Full-Stack-MERN-Questions.md](Bitwise-Global/Full-Stack-MERN/Bitwise-Global-Full-Stack-MERN-Questions.md) |
+| Bajaj Finserv | Node.js | 6 | [Bajaj-Finserv-Node.js-Questions.md](Bajaj-Finserv/Node.js/Bajaj-Finserv-Node.js-Questions.md) |
+| Bitwise Global | Full-Stack-MERN | 1 | [Bitwise-Global-Full-Stack-MERN-Questions.md](Bitwise-Global/Full-Stack-MERN/Bitwise-Global-Full-Stack-MERN-Questions.md) |
 | Capsitech | Authentication-JWT | 1 | [Capsitech-Authentication-JWT-Questions.md](Capsitech/Authentication-JWT/Capsitech-Authentication-JWT-Questions.md) |
 | Capsitech | JavaScript | 1 | [Capsitech-JavaScript-Questions.md](Capsitech/JavaScript/Capsitech-JavaScript-Questions.md) |
 | Capsitech | Node.js | 3 | [Capsitech-Node.js-Questions.md](Capsitech/Node.js/Capsitech-Node.js-Questions.md) |
 | Capsitech | React-NextJS | 2 | [Capsitech-React-NextJS-Questions.md](Capsitech/React-NextJS/Capsitech-React-NextJS-Questions.md) |
 | Dehaat | Authentication-JWT | 1 | [Dehaat-Authentication-JWT-Questions.md](Dehaat/Authentication-JWT/Dehaat-Authentication-JWT-Questions.md) |
 | EZ Works | JavaScript | 3 | [EZ-Works-JavaScript-Questions.md](EZ-Works/JavaScript/EZ-Works-JavaScript-Questions.md) |
-| EZ Works | React-NextJS | 20 | [EZ-Works-React-NextJS-Questions.md](EZ-Works/React-NextJS/EZ-Works-React-NextJS-Questions.md) |
+| EZ Works | React-NextJS | 19 | [EZ-Works-React-NextJS-Questions.md](EZ-Works/React-NextJS/EZ-Works-React-NextJS-Questions.md) |
 | Fundwave | JavaScript | 1 | [Fundwave-JavaScript-Questions.md](Fundwave/JavaScript/Fundwave-JavaScript-Questions.md) |
 | Fundwave | React-NextJS | 1 | [Fundwave-React-NextJS-Questions.md](Fundwave/React-NextJS/Fundwave-React-NextJS-Questions.md) |
 | HashedIn by Deloitte | Docker-CICD-Git | 3 | [HashedIn-by-Deloitte-Docker-CICD-Git-Questions.md](HashedIn-by-Deloitte/Docker-CICD-Git/HashedIn-by-Deloitte-Docker-CICD-Git-Questions.md) |
@@ -40,17 +40,16 @@ Layout: `Company/Technology/Company-Technology-Questions.md`. Every file has the
 | Technovert | Full-Stack-MERN | 2 | [Technovert-Full-Stack-MERN-Questions.md](Technovert/Full-Stack-MERN/Technovert-Full-Stack-MERN-Questions.md) |
 | Technovert | Node.js | 1 | [Technovert-Node.js-Questions.md](Technovert/Node.js/Technovert-Node.js-Questions.md) |
 | Technovert | React-NextJS | 1 | [Technovert-React-NextJS-Questions.md](Technovert/React-NextJS/Technovert-React-NextJS-Questions.md) |
-| Upelars | Node.js | 2 | [Upelars-Node.js-Questions.md](Upelars/Node.js/Upelars-Node.js-Questions.md) |
-| Upelars | React-NextJS | 1 | [Upelars-React-NextJS-Questions.md](Upelars/React-NextJS/Upelars-React-NextJS-Questions.md) |
+| Upelars | Node.js | 1 | [Upelars-Node.js-Questions.md](Upelars/Node.js/Upelars-Node.js-Questions.md) |
 | Visa | Docker-CICD-Git | 2 | [Visa-Docker-CICD-Git-Questions.md](Visa/Docker-CICD-Git/Visa-Docker-CICD-Git-Questions.md) |
 | Web3Dev | Authentication-JWT | 1 | [Web3Dev-Authentication-JWT-Questions.md](Web3Dev/Authentication-JWT/Web3Dev-Authentication-JWT-Questions.md) |
 | Web3Dev | Node.js | 3 | [Web3Dev-Node.js-Questions.md](Web3Dev/Node.js/Web3Dev-Node.js-Questions.md) |
 | Web3Dev | React-NextJS | 3 | [Web3Dev-React-NextJS-Questions.md](Web3Dev/React-NextJS/Web3Dev-React-NextJS-Questions.md) |
 | Web3Dev | TypeScript | 1 | [Web3Dev-TypeScript-Questions.md](Web3Dev/TypeScript/Web3Dev-TypeScript-Questions.md) |
-| ZS | AI-LLM | 13 | [ZS-AI-LLM-Questions.md](ZS/AI-LLM/ZS-AI-LLM-Questions.md) |
+| ZS | AI-LLM | 11 | [ZS-AI-LLM-Questions.md](ZS/AI-LLM/ZS-AI-LLM-Questions.md) |
 | rtCamp | Docker-CICD-Git | 5 | [rtCamp-Docker-CICD-Git-Questions.md](rtCamp/Docker-CICD-Git/rtCamp-Docker-CICD-Git-Questions.md) |
 
-**Total:** 154 questions (some are topic summaries; each file says so).
+**Total:** 140 questions (some are topic summaries; each file says so).
 
 ## Not included
 

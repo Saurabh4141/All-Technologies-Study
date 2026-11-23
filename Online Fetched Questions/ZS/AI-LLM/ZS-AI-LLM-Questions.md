@@ -23,7 +23,5 @@
 
 ## Round 3 – Experience-based interview (30-45 min, senior LLM engineer or ZS partner)
 
-10. Detailed discussion on the GenAI products you built, including their usage metrics.
-11. Questions about the AWS tools mentioned in your resume.
-12. Specific discussion on your experience with AWS Bedrock.
-13. Insights on topics like Hybrid RAG, multimodal agents, and MoE LLaVA.
+10. Specific discussion on your experience with AWS Bedrock.
+11. Insights on topics like Hybrid RAG, multimodal agents, and MoE LLaVA.

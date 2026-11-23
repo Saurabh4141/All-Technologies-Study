@@ -65,43 +65,40 @@ Source: https://www.youtube.com/watch?v=B1PUBlhd9Yg
 
 1. What challenges did you face while building the POC, and while converting the POC into a production-level project?
 2. What issues came up when moving to production?
-3. Why did you use this specific technology or model (e.g. LangGraph, U-Net++)? Why not others like MCP, U-Net or YOLO?
-4. How does each technology on your resume work? (e.g. LangGraph: what are nodes and edges?)
-5. Explain your project on the board with a marker.
+3. How does each technology on your resume work? (e.g. LangGraph: what are nodes and edges?)
 
 ## Round 2 – Technical
 
-6. What was the motive behind your research paper, and what is it about?
-7. Everyone knows machine learning, but **how does it actually work**?
-8. What is **backpropagation**? What is **forward propagation**?
-9. How does the **change of derivatives** work in backpropagation?
-10. What are **neurons**?
-11. Why did you choose **U-Net++ instead of YOLO**?
-12. What is the difference between **Decision Trees, Random Forest and XGBoost**?
-13. What is the difference between **MCP, LangGraph and LangChain**? Which is better?
-14. How can **LangGraph and MCP be used together**?
-15. What is the difference between **Generative AI and Agentic AI**?
-16. Why do we use **RAG** if we can just upload a document to an LLM (ChatGPT / Gemini) and ask questions? Why is RAG considered better?
-17. What do you mean by **Top-N** and **Top-K**?
-18. What is **similarity search**? What is **cosine similarity**?
-19. How do you **test a RAG** system? What **metrics or scores** do you use to check the accuracy of RAG-based answers?
-20. What are **BLEU** and **ROUGE** scores?
-21. What are **Recall** and **Precision**?
-22. In which scenario will you use **Recall**?
-23. *(Scenario)* Which model would you use, and how would you implement the agent? What is **orchestration of agents**?
+4. Everyone knows machine learning, but **how does it actually work**?
+5. What is **backpropagation**? What is **forward propagation**?
+6. How does the **change of derivatives** work in backpropagation?
+7. What are **neurons**?
+8. Why did you choose **U-Net++ instead of YOLO**?
+9. What is the difference between **Decision Trees, Random Forest and XGBoost**?
+10. What is the difference between **MCP, LangGraph and LangChain**? Which is better?
+11. How can **LangGraph and MCP be used together**?
+12. What is the difference between **Generative AI and Agentic AI**?
+13. Why do we use **RAG** if we can just upload a document to an LLM (ChatGPT / Gemini) and ask questions? Why is RAG considered better?
+14. What do you mean by **Top-N** and **Top-K**?
+15. What is **similarity search**? What is **cosine similarity**?
+16. How do you **test a RAG** system? What **metrics or scores** do you use to check the accuracy of RAG-based answers?
+17. What are **BLEU** and **ROUGE** scores?
+18. What are **Recall** and **Precision**?
+19. In which scenario will you use **Recall**?
+20. *(Scenario)* Which model would you use, and how would you implement the agent? What is **orchestration of agents**?
 
 ## Situation-Based
 
-24. We already have APIs, so **why was MCP introduced**? What are the reasons?
-25. A company has deterministic, highly secured documents, and employees use an enterprise-level LLM by uploading those documents to get answers. What are your views, and how can employees get answers from the enterprise LLM **without uploading the highly secured documents**?
-26. Why was RAG introduced when we already have the option to attach our documents to an LLM?
+21. We already have APIs, so **why was MCP introduced**? What are the reasons?
+22. A company has deterministic, highly secured documents, and employees use an enterprise-level LLM by uploading those documents to get answers. What are your views, and how can employees get answers from the enterprise LLM **without uploading the highly secured documents**?
+23. Why was RAG introduced when we already have the option to attach our documents to an LLM?
 
 ## Coding (Python)
 
-27. You have three lists with different numbers. How do you get the **union** of them?
-28. You have **two hash maps**. Merge **only the distinct keys** into one hash map.
-29. Given a list, **flatten it** so that it is consumable by an ML model.
-30. **Leaders in an array** (LeetCode).
+24. You have three lists with different numbers. How do you get the **union** of them?
+25. You have **two hash maps**. Merge **only the distinct keys** into one hash map.
+26. Given a list, **flatten it** so that it is consumable by an ML model.
+27. **Leaders in an array** (LeetCode).
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------
