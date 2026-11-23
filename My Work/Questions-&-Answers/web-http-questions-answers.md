@@ -93,14 +93,18 @@ Ordered by priority: the question asked by the most interviewers comes first.
 5. Why do we use Nginx as a proxy server?
    *(Asked 1×: One97 Paytm)*
 
-==> Nginx sits in front of our Node.js app as a **reverse proxy** (it receives client requests and
-    forwards them to the app).
-    - **Load balancing** – spreads traffic across many Node instances.
-    - **SSL/HTTPS termination** – handles certificates so Node does not have to.
+==> A **reverse proxy** is a server that sits in front of one or more backend app servers: it
+    receives client requests and forwards them to the right backend. Nginx is a popular choice for
+    this with any backend (Node.js, PHP-FPM, Python, Java ...).
+    - **Load balancing** – spreads traffic across many app instances/servers.
+    - **SSL/HTTPS termination** – handles certificates so the app does not have to.
     - **Serves static files** (images, JS, CSS) very fast.
     - **Caching and gzip compression**.
     - **Security** – hides the app server, rate limiting, request size limits.
     - Handles thousands of connections with little memory.
+
+    Node.js example: the Node app listens on port 3000 and Nginx forwards public traffic to it
+    (and can balance across several Node processes).
 
     ```nginx
     server {

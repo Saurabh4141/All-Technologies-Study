@@ -13,10 +13,13 @@ Ordered by priority: the question asked by the most interviewers comes first.
     - **Authentication (who are you):** user logs in → server checks password → server creates a JWT
       signed with a secret → sends it to the client.
     - Client sends the token on every request in the header: `Authorization: Bearer <token>`.
-    - Server checks the signature with `jwt.verify`. If valid, it trusts the user id inside.
+    - Server checks the signature (in Node.js: `jwt.verify`). If valid, it trusts the user id
+      inside.
     - **Authorization (what can you do):** server reads the role from the token and allows or blocks
       the action.
     - It is **stateless**: the server does not need to store sessions.
+
+    In Node.js, with the `jsonwebtoken` package:
 
     ```js
     const jwt = require('jsonwebtoken');
@@ -145,10 +148,11 @@ Ordered by priority: the question asked by the most interviewers comes first.
    *(Asked 1×: Senior Node.js round (YT))*
 
 ==> **No, it is not decrypted.** A normal JWT is **signed, not encrypted**.
-    - `jwt.verify(token, secret)` recalculates the signature from header + payload using the secret
-      and compares it with the token's signature.
+    - Verifying = the server recalculates the signature from header + payload using the secret
+      (HS256) or checks it with the public key (RS256), and compares it with the token's signature.
     - It also checks expiry (`exp`).
-    - If something does not match → it throws an error → return 401.
+    - In Node.js, `jwt.verify(token, secret)` from `jsonwebtoken` does all of this. If something
+      does not match → it throws an error → return 401.
 
     ```js
     try {
@@ -188,8 +192,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
     1. The signature was made from the original header + payload (id 123) using the server's secret.
     2. The attacker changes the payload to 456 but does not know the secret, so he cannot make a new
        valid signature.
-    3. `jwt.verify` recalculates the signature for the new payload → it does not match → error →
-       401.
+    3. The server (`jwt.verify` in Node.js) recalculates the signature for the new payload → it
+       does not match → error → 401.
 
     Interview tip: keep the secret strong and private. Note: if the attacker steals the *unchanged*
     token, it still works until it expires — that's why access tokens are short-lived and sent over
@@ -200,7 +204,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
 10. How do you protect your APIs from unauthorized access?
    *(Asked 1×: Senior Node.js round (YT))*
 
-==> 
+==> Check **who** the caller is (authentication) and **what** they may do (authorization) on the
+    server, on every request. In Node.js/Express this is done with middleware:
     1. User logs in → gets a short-lived JWT (access token).
     2. Client sends it in the `Authorization: Bearer <token>` header (or an HttpOnly cookie).
     3. An **auth middleware** runs `jwt.verify` on every protected route; invalid/missing → 401.
@@ -521,10 +526,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
     - `X-Content-Type-Options: nosniff` → don't guess file types.
     - `X-Frame-Options` / CSP `frame-ancestors` → stop clickjacking (site inside an iframe).
     - `Referrer-Policy` → don't leak full URLs.
-    - Remove `X-Powered-By: Express` → don't reveal the tech stack.
+    - Remove `X-Powered-By` (e.g. `X-Powered-By: Express`) → don't reveal the tech stack.
     - CORS headers (`Access-Control-Allow-Origin`) → only trusted origins.
 
-    Easiest way: `app.use(helmet())`.
+    In Express, the easiest way: `app.use(helmet())`.
 
 ---
 
@@ -626,6 +631,8 @@ Ordered by topic priority: questions from the most-asked topics come first.
     - CORS is enforced only by browsers. Postman, curl or server-to-server calls ignore it, so CORS
       is not an authentication mechanism.
 
+    In Express, use the `cors` package:
+
     ```js
     const cors = require('cors');
     app.use(cors({
@@ -642,8 +649,10 @@ Ordered by topic priority: questions from the most-asked topics come first.
 32. What is NoSQL injection and how do you prevent it?
    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
-==> NoSQL injection is when a user sends query operators (like `$ne`, `$gt`, `$where`) instead of
-    plain values, and they go straight into a MongoDB query.
+==> NoSQL injection is when user input changes the meaning of a NoSQL database query (like SQL
+    injection, but for NoSQL databases).
+    - In MongoDB, the common case: a user sends query operators (like `$ne`, `$gt`, `$where`)
+      instead of plain values, and they go straight into the query.
     - Example attack on login: body is `{ "email": "a@b.com", "password": { "$ne": null } }`. The
       query matches any password, so the attacker logs in.
 

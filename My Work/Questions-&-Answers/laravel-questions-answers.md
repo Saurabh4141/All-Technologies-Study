@@ -9,8 +9,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 1. Cross-site attacks (XSS / CSRF): how do they work and how do you handle them?
    *(Asked 1×: Interview, no company)*
 
-==> **XSS (Cross-Site Scripting)**: an attacker saves a `<script>` in your data (comment, name).
-    When another user opens the page, the script runs in their browser and can steal data.
+==> **XSS (Cross-Site Scripting)**: an attacker gets their own `<script>` into your page (saved in
+    data like a comment or name, or put in a URL). When another user opens the page, the script
+    runs in their browser and can steal data.
     - Laravel fix: Blade `{{ $value }}` escapes HTML automatically. Avoid `{!! $value !!}` for user
       input (or clean it first).
 
@@ -41,7 +42,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 2. How will you secure your application?
    *(Asked 1×: Interview, no company)*
 
-==> Main steps:
+==> In any web app: validate input, use parameterized queries, escape output, protect forms
+    against CSRF, use strong auth and permissions, rate-limit, and keep secrets and software safe.
+    Main steps in Laravel:
     1. **Validation**: validate every input (`$request->validate()` / Form Requests).
     2. **SQL injection**: use Eloquent / Query Builder (they bind values); never put raw input into
        `DB::raw`.
@@ -74,8 +77,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 4. Where should sensitive files be saved for security?
    *(Asked 1×: Interview, no company)*
 
-==> Outside the `public/` folder — in `storage/app` (the "local" / private disk). Only `public/` is
-    reachable by URL.
+==> In any web app: outside the web root (the folder the web server serves), so no URL can reach
+    them; give them out only through code that checks permission.
+    In Laravel: outside the `public/` folder — in `storage/app` (the "local" / private disk). Only
+    `public/` is reachable by URL.
     - Give access through a controller that checks the user first, or with a **temporary signed
       URL** (for S3).
     - Secrets (DB password, API keys) go in `.env`, which is never committed to git.
@@ -123,7 +128,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 6. Types of authentication after user login
    *(Asked 1×: Interview, no company)*
 
-==> After login, the app must remember who the user is. Common ways in Laravel:
+==> After login, the app must remember who the user is. Two general ways: a server-side
+    **session** (the browser keeps a session-ID cookie), or a **token** the client sends with each
+    request (random API token, JWT, OAuth2 access token). Common ways in Laravel:
 
     +-------------------+--------------------------------------------+-------------------------------------+
     | Type              | How it works                               | Used for                            |
@@ -147,7 +154,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
 7. How do tokens work?
    *(Asked 1×: Interview, no company)*
 
-==> Steps:
+==> A token is a string the server gives the client after login; the client sends it with every
+    request to prove who it is, instead of using a server session. Steps:
     1. User logs in with email + password.
     2. Server checks them and creates a token, then returns it.
     3. Client saves it (mobile storage / memory).
@@ -155,6 +163,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
     5. Server checks the token (Sanctum: looks up its hash in DB; JWT: checks the signature) and
        finds the user.
     6. Logout = delete the token (or let it expire).
+
+    In Laravel (Sanctum):
 
     ```php
     // login
@@ -197,7 +207,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
     1. **DNS** turns `shop.com` into the server's IP address.
     2. Browser opens a **TCP** connection and an **HTTPS (TLS)** handshake.
     3. Browser sends the HTTP request (`GET /products/5`).
-    4. Web server (**Nginx/Apache**) gets it and passes it to **PHP-FPM** → `public/index.php`.
+    4. Web server (**Nginx/Apache**) gets it and passes it to the app; for Laravel that is
+       **PHP-FPM** → `public/index.php`.
     5. Laravel runs it: middleware → route `products/{id}` → controller → database.
     6. Laravel returns an HTML/JSON response; the server sends it back.
     7. Browser renders the page and loads CSS/JS/images.
@@ -268,9 +279,12 @@ Ordered by priority: the question asked by the most interviewers comes first.
 12. How does the rate limiter work?
    *(Asked 1×: Interview, no company)*
 
-==> It limits how many requests a user/IP can make in a time window (e.g. 60 per minute). It stores
-    a counter in the cache (Redis/file). When the limit is crossed, Laravel returns **429 Too Many
-    Requests** with a `Retry-After` header. The counter resets after the window.
+==> A rate limiter caps how many requests a user/IP can make in a time window (e.g. 60 per
+    minute); extra requests are rejected, usually with **429 Too Many Requests**, until the window
+    resets.
+    In Laravel: the `throttle` middleware keeps a counter per key (user ID or IP) in the cache
+    (Redis/file). When the limit is crossed it returns 429 with a `Retry-After` header. The counter
+    resets after the window.
 
     ```php
     // AppServiceProvider::boot()

@@ -9,7 +9,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 1. What is a cold start? How can you tackle it?
    *(Asked 2×: TCS, TechM)*
 
-==> A cold start is the extra delay when Lambda has no ready instance and must create a new one.
+==> In general, a cold start is the extra delay when a system must start a fresh instance (load the
+    code, start the runtime, run init code) before it can serve a request; it applies to serverless
+    platforms, containers and apps in general.
+    In AWS Lambda, it happens when there is no ready instance and Lambda must create a new one.
     - It happens on the first call, after the function was idle, or when traffic suddenly grows.
     - During a cold start AWS downloads your code, starts the runtime (Node.js) and runs your init
       code (outside the handler).
@@ -82,7 +85,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
 5. How many parameters can we pass to a Lambda function?
    *(Asked 1×: TechM)*
 
-==> The handler receives **3 parameters**: `event`, `context`, `callback`.
+==> In the Node.js runtime the handler receives **3 parameters**: `event`, `context`, `callback`
+    (other runtimes, e.g. Python, take only `event` and `context`).
     - `event` – the input data (you put all your values inside this one object).
     - `context` – info about the run (request id, remaining time, function name).
     - `callback` – old style to return a result; with `async` handlers you just `return` instead.
@@ -201,7 +205,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
 11. How do you monitor production in serverless?
    *(Asked 1×: Algoworks)*
 
-==>
+==> In general, serverless apps are monitored through the cloud provider's logs, metrics, alerts and
+    distributed tracing, since there are no servers to watch. On AWS:
     - **CloudWatch Logs** – all `console.log` output of Lambda goes here.
     - **CloudWatch Metrics** – invocations, errors, duration, throttles, concurrent executions.
     - **CloudWatch Alarms** – send alert (SNS → email/Slack) when errors or duration go high.

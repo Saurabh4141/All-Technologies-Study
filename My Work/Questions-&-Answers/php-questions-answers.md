@@ -143,7 +143,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 5. Flow of a cookie
    *(Asked 1×: Interview, no company)*
 
-==> A cookie is a small piece of data stored in the **browser**.
+==> A cookie is a small piece of data stored in the **browser**. The server sends it in a
+    `Set-Cookie` response header, and the browser sends it back in the `Cookie` request header on
+    every later request to that site. This is plain HTTP, the same in every web language.
+    In PHP:
     1. PHP calls `setcookie()`. This sends a `Set-Cookie` header with the response.
     2. The browser saves the cookie (name, value, expiry, path, domain).
     3. On every next request to that site, the browser sends it back in the `Cookie` header.
@@ -172,7 +175,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 6. Flow of a session
    *(Asked 1×: Interview, no company)*
 
-==> A session stores user data on the **server**; the browser keeps only a session ID.
+==> A session stores user data on the **server**; the browser keeps only a session ID (usually in a
+    cookie) and sends it with each request. Every web language/framework uses this idea.
+    In PHP:
     1. `session_start()` creates a unique session ID (or reuses the existing one).
     2. PHP sends the ID to the browser in a cookie named `PHPSESSID`.
     3. Data you put in `$_SESSION` is saved in a file on the server (named after the ID).
@@ -219,7 +224,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 8. GET vs POST
    *(Asked 1×: Interview, no company)*
 
-==> Both send data to the server, in different ways.
+==> GET and POST are HTTP methods (same in every language): GET asks the server for data, POST
+    sends data to the server to create or change something. In PHP you read them from `$_GET` and
+    `$_POST`.
 
     +-------------------------------------+--------------------------------------------+
     | GET                                 | POST                                       |

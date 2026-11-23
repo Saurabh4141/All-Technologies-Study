@@ -341,13 +341,14 @@ Ordered by priority: the question asked by the most interviewers comes first.
 16. What steps do you include in a CI/CD pipeline?
    *(Asked 1×: Kyndryl)*
 
-==>
+==> A CI/CD pipeline is an automated sequence that builds, tests and deploys code on every change.
+    Typical steps (tool examples for a Node.js project in brackets):
     1. Code push / pull request (Git) triggers the pipeline.
-    2. Install dependencies (`npm ci`).
-    3. Lint and static analysis (ESLint, SonarQube).
+    2. Install dependencies (e.g. `npm ci`; `pip install`, `mvn install` in other stacks).
+    3. Lint and static analysis (e.g. ESLint, SonarQube).
     4. Unit tests (+ coverage).
     5. Integration tests.
-    6. Build (e.g. TypeScript compile, Docker image) and security scan (`npm audit`).
+    6. Build (e.g. TypeScript compile, Docker image) and security scan (e.g. `npm audit`, Trivy).
     7. Push artifact/image to a registry (ECR / Docker Hub).
     8. Deploy to staging → smoke tests → approval → production.
     9. Monitoring and rollback if something breaks.

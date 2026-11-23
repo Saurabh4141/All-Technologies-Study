@@ -503,10 +503,11 @@ Ordered by priority: the question asked by the most interviewers comes first.
     - **Non-primitive (reference)**: `object` (includes arrays, functions, Date, Map, etc.).
 
     How they are stored:
-    - **Primitives** are stored by **value** (simple values, usually kept on the stack). Copying
-      makes a real copy.
+    - **Primitives** behave as **values**: copying makes a real copy.
     - **Objects** are stored in the **heap**; a variable holds a **reference** (address) to it.
       Copying copies only the reference.
+    - Note: "primitives on the stack" is only a mental model. The JS spec does not define stack or
+      heap; the engine decides (e.g. V8 keeps strings on the heap).
 
     ```js
     let a = 10; let b = a; b = 20;
@@ -776,7 +777,7 @@ Ordered by priority: the question asked by the most interviewers comes first.
    *(Asked 1×: TCS)*
 
 ==> **Currying** turns a function that takes many arguments into a chain of functions that each take
-    one argument. It works because of closures.
+    one argument. In JavaScript it is built with closures.
 
     ```js
     function multi(a) {

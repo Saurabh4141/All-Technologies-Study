@@ -36,7 +36,8 @@ Ordered by priority: the question asked by the most interviewers comes first.
 2. How do you identify if a query is taking a long time to execute?
    *(Asked 1×: Deloitte)*
 
-==> 
+==> Measure it: most databases can log slow queries, show what is running now, and show the
+    execution plan with real timing (e.g. MongoDB has the profiler and `.explain()`). In MySQL:
     - Turn on the **slow query log** (logs queries slower than N seconds).
     - Run **`EXPLAIN`** / **`EXPLAIN ANALYZE`** to see the plan and real time.
     - Log query time in the app (e.g. Sequelize `benchmark: true`) or use APM tools.
@@ -56,10 +57,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ==> 
     1. **Confirm:** find it in the slow query log / APM and note how slow and how often.
-    2. **Explain:** run `EXPLAIN ANALYZE` on it. Look for `type: ALL` (full scan), large `rows`,
-       `Using filesort`, `Using temporary`.
-    3. **Check the data:** did the table grow? Are stats old (`ANALYZE TABLE`)? Is it locked by
-       other queries?
+    2. **Explain:** run `EXPLAIN ANALYZE` on it (MySQL/PostgreSQL). In MySQL look for `type: ALL`
+       (full scan), large `rows`, `Using filesort`, `Using temporary`.
+    3. **Check the data:** did the table grow? Are stats old (`ANALYZE TABLE` in MySQL)? Is it
+       locked by other queries?
     4. **Fix:** add/adjust an index, rewrite the query (no `SELECT *`, no function on indexed
        column, better JOIN), add pagination or caching.
     5. **Test** on staging with similar data, compare the plan and time.
@@ -70,12 +71,15 @@ Ordered by priority: the question asked by the most interviewers comes first.
 4. What is indexing in a database?
    *(Asked 1×: Deloitte)*
 
-==> An **index** is a separate sorted structure (a B-Tree in MySQL) that helps the DB find rows
-    fast, like the index at the back of a book.
+==> An **index** is a separate data structure that helps the DB find rows fast without reading
+    the whole table, like the index at the back of a book.
     - Without index → DB reads every row (full table scan).
     - With index → DB jumps almost directly to the matching rows.
-    - Types: **Primary** (clustered in InnoDB), **Unique**, **Secondary/normal**, **Composite**
-      (many columns), **Full-text**.
+    - The structure depends on the database and index type: B-Tree is the common default, but
+      there are also hash, full-text (inverted), GIN/GiST (PostgreSQL), bitmap (Oracle), etc.
+    - In MySQL (InnoDB), normal indexes are B+Trees. Types: **Primary** (clustered in InnoDB),
+      **Unique**, **Secondary/normal**, **Composite** (many columns), **Full-text**.
+    - MongoDB also uses B-Tree indexes (single field, compound, text, etc.).
     - Cost: uses disk space and makes INSERT/UPDATE/DELETE a bit slower, so don't index everything.
 
     ```sql
@@ -126,7 +130,7 @@ Ordered by priority: the question asked by the most interviewers comes first.
    *(Asked 1×: Deloitte)*
 
 ==> You don't calculate it by hand; the **query optimizer estimates it** (based on rows to read,
-    index use, disk I/O, CPU, joins and sorting). You read it with:
+    index use, disk I/O, CPU, joins and sorting). In MySQL you read it with:
     - `EXPLAIN FORMAT=JSON` → shows `query_cost`.
     - `EXPLAIN ANALYZE` → shows estimated cost and **actual** time and rows.
     - `SHOW STATUS LIKE 'Last_query_cost';` right after running the query.
@@ -231,8 +235,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 12. Write a stored procedure
    *(Asked 1×: Interview, no company)*
 
-==> A **stored procedure** is saved SQL code in the database that you run with `CALL`. It can take
-    IN/OUT parameters.
+==> A **stored procedure** is saved SQL code in the database that you run by name (`CALL` in
+    MySQL/PostgreSQL, `EXEC` in SQL Server). It can take IN/OUT parameters.
+
+    MySQL example:
 
     ```sql
     DELIMITER //

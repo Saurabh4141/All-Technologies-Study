@@ -4,12 +4,65 @@ Questions that were really asked in interviews (company rounds, online interview
 interviews).
 Ordered by priority: the question asked by the most interviewers comes first.
 
+# What is Node.js?
+ -- Node.js is a JavaScript runtime that allows us to execute JavaScript outside the browser, such as on a server.
+ -- It uses the V8 JavaScript engine and supports asynchronous, non-blocking I/O
+
+
+*** JavaScript & Node.js Execution Order *** 
+
+┌───────────────────────────────────────┐
+│ 1. SYNCHRONOUS JAVASCRIPT             │
+│    ├── Normal statements              │
+│    ├── Function calls                 │
+│    ├── Loops                          │
+│    └── Synchronous callbacks          │
+└──────────────────┬────────────────────┘
+                   ▼
+┌──────────────────────────────────────┐           ===== > There Is No process.nextTick in JavaScript , So No 2nd Step in JavaScript
+│ 2. process.nextTick() QUEUE          │
+│    └── process.nextTick(callback)    │
+└──────────────────┬───────────────────┘
+                   ▼
+┌───────────────────────────────────────┐
+│ 3. MICROTASK QUEUE                    │
+│    ├── Promise.then()                 │
+│    ├── Promise.catch()                │
+│    ├── Promise.finally()              │
+│    ├── queueMicrotask()               │
+│    └── async/await continuations      │
+└──────────────────┬────────────────────┘
+                   ▼
+┌───────────────────────────────────────┐
+│ 4. EVENT LOOP                         │
+│                                       │
+│    ├── Timers                         │
+│    │   ├── setTimeout()               │
+│    │   └── setInterval()              │
+│    │                                  │
+│    ├── Pending callbacks              │
+│    ├── Idle / Prepare (internal)      │
+│    ├── Poll                           │
+│    │   └── I/O callbacks              │
+│    ├── Check                          │
+│    │   └── setImmediate()             │          ===== > There Is No setImmediate()  in JavaScript
+│    └── Close callbacks                │
+└───────────────────────────────────────┘
+
+
+
+=======================================================
+
 ---
 
 1. What is the event loop? How does it work and manage asynchronous operations?
    *(Asked 4×: Persistent Systems, TCS (online), Fundwave, Hyland Software)*
 
-==> The event loop is the part of Node.js that decides **when each callback gets to run**.
+==> An event loop is a general programming pattern: a loop that waits for events (I/O finished,
+    timer fired, user click) and runs their callbacks one by one on a single thread. Browsers,
+    Deno, Python asyncio and GUI toolkits all have one.
+
+    In Node.js, the event loop (provided by libuv) decides **when each callback gets to run**.
     - JavaScript runs on one main thread (the call stack).
     - Slow work (file read, DB query, network call, timer) is handed off to the OS or libuv (Node's
       C library for async I/O).
@@ -33,8 +86,11 @@ Ordered by priority: the question asked by the most interviewers comes first.
 2. What is middleware? Write a custom middleware function
    *(Asked 4×: Persistent Systems, TCS (online), Capsitech, EarlyCoder 5-yr Node (YT))*
 
-==> Middleware is a function that runs **between the request coming in and the response going out**.
-    - It gets `req`, `res` and `next`.
+==> Middleware is a general concept: code that runs **between the request coming in and the
+    response going out** and handles a shared job (auth, logging...). Express, Laravel, Django and
+    ASP.NET Core all use it.
+
+    In Express.js, middleware is a function that gets `req`, `res` and `next`.
     - It can read/change `req`/`res`, end the request, or call `next()` to pass control on.
     - Uses: logging, authentication, validation, body parsing, error handling, rate limiting.
     - Types: application-level, router-level, built-in (`express.json()`), third-party (`cors`,
@@ -800,7 +856,7 @@ Ordered by priority: the question asked by the most interviewers comes first.
     +--------------------------------------------+-------------------------------------------+
     | Waits at least the given delay (0 → ~1 ms) | No delay, runs after the poll (I/O) phase |
     +--------------------------------------------+-------------------------------------------+
-    | Exists in browser and Node                 | Node only                                 |
+    | Exists in browser and Node                 | Node API, not in browsers                 |
     +--------------------------------------------+-------------------------------------------+
 
     Order:
@@ -1431,7 +1487,9 @@ Ordered by topic priority: questions from the most-asked topics come first.
    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
    revision PDF)*
 
-==> Two module systems exist in Node.js.
+==> CommonJS (CJS) is the module system Node.js started with (`require` / `module.exports`). ES
+    Modules (ESM) are the official JavaScript standard (`import` / `export`), used in browsers,
+    Deno, bundlers and Node.js. Node.js supports both.
 
     +-----------------+--------------------------------+--------------------------------------------+
     |                 | CommonJS                       | ES Modules                                 |

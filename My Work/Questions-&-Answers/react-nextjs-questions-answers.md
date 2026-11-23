@@ -183,7 +183,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 8. What is the Virtual DOM and why is it useful?
    *(Asked 2×: EZ Works, TCS (online))*
 
-==> The Virtual DOM is a **lightweight JavaScript copy** of the real DOM kept in memory.
+==> The Virtual DOM is a **lightweight JavaScript copy** of the real DOM kept in memory. It is a
+    general UI technique, used by React and also by other libraries like Vue and Preact.
+    In React:
     1. State changes → React builds a new Virtual DOM tree.
     2. It compares (diffs) it with the old one.
     3. It updates **only the changed parts** in the real DOM.
@@ -307,8 +309,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 15. What is hydration? Why do hydration mismatch errors happen?
     *(Asked 1×: EZ Works)*
 
-==> **Hydration**: the server sends ready HTML; then React runs in the browser and **attaches event
-    handlers and state** to that existing HTML, making it interactive.
+==> **Hydration**: the server sends ready HTML; then the JS framework runs in the browser and
+    **attaches event handlers and state** to that existing HTML, making it interactive. It happens
+    in any SSR framework (React/Next.js, Vue/Nuxt, Svelte ...).
+    In React/Next.js, React does this with `hydrateRoot` (Next.js calls it for you).
 
     **Mismatch error**: the HTML React renders in the browser is different from the server HTML.
     Common causes:
