@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. How do you improve slow query performance? What tools or techniques do you use?
+##### 1. How do you improve slow query performance? What tools or techniques do you use?
 
-   *(Asked 3×: Algoworks, Deloitte, Interview, no company)*
+*(Asked 3×: Algoworks, Deloitte, Interview, no company)*
 
 ==> Two steps: first **find** the slow query, then **fix** it.
 
@@ -41,9 +41,9 @@ In short: measure with the slow log and EXPLAIN, then fix with indexes, leaner q
 
 ---
 
-2. How do you identify if a query is taking a long time to execute?
+##### 2. How do you identify if a query is taking a long time to execute?
 
-   *(Asked 1×: Deloitte)*
+*(Asked 1×: Deloitte)*
 
 ==> In MySQL, four quick ways:
 - **Slow query log** – turn it on and it records every query slower than N seconds.
@@ -65,9 +65,9 @@ In short: slow query log for history, PROCESSLIST for now, EXPLAIN ANALYZE for t
 
 ---
 
-3. A SQL statement performs poorly in production. How do you find the root cause and fix it?
+##### 3. A SQL statement performs poorly in production. How do you find the root cause and fix it?
 
-   *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> My step-by-step approach:
 1. **Confirm** – find it in the slow query log / APM. How slow? How often does it run?
@@ -84,9 +84,9 @@ In short: confirm → explain → check data and locks → fix → test → moni
 
 ---
 
-4. What is indexing in a database?
+##### 4. What is indexing in a database?
 
-   *(Asked 1×: Deloitte)*
+*(Asked 1×: Deloitte)*
 
 ==> An **index** is a separate sorted structure that lets the database find rows **without
 reading the whole table** – like the index at the back of a book.
@@ -111,9 +111,9 @@ In short: an index trades some write speed and disk for much faster reads.
 
 ---
 
-5. A query uses three columns. Do you just add indexes to them, or what is your first step?
+##### 5. A query uses three columns. Do you just add indexes to them, or what is your first step?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> No. My first step is to **run `EXPLAIN`** and understand the query.
 1. Check the plan – is an index already used? How many rows are scanned?
@@ -135,9 +135,9 @@ In short: EXPLAIN first, then usually one well-ordered composite index.
 
 ---
 
-6. id is the primary key but you search by name or age. Will the primary index help?
+##### 6. id is the primary key but you search by name or age. Will the primary index help?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> **No.** The primary key index is sorted by `id`, so it only helps lookups on `id`.
 - `WHERE name = 'Ravi'` → **full table scan** unless `name` has its own index.
@@ -156,9 +156,9 @@ In short: an index only helps the columns it is built on.
 
 ---
 
-7. How do you calculate query cost?
+##### 7. How do you calculate query cost?
 
-   *(Asked 1×: Deloitte)*
+*(Asked 1×: Deloitte)*
 
 ==> You don't calculate it by hand – the **query optimizer estimates** it from rows to read,
 index use, disk I/O, CPU, joins and sorting. In MySQL you can read the number:
@@ -176,9 +176,9 @@ In short: the optimizer gives the cost; EXPLAIN shows it so you can compare quer
 
 ---
 
-8. What is the query execution plan?
+##### 8. What is the query execution plan?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> The **execution plan** is the step-by-step route the database picks to run your query: which
 table first, which index, how to join, and how many rows it expects.
@@ -208,9 +208,9 @@ In short: the plan tells you whether the database uses an index or scans everyth
 
 ---
 
-9. What is the difference between SQL and NoSQL?
+##### 9. What is the difference between SQL and NoSQL?
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==>
 ```text
@@ -252,9 +252,9 @@ In short: SQL = structure and consistency; NoSQL = flexibility and easy scale-ou
 
 ---
 
-10. How do you do horizontal scaling in a database?
+##### 10. How do you do horizontal scaling in a database?
 
-    *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> Horizontal scaling = add **more database servers** instead of a bigger one.
 - **Read replicas** – one **primary** takes writes, **replicas** copy it and serve reads (MySQL
@@ -270,9 +270,9 @@ In short: replicas scale reads, sharding scales reads and writes.
 
 ---
 
-11. Delete duplicate records from a table
+##### 11. Delete duplicate records from a table
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> Keep one row per duplicate group (the smallest `id`) and delete the rest.
 
@@ -317,9 +317,9 @@ In short: find with GROUP BY + HAVING, delete with a self join or ROW_NUMBER, th
 
 ---
 
-12. Write a stored procedure
+##### 12. Write a stored procedure
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> A **stored procedure** is named SQL code saved **inside the database**. You run it with `CALL`
 (MySQL). It can take **IN**, **OUT** and **INOUT** parameters.
@@ -355,9 +355,9 @@ In short: saved, parameterised SQL you run with CALL.
 
 ---
 
-13. MongoDB aggregation and $lookup
+##### 13. MongoDB aggregation and $lookup
 
-    *(Asked 1×: Capsitech)*
+*(Asked 1×: Capsitech)*
 
 ==> **Aggregation** = a **pipeline of stages**; each stage takes documents, changes them, and
 passes them on. Think of it as SQL `WHERE` → `JOIN` → `GROUP BY` → `ORDER BY`.
@@ -390,9 +390,9 @@ In short: aggregation is a stage-by-stage pipeline; $lookup is MongoDB's LEFT JO
 
 ---
 
-14. Why do we use Redis?
+##### 14. Why do we use Redis?
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> **Redis** is an **in-memory key-value store** – data lives in RAM, so reads/writes take well
 under a millisecond.
@@ -431,9 +431,9 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ---
 
-15. What is the N+1 query problem and how do you fix it?
+##### 15. What is the N+1 query problem and how do you fix it?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
 ==> You run **1 query** to get a list, then **1 more query for each item**. 100 posts = 101
 queries – slow because of all the round trips.
@@ -462,10 +462,9 @@ In short: replace many small queries with one JOIN or one batched IN query.
 
 ---
 
-16. Redis vs in-memory cache; what is the cache-aside pattern and cache invalidation?
+##### 16. Redis vs in-memory cache; what is the cache-aside pattern and cache invalidation?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
-    revision PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
 ==> Both keep hot data in RAM so you hit the database less. The difference is **where** that
 memory lives.
@@ -513,9 +512,9 @@ invalidate with TTL plus delete-on-write.
 
 ---
 
-17. MongoDB: when do you embed and when do you reference? (populate)
+##### 17. MongoDB: when do you embed and when do you reference? (populate)
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
 ==> **Embed** = put related data inside the same document. **Reference** = store only the other
 document's `_id` and look it up when needed.
@@ -542,9 +541,9 @@ In short: embed small data you read together; reference big, growing or shared d
 
 ---
 
-18. What is Mongoose? (schema, model, validation)
+##### 18. What is Mongoose? (schema, model, validation)
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
 ==> **Mongoose** is an **ODM** (Object Data Modeling) library for using MongoDB from Node.js.
 MongoDB itself is schema-less; Mongoose adds structure on top.

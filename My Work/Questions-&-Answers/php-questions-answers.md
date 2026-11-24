@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. Multidimensional array and string function programs
+##### 1. Multidimensional array and string function programs
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> A **multidimensional array** in PHP is an array whose items are arrays, like rows of a table.
 Loop it with nested `foreach`, and read a cell with two keys: `$arr[row][column]`.
@@ -40,9 +40,9 @@ In short: nested `foreach` to loop, `$arr[i][key]` to read, string functions to 
 
 ---
 
-2. Define an array, unset an element, then implode it
+##### 2. Define an array, unset an element, then implode it
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> Three functions to know:
 - **`unset()`** removes an element by key. The other keys are **not** re-numbered.
@@ -63,9 +63,9 @@ In short: `unset` removes, `implode` joins, `explode` splits.
 
 ---
 
-3. Get the 2nd highest number from an array without built-in functions
+##### 3. Get the 2nd highest number from an array without built-in functions
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> Loop **once** and keep two variables: `$first` (highest) and `$second`. No `sort`, `max` or
 `count` needed, and it runs in **O(n)**.
@@ -95,9 +95,9 @@ In short: one loop, two variables, update `second` whenever `first` changes.
 
 ---
 
-4. Array and string logic questions without built-in functions
+##### 4. Array and string logic questions without built-in functions
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> The interviewer wants you to do by hand what `strlen`, `strrev`, `array_reverse`,
 `array_unique` and `count` do. Use loops and indexes. Key trick: a PHP string can be read like
@@ -157,9 +157,9 @@ duplicates.
 
 ---
 
-5. Flow of a cookie
+##### 5. Flow of a cookie
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> A **cookie** is small data stored in the **browser**. In PHP:
 1. You call **`setcookie()`**. PHP adds a **`Set-Cookie`** header to the response, so call it
@@ -190,9 +190,9 @@ In short: `setcookie()` → browser stores it → browser sends it back → `$_C
 
 ---
 
-6. Flow of a session
+##### 6. Flow of a session
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> A PHP **session** keeps user data on the **server**. The browser holds only the **session
 ID**.
@@ -233,9 +233,9 @@ In short: data on the server, only `PHPSESSID` in the browser cookie.
 
 ---
 
-7. Where are session files stored?
+##### 7. Where are session files stored?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> On the server, in the folder set by **`session.save_path`** in `php.ini`. Each file is named
 **`sess_<session_id>`**.
@@ -254,9 +254,9 @@ In short: `session.save_path`, one `sess_<id>` file per user; use Redis for many
 
 ---
 
-8. GET vs POST
+##### 8. GET vs POST
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> In PHP you read GET data from **`$_GET`** and POST data from **`$_POST`**. Use GET to read data
 and POST to create or change data.
@@ -296,9 +296,9 @@ In short: GET = URL, for reading; POST = body, for changing; `$_GET` / `$_POST`.
 
 ---
 
-9. Errors in PHP
+##### 9. Errors in PHP
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> Main error types (PHP 8):
 - **Parse / syntax error**: the code is wrong (e.g. missing `;`), so the script doesn't run.
@@ -333,9 +333,9 @@ In short: show all errors in dev, log them in prod, catch `Throwable`.
 
 ---
 
-10. Can we inherit a final class / method in PHP?
+##### 10. Can we inherit a final class / method in PHP?
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> No.
 - A **`final` class** cannot be extended at all.

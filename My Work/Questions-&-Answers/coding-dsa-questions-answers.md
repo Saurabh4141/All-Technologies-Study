@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. Filter even numbers and return their doubled values ([1,2,3,4,5] gives [4,8])
+##### 1. Filter even numbers and return their doubled values ([1,2,3,4,5] gives [4,8])
 
-   *(Asked 1×: Hitachi)*
+*(Asked 1×: Hitachi)*
 
 ==> **Approach:** keep only the even numbers (`n % 2 === 0`), then double each one.
 **`filter`** picks items, **`map`** changes them.
@@ -34,9 +34,9 @@ In short: filter the evens, map them to double.
 
 ---
 
-2. Reverse all words in an array
+##### 2. Reverse all words in an array
 
-   *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> **Approach:** for each word, turn it into characters, reverse them, join them back.
 **`map`** runs this on every word.
@@ -63,9 +63,9 @@ In short: split → reverse → join, inside a map.
 
 ---
 
-3. Leaders in an array
+##### 3. Leaders in an array
 
-   *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> A **leader** is an element bigger than every element to its right. The last element is always a
 leader.
@@ -94,9 +94,9 @@ In short: scan from the right, track the max, anything bigger than the max is a 
 
 ---
 
-4. Flatten a nested object into an array
+##### 4. Flatten a nested object into an array
 
-   *(Asked 1×: EInfochips)*
+*(Asked 1×: EInfochips)*
 
 ==> **Approach:** loop over the keys. If the value is a plain value, push it. If it's an object, call
 the same function on it (**recursion**) and spread its result in.
@@ -128,9 +128,9 @@ In short: plain value → push, object → recurse and spread.
 
 ---
 
-5. Compare two objects
+##### 5. Compare two objects
 
-   *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> `obj1 === obj2` only checks whether both point to the **same reference**, not the same content.
 So do a **deep compare**: same number of keys, and every key has an equal value. Recurse for nested
@@ -162,9 +162,9 @@ In short: `===` compares references; compare key count and values recursively fo
 
 ---
 
-6. Longest repeated substring that appears at least twice ('banana' gives 'ana')
+##### 6. Longest repeated substring that appears at least twice ('banana' gives 'ana')
 
-   *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> **Approach:** try lengths from longest to shortest. For each length, slide a window over the
 string and store each substring in a **Set**. The first substring you see twice is the answer.
@@ -195,9 +195,9 @@ In short: longest length first, Set of windows, first duplicate wins.
 
 ---
 
-7. Detect a loop / cycle in a linked list
+##### 7. Detect a loop / cycle in a linked list
 
-   *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> **Approach:** Floyd's **"tortoise and hare"**. Move `slow` 1 step and `fast` 2 steps. If they
 ever meet, there is a loop. If `fast` reaches the end (`null`), there is no loop.

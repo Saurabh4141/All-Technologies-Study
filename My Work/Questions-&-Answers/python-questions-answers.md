@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. Read a CSV and fill null values with the median
+##### 1. Read a CSV and fill null values with the median
 
-   *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Use **pandas**: `read_csv` loads the file into a **DataFrame**, empty cells become **`NaN`**,
 and `fillna()` replaces them with each column's **median**.
@@ -45,9 +45,9 @@ In short: `read_csv` → `median(numeric_only=True)` → `fillna()`.
 
 ---
 
-2. Python + SQLite: employees with more than 3 leave requests last month
+##### 2. Python + SQLite: employees with more than 3 leave requests last month
 
-   *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Use the built-in **`sqlite3`** module (no install needed). Filter rows to last month,
 **`GROUP BY`** employee, keep groups with **`HAVING COUNT(*) > 3`**.
@@ -84,9 +84,9 @@ In short: `sqlite3` + `WHERE` date range + `GROUP BY` + `HAVING COUNT(*) > 3`.
 
 ---
 
-3. Union of three lists
+##### 3. Union of three lists
 
-   *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> **Union** = every value that is in any of the lists, with no duplicates. Convert the lists to
 **sets** and combine them with **`|`** (or `set.union`).
@@ -109,9 +109,9 @@ In short: `set(a) | set(b) | set(c)`; use `dict.fromkeys` when order matters.
 
 ---
 
-4. Merge two hash maps, keeping only distinct keys
+##### 4. Merge two hash maps, keeping only distinct keys
 
-   *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> In Python a hash map is a **`dict`**. "Distinct keys" = keys that are in only **one** of the two
 dicts (drop keys both have). Dict key views support set operations, so use **`^`** (symmetric
@@ -137,9 +137,9 @@ In short: `d1.keys() ^ d2.keys()` for keys in only one dict; `d1 | d2` for a nor
 
 ---
 
-5. Flatten a nested list so an ML model can use it
+##### 5. Flatten a nested list so an ML model can use it
 
-   *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> ML libraries (scikit-learn, NumPy) want a flat list / **1-D array** of numbers. Walk the list: if
 an item is a list, flatten it too (**recursion**); otherwise add it.
@@ -166,9 +166,9 @@ In short: list → recurse, value → append.
 
 ---
 
-6. What are the data structures in Python?
+##### 6. What are the data structures in Python?
 
-   *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Four main **built-in** ones:
 
@@ -203,9 +203,9 @@ In short: list = ordered and changeable, tuple = fixed, set = unique items, dict
 
 ---
 
-7. Mutable vs immutable types in Python
+##### 7. Mutable vs immutable types in Python
 
-   *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Mutable** = can be changed in place. **Immutable** = can't; a "change" creates a new object.
 
@@ -247,9 +247,9 @@ In short: list/dict/set change in place; int/str/tuple make new objects.
 
 ---
 
-8. What is a closure in Python?
+##### 8. What is a closure in Python?
 
-   *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> A **closure** is an inner function that **remembers variables from its outer function**, even
 after the outer function has returned.

@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. Difference between React and Next.js; why is Next.js better?
+##### 1. Difference between React and Next.js; why is Next.js better?
 
-   *(Asked 3×: AST Consulting, EZ Works, Web3Dev)*
+*(Asked 3×: AST Consulting, EZ Works, Web3Dev)*
 
 ==> **React** is a **UI library** – it only renders components. **Next.js** is a **React
 framework** that adds routing, server rendering and a backend on top.
@@ -39,10 +39,9 @@ In short: Next.js = React + routing + server rendering + backend, already set up
 
 ---
 
-2. What hooks are available in React and what are their use cases? How do they differ from class
-   lifecycle methods?
+##### 2. What hooks are available in React and what are their use cases? How do they differ from class lifecycle methods?
 
-   *(Asked 3×: Persistent Systems, TCS (online), Capsitech)*
+*(Asked 3×: Persistent Systems, TCS (online), Capsitech)*
 
 ==> **Hooks** are functions (starting with `use`) that give **function components** state and
 lifecycle features.
@@ -81,9 +80,9 @@ loops, conditions or nested functions.
 
 ---
 
-3. Explain the React component lifecycle in detail, with scenarios for each phase
+##### 3. Explain the React component lifecycle in detail, with scenarios for each phase
 
-   *(Asked 3×: American Express, EZ Works, Fundwave)*
+*(Asked 3×: American Express, EZ Works, Fundwave)*
 
 ==> Every component goes through **3 phases**:
 
@@ -118,9 +117,9 @@ cleanups.
 
 ---
 
-4. How does routing work in React? Why do we need React Router DOM?
+##### 4. How does routing work in React? Why do we need React Router DOM?
 
-   *(Asked 3×: EZ Works, Web3Dev, Fundwave)*
+*(Asked 3×: EZ Works, Web3Dev, Fundwave)*
 
 ==> A React app is a **Single Page App** – one `index.html`. React itself has **no routing**.
 
@@ -156,9 +155,9 @@ In short: React Router maps URLs to components on the client, no full reload.
 
 ---
 
-5. How are components created in React?
+##### 5. How are components created in React?
 
-   *(Asked 2×: AST Consulting, Capsitech)*
+*(Asked 2×: AST Consulting, Capsitech)*
 
 ==> Two ways:
 - **Function component** (modern, recommended) – a function that returns JSX.
@@ -183,9 +182,9 @@ HTML tag.
 
 ---
 
-6. Functional vs class components: which do you use?
+##### 6. Functional vs class components: which do you use?
 
-   *(Asked 2×: American Express, Fundwave)*
+*(Asked 2×: American Express, Fundwave)*
 
 ==>
 ```text
@@ -210,9 +209,9 @@ Boundary**, or use the `react-error-boundary` package."
 
 ---
 
-7. What is Next.js?
+##### 7. What is Next.js?
 
-   *(Asked 2×: AST Consulting, Fundwave)*
+*(Asked 2×: AST Consulting, Fundwave)*
 
 ==> **Next.js** is a **React framework by Vercel** for production apps.
 - **SSR / SSG / ISR** → fast first load and good SEO.
@@ -225,9 +224,9 @@ In short: React with routing, server rendering and a backend already wired up.
 
 ---
 
-8. What is the Virtual DOM and why is it useful?
+##### 8. What is the Virtual DOM and why is it useful?
 
-   *(Asked 2×: EZ Works, TCS (online))*
+*(Asked 2×: EZ Works, TCS (online))*
 
 ==> The **Virtual DOM** is a **plain JavaScript object tree** that describes the UI. React keeps it
 in memory.
@@ -250,9 +249,9 @@ In short: describe UI → React diffs → touches only what changed.
 
 ---
 
-9. What is React?
+##### 9. What is React?
 
-   *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **React** is an open-source **JavaScript library by Meta** for building user interfaces.
 - UI is built from reusable **components**.
@@ -265,9 +264,9 @@ In short: components + state → React keeps the screen in sync.
 
 ---
 
-10. Why ReactJS (listed in your resume)?
+##### 10. Why ReactJS (listed in your resume)?
 
-    *(Asked 1×: Technovert)*
+*(Asked 1×: Technovert)*
 
 ==> Sample answer: "I chose React because:
 - **Component-based** – I build reusable pieces like buttons, forms and tables once.
@@ -278,9 +277,9 @@ In short: components + state → React keeps the screen in sync.
 
 ---
 
-11. What is JSX?
+##### 11. What is JSX?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **JSX** (JavaScript XML) lets you write HTML-like markup inside JavaScript.
 - It is **not** HTML – a compiler (Babel / SWC) turns it into JS function calls.
@@ -301,9 +300,9 @@ In short: JSX is syntax sugar that becomes plain JS objects describing the UI.
 
 ---
 
-12. What are stateless and stateful components? Give examples
+##### 12. What are stateless and stateful components? Give examples
 
-    *(Asked 1×: American Express)*
+*(Asked 1×: American Express)*
 
 ==>
 - **Stateless** (presentational) – no state of its own; just renders the **props** it gets.
@@ -327,9 +326,9 @@ Good pattern: a few stateful "container" components, many simple stateless ones.
 
 ---
 
-13. SSR, SSG, CSR; why Next.js is better for SEO; file-based routing, App Router and 'use client'
+##### 13. SSR, SSG, CSR; why Next.js is better for SEO; file-based routing, App Router and 'use client'
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 ```text
@@ -369,9 +368,9 @@ In short: server-render for SEO, `'use client'` only where you need interactivit
 
 ---
 
-14. What is CSR (Client-Side Rendering)?
+##### 14. What is CSR (Client-Side Rendering)?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **CSR**: the server sends an almost empty HTML file plus a **JS bundle**; the **browser** runs
 React to build the page.
@@ -389,9 +388,9 @@ In short: CSR = the browser builds the page with JS.
 
 ---
 
-15. What is hydration? Why do hydration mismatch errors happen?
+##### 15. What is hydration? Why do hydration mismatch errors happen?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **Hydration**: the server sends ready HTML, then React runs in the browser and **attaches event
 handlers and state** to that HTML so it becomes interactive. React does it with `hydrateRoot`
@@ -417,9 +416,9 @@ In short: server HTML and first client render must match exactly.
 
 ---
 
-16. Advanced hooks
+##### 16. Advanced hooks
 
-    *(Asked 1×: Capsitech)*
+*(Asked 1×: Capsitech)*
 
 ==> Beyond `useState` / `useEffect`:
 - `useReducer` – state with many actions (cart, multi-step form).
@@ -447,10 +446,9 @@ const users = useFetch("/api/users"); // null first, then the array
 
 ---
 
-17. useEffect: managing side effects, and why cleanup is needed (listeners, timers, API calls,
-    AbortController)
+##### 17. useEffect: managing side effects, and why cleanup is needed (listeners, timers, API calls, AbortController)
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> `useEffect` runs **after render** for **side effects** – work outside rendering (API calls,
 timers, listeners).
@@ -488,9 +486,9 @@ In short: effect sets something up, cleanup tears it down.
 
 ---
 
-18. Why is React considered fast?
+##### 18. Why is React considered fast?
 
-    *(Asked 1×: AST Consulting)*
+*(Asked 1×: AST Consulting)*
 
 ==>
 - **Virtual DOM + diffing** – only changed nodes in the real DOM are updated.
@@ -511,9 +509,9 @@ default**, so apps stay fast as they grow.
 
 ---
 
-19. What is React's rendering process?
+##### 19. What is React's rendering process?
 
-    *(Asked 1×: Web3Dev)*
+*(Asked 1×: Web3Dev)*
 
 ==>
 1. **Trigger** – first load, or a state change (`setState`) / parent re-render.
@@ -530,9 +528,9 @@ In short: trigger → render → diff → commit → paint → effects.
 
 ---
 
-20. What is the key prop and why is it important?
+##### 20. What is the key prop and why is it important?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> `key` is a **unique, stable ID** for each item in a list. React uses it to know **which item
 was added, removed or moved**.
@@ -550,9 +548,9 @@ In short: keys give list items an identity across renders.
 
 ---
 
-21. Explain componentDidMount and componentWillUnmount with code
+##### 21. Explain componentDidMount and componentWillUnmount with code
 
-    *(Asked 1×: American Express)*
+*(Asked 1×: American Express)*
 
 ==>
 - `componentDidMount` – runs **once, after** the component is added to the DOM. Use it for API
@@ -589,9 +587,9 @@ useEffect(() => {
 
 ---
 
-22. How do you share state between components without a common parent?
+##### 22. How do you share state between components without a common parent?
 
-    *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==>
 - **Context API** – put the state in a Provider high in the tree; any component reads it with
@@ -623,9 +621,9 @@ big state that changes often – every Context consumer re-renders when the valu
 
 ---
 
-23. How do you cache API responses in Redux?
+##### 23. How do you cache API responses in Redux?
 
-    *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==> Manual way:
 1. Save the response in the store with a `lastFetched` timestamp.
@@ -660,9 +658,9 @@ In short: RTK Query = cache + auto refetch with tags.
 
 ---
 
-24. What is middleware in React (Redux middleware)? Have you used any?
+##### 24. What is middleware in React (Redux middleware)? Have you used any?
 
-    *(Asked 1×: American Express)*
+*(Asked 1×: American Express)*
 
 ==> React itself has no middleware – this means **Redux middleware**: a function that sits
 **between `dispatch(action)` and the reducer**. It can log, modify, delay or block actions, and
@@ -685,9 +683,9 @@ Sample answer: "Yes – thunk through `createAsyncThunk` in Redux Toolkit for AP
 
 ---
 
-25. State management (advanced)
+##### 25. State management (advanced)
 
-    *(Asked 1×: Capsitech)*
+*(Asked 1×: Capsitech)*
 
 ==> Pick the tool by **type of state**:
 
@@ -715,9 +713,9 @@ Tips:
 
 ---
 
-26. How can you improve the performance of a React application (large lists, complex UIs)?
+##### 26. How can you improve the performance of a React application (large lists, complex UIs)?
 
-    *(Asked 1×: Persistent Systems)*
+*(Asked 1×: Persistent Systems)*
 
 ==>
 - `React.memo` – skip re-rendering a child when its props are the same.
@@ -734,9 +732,9 @@ In short: render less, render smaller, load later – and measure first.
 
 ---
 
-27. What is lazy loading? Ways to implement it; component-level vs data-level
+##### 27. What is lazy loading? Ways to implement it; component-level vs data-level
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **Lazy loading** = load something **only when it's needed**, not on startup → faster first
 load.
@@ -761,9 +759,9 @@ Next.js: `const Chart = dynamic(() => import("./Chart"))`.
 
 ---
 
-28. useCallback, React.memo, preventing re-renders: when does memoization make sense?
+##### 28. useCallback, React.memo, preventing re-renders: when does memoization make sense?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 - `React.memo(Component)` – skips re-render if props are **shallowly equal**.
@@ -794,9 +792,9 @@ comparisons. Profile first. (The **React Compiler** can add memoization automati
 
 ---
 
-29. The marketing team says the website is slow. How will you debug and fix it?
+##### 29. The marketing team says the website is slow. How will you debug and fix it?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 1. **Ask & reproduce** – which page, device, network? First load or interactions?
@@ -815,9 +813,9 @@ In short: reproduce → measure → fix the biggest cause → measure again.
 
 ---
 
-30. What is the difference between state and props?
+##### 30. What is the difference between state and props?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 ```text
@@ -846,9 +844,9 @@ In short: props are like function arguments; state is the component's own memory
 
 ---
 
-31. How do you transfer data between components?
+##### 31. How do you transfer data between components?
 
-    *(Asked 1×: American Express)*
+*(Asked 1×: American Express)*
 
 ==>
 - **Parent → child**: props.
@@ -875,9 +873,9 @@ function Child({ name, onSend }) {
 
 ---
 
-32. What is prop drilling?
+##### 32. What is prop drilling?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **Prop drilling** = passing props through **many middle components that don't use them**, just
 to reach a deep child.
@@ -895,9 +893,9 @@ to reach a deep child.
 
 ---
 
-33. Write a React example that handles user input and shows the submitted value
+##### 33. Write a React example that handles user input and shows the submitted value
 
-    *(Asked 1×: Persistent Systems)*
+*(Asked 1×: Persistent Systems)*
 
 ==>
 ```jsx
@@ -930,9 +928,9 @@ export default function App() {
 
 ---
 
-34. Controlled vs uncontrolled components
+##### 34. Controlled vs uncontrolled components
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 ```text
@@ -964,9 +962,9 @@ uncontrolled inputs for speed.
 
 ---
 
-35. Counter app with useState (plus and minus buttons)
+##### 35. Counter app with useState (plus and minus buttons)
 
-    *(Asked 1×: Capsitech)*
+*(Asked 1×: Capsitech)*
 
 ==>
 ```jsx
@@ -991,9 +989,9 @@ one handler, you get +1, not +2, because both read the same old `count`.
 
 ---
 
-36. Piano tiles: 8 tiles that expand vertically when clicked (map + useState toggle)
+##### 36. Piano tiles: 8 tiles that expand vertically when clicked (map + useState toggle)
 
-    *(Asked 1×: ScroBits Technologies)*
+*(Asked 1×: ScroBits Technologies)*
 
 ==>
 ```jsx
@@ -1034,9 +1032,9 @@ export default function PianoTiles() {
 
 ---
 
-37. What are Higher-Order Components (HOCs)? How are they different from render props?
+##### 37. What are Higher-Order Components (HOCs)? How are they different from render props?
 
-    *(Asked 1×: AST Consulting)*
+*(Asked 1×: AST Consulting)*
 
 ==> An **HOC** is a function that **takes a component and returns a new component** with extra
 behaviour (a wrapper).

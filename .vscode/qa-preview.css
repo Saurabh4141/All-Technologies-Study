@@ -1,0 +1,23 @@
+/* Markdown preview style for My Work/Questions-&-Answers/*.md
+   Questions are written as ##### (h5) headings - no other file in this repo uses h5. */
+
+h5 {
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-top: 1.6em;
+  margin-bottom: 0.3em;
+  padding: 6px 10px;
+  border-left: 4px solid #1f6feb;
+  border-radius: 4px;
+  color: #0b5cad;
+  background: rgba(31, 111, 235, 0.08);
+}
+
+/* dark themes */
+body.vscode-dark h5,
+body.vscode-high-contrast h5 {
+  color: #6cb6ff;
+  border-left-color: #4493f8;
+  background: rgba(68, 147, 248, 0.12);
+}

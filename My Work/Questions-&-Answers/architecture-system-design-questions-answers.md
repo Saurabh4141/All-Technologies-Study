@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What is the MERN stack? Explain its architecture
+##### 1. What is the MERN stack? Explain its architecture
 
-   *(Asked 2×: TCS (online), Technovert)*
+*(Asked 2×: TCS (online), Technovert)*
 
 ==> **MERN** = **MongoDB + Express.js + React + Node.js**: a full-stack app written end to end in
 JavaScript. It's a classic **3-tier architecture**:
@@ -41,9 +41,9 @@ In short: UI (React) → API (Express/Node) → DB (MongoDB), with JSON and Java
 
 ---
 
-2. Monolith vs microservices vs serverless
+##### 2. Monolith vs microservices vs serverless
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> Three ways to **split and run** a backend:
 - **Monolith** – one codebase, one deploy (e.g. one Express or Laravel app).
@@ -77,9 +77,9 @@ In short: monolith = one app; microservices = many small apps; serverless = func
 
 ---
 
-3. What are microservices and why do we prefer them?
+##### 3. What are microservices and why do we prefer them?
 
-   *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> **Microservices** = the app is split into small, independent services, each owning **one
 business area** (users, orders, payments) and **its own database**. They talk over REST/gRPC or
@@ -101,9 +101,9 @@ more operational complexity.
 
 ---
 
-4. How do microservices communicate?
+##### 4. How do microservices communicate?
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> Two ways:
 - **Synchronous** (caller waits for the reply): **REST/HTTP**, **gRPC**, GraphQL.
@@ -140,9 +140,9 @@ In short: REST/gRPC when you need an answer now; queues/events when you don't.
 
 ---
 
-5. What is a distributed environment?
+##### 5. What is a distributed environment?
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> A **distributed system** is one app running on **many servers connected over a network**
 that work together and look like one system to the user.
@@ -160,9 +160,9 @@ debugging.
 
 ---
 
-6. What is a circuit breaker?
+##### 6. What is a circuit breaker?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> A **circuit breaker** wraps calls to another service and **stops calling it for a while
 when it keeps failing**. Requests fail fast (or get a fallback) instead of piling up and slowing
@@ -194,9 +194,9 @@ In short: like an electric breaker – trip on repeated failures, fail fast, tes
 
 ---
 
-7. Design a URL shortener
+##### 7. Design a URL shortener
 
-   *(Asked 1×: Irpgrammer Solutions)*
+*(Asked 1×: Irpgrammer Solutions)*
 
 ==> **API**
 - `POST /shorten` `{ url }` → `{ short: "https://sho.rt/aZ3x9Qk" }`
@@ -235,9 +235,9 @@ In short: base62 key + DB with a unique index + Redis cache + redirect.
 
 ---
 
-8. Design large-file upload to S3 with processing
+##### 8. Design large-file upload to S3 with processing
 
-   *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==>
 1. Client asks the backend to start an upload (`POST /uploads`).
@@ -263,10 +263,9 @@ In short: pre-signed multipart upload straight to S3, then event → queue → w
 
 ---
 
-9. Image upload feature: React front end, Node.js back end, MongoDB. API endpoints, data flow and
-   schema
+##### 9. Image upload feature: React front end, Node.js back end, MongoDB. API endpoints, data flow and schema
 
-   *(Asked 1×: Bitwise Global)*
+*(Asked 1×: Bitwise Global)*
 
 ==> **Flow**
 1. React: `<input type="file">` → add the file to `FormData` → `POST /api/images`.
@@ -318,9 +317,9 @@ In short: file → S3, metadata → MongoDB, React shows it by URL.
 
 ---
 
-10. What is MVC architecture?
+##### 10. What is MVC architecture?
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> **MVC = Model – View – Controller**: split the code into 3 jobs.
 - **Model** – data and DB logic (Mongoose / Sequelize models, Laravel Eloquent models).
@@ -354,9 +353,9 @@ In short: Model = data, View = output, Controller = glue between them.
 
 ---
 
-11. Did you handle any production issues?
+##### 11. Did you handle any production issues?
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> Sample answer: "Yes. I've handled performance, deployment and outage issues."
 - **Slow APIs at peak traffic:** CloudWatch showed p95 latency jumping to ~4 s. Logs pointed to a
@@ -385,9 +384,9 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ---
 
-12. Serverless vs containers
+##### 12. Serverless vs containers
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> Neither one makes you manage physical servers, but they run your code differently:
 - **Serverless** (AWS Lambda, Azure Functions): you upload **functions**; the cloud runs them per
@@ -421,9 +420,9 @@ for steady and long-running work.
 
 ---
 
-13. What does a typical production Node.js architecture look like?
+##### 13. What does a typical production Node.js architecture look like?
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> A common setup:
 1. Client (web/mobile) → **CDN** (CloudFront) for static files.
@@ -452,11 +451,9 @@ monitoring.
 
 ---
 
-14. Horizontal vs vertical scaling; how do you scale a Node.js app (stateless servers, Redis,
-    queues)?
+##### 14. Horizontal vs vertical scaling; how do you scale a Node.js app (stateless servers, Redis, queues)?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
-    revision PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
 ==> **Vertical scaling** = a bigger machine (more CPU/RAM). Simple, but it has a hard limit and
 is a single point of failure.
@@ -492,9 +489,9 @@ stateless servers, Redis, queues and a load balancer.
 
 ---
 
-15. What is a load balancer? Load-balancing strategies (round robin, least connections, IP hash)
+##### 15. What is a load balancer? Load-balancing strategies (round robin, least connections, IP hash)
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> A **load balancer** sits in front of many servers and spreads incoming requests across them.
 - Benefits: more capacity, no single point of failure, **health checks** (stops sending traffic
@@ -534,9 +531,9 @@ In short: a load balancer spreads traffic; pick the strategy by server sizes and
 
 ---
 
-16. What is an API gateway? How is it different from a load balancer?
+##### 16. What is an API gateway? How is it different from a load balancer?
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> An **API gateway** is the **single front door** for all clients in a microservices system.
 It routes each request to the right service and handles shared concerns in one place:
@@ -569,9 +566,9 @@ that routes and secures APIs.
 
 ---
 
-17. REST vs GraphQL
+##### 17. REST vs GraphQL
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> Two ways to build an API:
 - **REST**: many endpoints, one per resource (`GET /users/1`, `GET /users/1/posts`); uses
@@ -617,9 +614,9 @@ In short: REST is simple and cache-friendly; GraphQL gets exactly the needed dat
 
 ---
 
-18. What is a webhook?
+##### 18. What is a webhook?
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> A **webhook** is an HTTP callback: when an event happens in another system, **that system
 sends an HTTP POST to a URL you registered**. Push instead of you polling again and again.

@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What is the use of TypeScript?
+##### 1. What is the use of TypeScript?
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> **TypeScript** = JavaScript + **static types**. The TypeScript compiler (**`tsc`**) checks your
 types and then outputs plain JavaScript. Browsers and Node run that JS; the types are removed.
@@ -34,9 +34,9 @@ In short: same JavaScript, but checked before it runs – fewer bugs, easier mai
 
 ---
 
-2. What is the any data type?
+##### 2. What is the any data type?
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> **`any`** means "this can be anything". It **switches off type checking** for that value, so
 TypeScript allows every operation on it.
@@ -56,9 +56,9 @@ In short: `any` = "trust me", TypeScript stops checking.
 
 ---
 
-3. What is the difference between unknown and any?
+##### 3. What is the difference between unknown and any?
 
-   *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==> Both can hold any value. The difference is what you're allowed to **do** with it.
 
@@ -93,9 +93,9 @@ In short: `unknown` is the safe version of `any` – you must check before you u
 
 ---
 
-4. Interface vs type in TypeScript
+##### 4. Interface vs type in TypeScript
 
-   *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==> Both describe the **shape of data**. The main differences:
 
@@ -135,9 +135,9 @@ In short: interface = extendable object shapes; type = any type, including union
 
 ---
 
-5. Type-safe APIs using generics and conditional types
+##### 5. Type-safe APIs using generics and conditional types
 
-   *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==>
 - **Generics** = a type parameter `<T>`. Like a function argument, but for types. One function
@@ -179,9 +179,9 @@ type from the input.
 
 ---
 
-6. Create a TODO app on the MERN stack using TypeScript
+##### 6. Create a TODO app on the MERN stack using TypeScript
 
-   *(Asked 1×: Web3Dev)*
+*(Asked 1×: Web3Dev)*
 
 ==> Steps (MERN = MongoDB, Express, React, Node):
 1. **Backend setup**: `npm i express mongoose cors` and `npm i -D typescript ts-node

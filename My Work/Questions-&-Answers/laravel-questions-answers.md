@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. Cross-site attacks (XSS / CSRF): how do they work and how do you handle them?
+##### 1. Cross-site attacks (XSS / CSRF): how do they work and how do you handle them?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> **XSS (Cross-Site Scripting)**: an attacker gets their own script into your page, for example
 by saving `<script>...</script>` as a comment or name. When another user opens the page, the
@@ -50,9 +50,9 @@ In short: `{{ }}` stops XSS, `@csrf` stops CSRF.
 
 ---
 
-2. How will you secure your application?
+##### 2. How will you secure your application?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> My checklist for a Laravel app:
 1. **Validation**: validate every input with `$request->validate()` or **Form Requests**.
@@ -79,9 +79,9 @@ In short: validate input, use Eloquent, escape output, `@csrf`, policies, thrott
 
 ---
 
-3. What types of security have you used in your app?
+##### 3. What types of security have you used in your app?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> Sample answer:
 "In my project I used **Sanctum token authentication** for the APIs and **Policies** so users can
@@ -95,9 +95,9 @@ Interview tip: name 4–5 real things you did and say *why* each one protects th
 
 ---
 
-4. Where should sensitive files be saved for security?
+##### 4. Where should sensitive files be saved for security?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> Outside the **`public/`** folder. Only `public/` is reachable by URL, so save private files in
 **`storage/app`** (the `local` / private disk).
@@ -122,9 +122,9 @@ In short: private files in `storage/app`, served by a controller with an auth ch
 
 ---
 
-5. How do you store data in a Sanctum token?
+##### 5. How do you store data in a Sanctum token?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> You don't. A **Sanctum token is not a JWT**. It's a random string, and only its **hash** is
 saved in the **`personal_access_tokens`** table, linked to the user. You can't put custom data
@@ -150,9 +150,9 @@ In short: the data lives in the database; the token only points to it.
 
 ---
 
-6. Types of authentication after user login
+##### 6. Types of authentication after user login
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> After login, Laravel must remember who the user is on every request. Laravel's options:
 
@@ -185,9 +185,9 @@ In short: session for websites, Sanctum for APIs/SPAs, Passport when you need fu
 
 ---
 
-7. How do tokens work?
+##### 7. How do tokens work?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> The server gives the client a token after login. The client sends it on every request instead
 of using a session. With **Sanctum**:
@@ -218,9 +218,9 @@ In short: login gives a token, every request sends it, `auth:sanctum` turns it b
 
 ---
 
-8. How does a Laravel request flow?
+##### 8. How does a Laravel request flow?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> The **request lifecycle**:
 1. Every request enters **`public/index.php`**.
@@ -242,9 +242,9 @@ In short: index.php → kernel → middleware → router → controller → resp
 
 ---
 
-9. URL request flow
+##### 9. URL request flow
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> What happens when you open `https://shop.com/products/5` on a Laravel site:
 1. **DNS** turns `shop.com` into the server's IP.
@@ -267,9 +267,9 @@ In short: DNS → Nginx → PHP-FPM → index.php → route → controller → r
 
 ---
 
-10. What is a facade in Laravel?
+##### 10. What is a facade in Laravel?
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> A **facade** is a static-looking shortcut to an object in the **service container**.
 `Cache::get('key')` looks static, but Laravel actually finds the real cache object in the
@@ -290,9 +290,9 @@ In short: facade = static shortcut to an object in the service container.
 
 ---
 
-11. Laravel traits and the service container
+##### 11. Laravel traits and the service container
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> **Trait**: a set of methods you can reuse in many classes. PHP allows only one parent class,
 and traits fill that gap. Add one with `use`. Laravel examples: `HasFactory`, `SoftDeletes`,
@@ -335,9 +335,9 @@ In short: trait = shared methods; container = builds objects and injects them.
 
 ---
 
-12. How does the rate limiter work?
+##### 12. How does the rate limiter work?
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> The **`throttle`** middleware keeps a **counter per key** (user ID or IP) in the **cache**
 (Redis, file, ...). Each request adds 1. When the limit is crossed, Laravel returns **429 Too
@@ -364,9 +364,9 @@ In short: a cache counter per user/IP; over the limit → 429.
 
 ---
 
-13. What is middleware? Give an example
+##### 13. What is middleware? Give an example
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> **Middleware** is a filter that runs **before** (or after) a request reaches the controller. It
 can let the request through, block it, or change it.
@@ -392,9 +392,9 @@ In short: middleware = a gate on the route; `$next($request)` lets the request t
 
 ---
 
-14. How do you handle errors in Laravel?
+##### 14. How do you handle errors in Laravel?
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> In layers:
 - **try / catch** around risky code (payments, external APIs), returning a friendly message.
@@ -421,9 +421,9 @@ In short: try/catch for risky code, the exception handler for the rest, and log 
 
 ---
 
-15. Localization in Laravel
+##### 15. Localization in Laravel
 
-    *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> **Localization** = showing the app in different languages.
 1. Put translations in `lang/<locale>/` files (PHP arrays) or `lang/<locale>.json`.

@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What is JWT and how is it used for authentication and authorization?
+##### 1. What is JWT and how is it used for authentication and authorization?
 
-   *(Asked 3×: Persistent Systems, American Express, TCS (online))*
+*(Asked 3×: Persistent Systems, American Express, TCS (online))*
 
 ==> **JWT (JSON Web Token)** is a small **signed** token that carries user info like id and role.
 The server hands it out at login and checks it on every request.
@@ -38,9 +38,9 @@ it.
 
 ---
 
-2. How can you secure a Node.js API? What best practices should be followed?
+##### 2. How can you secure a Node.js API? What best practices should be followed?
 
-   *(Asked 3×: Persistent Systems, Wipro, TechnoVerse Solutions)*
+*(Asked 3×: Persistent Systems, Wipro, TechnoVerse Solutions)*
 
 ==> Think in layers:
 - **HTTPS** everywhere.
@@ -72,10 +72,9 @@ In short: HTTPS + auth + validation + headers + rate limit + safe secrets.
 
 ---
 
-3. Which library did you use for authentication (jsonwebtoken)? Other than JWT, which module
-   (Passport)?
+##### 3. Which library did you use for authentication (jsonwebtoken)? Other than JWT, which module (Passport)?
 
-   *(Asked 2×: Web3Dev, EarlyCoder 5-yr Node (YT))*
+*(Asked 2×: Web3Dev, EarlyCoder 5-yr Node (YT))*
 
 ==> Sample answer: "I used **jsonwebtoken** to sign and verify tokens and **bcrypt** to hash
 passwords. I have also used **Passport.js** for social login."
@@ -99,9 +98,9 @@ In short: jsonwebtoken for tokens, bcrypt for passwords, Passport for plug-in lo
 
 ---
 
-4. What is the difference between authentication and authorization?
+##### 4. What is the difference between authentication and authorization?
 
-   *(Asked 2×: Capsitech, Dehaat)*
+*(Asked 2×: Capsitech, Dehaat)*
 
 ==>
 ```text
@@ -130,9 +129,9 @@ In short: **authentication = identity (401)**, **authorization = permission (403
 
 ---
 
-5. How do you implement rate limiting in Express?
+##### 5. How do you implement rate limiting in Express?
 
-   *(Asked 2×: Wipro, TechnoVerse Solutions)*
+*(Asked 2×: Wipro, TechnoVerse Solutions)*
 
 ==> **Rate limiting** = allow only N requests per IP/user in a time window. Extra requests get
 **429 Too Many Requests**. Stops brute force and abuse.
@@ -158,9 +157,9 @@ In short: `express-rate-limit` + Redis store → 429 after the limit.
 
 ---
 
-6. What is the structure of a JWT?
+##### 6. What is the structure of a JWT?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> Three parts joined by dots: **`header.payload.signature`**
 
@@ -178,9 +177,9 @@ In short: header (how it's signed) + payload (data) + signature (proof nobody ch
 
 ---
 
-7. How do you verify a JWT? Is it decrypted?
+##### 7. How do you verify a JWT? Is it decrypted?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> **No, it is not decrypted.** A normal JWT is **signed, not encrypted**.
 - The server re-computes the signature from header + payload with the secret (**HS256**), or
@@ -202,9 +201,9 @@ In short: verify = re-check the signature + expiry, nothing gets decrypted.
 
 ---
 
-8. What is the difference between jwt.decode and jwt.verify?
+##### 8. What is the difference between jwt.decode and jwt.verify?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==>
 ```text
@@ -231,9 +230,9 @@ In short: never trust `decode` for security; always `verify`.
 
 ---
 
-9. An attacker changes the user id inside a copied JWT from 123 to 456. How does JWT stop this?
+##### 9. An attacker changes the user id inside a copied JWT from 123 to 456. How does JWT stop this?
 
-   *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> The **signature** stops it.
 1. The signature was created from the original payload (id 123) using the server's **secret**.
@@ -248,9 +247,9 @@ In short: changing the payload breaks the signature; stealing the token is the r
 
 ---
 
-10. How do you protect your APIs from unauthorized access?
+##### 10. How do you protect your APIs from unauthorized access?
 
-    *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==> Check **who** the caller is and **what** they may do, on the server, on every request. In
 Express this is middleware:
@@ -272,9 +271,9 @@ In short: auth middleware (401) → role/ownership check (403) → route.
 
 ---
 
-11. Create a middleware to verify a JWT token
+##### 11. Create a middleware to verify a JWT token
 
-    *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==> Read the token from the header → verify → put the user on `req` → `next()`.
 
@@ -304,9 +303,9 @@ In short: no token or bad token → 401; good token → `req.user` + `next()`.
 
 ---
 
-12. Tokens expire every 20 minutes and users get logged out. How do you keep them logged in?
+##### 12. Tokens expire every 20 minutes and users get logged out. How do you keep them logged in?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> Use an **access token + refresh token** pair.
 1. On login, return a short **access token** (15–20 min) and a long **refresh token** (e.g. 7
@@ -323,9 +322,9 @@ In short: short access token for calls, long revocable refresh token to get new 
 
 ---
 
-13. How will the front end know the token expired? Will you make a separate refresh-token API?
+##### 13. How will the front end know the token expired? Will you make a separate refresh-token API?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> Yes, a separate API like **`POST /auth/refresh`**.
 - An expired access token → the API returns **401**.
@@ -348,9 +347,9 @@ In short: 401 → interceptor → refresh → retry once.
 
 ---
 
-14. When should the front end call the refresh API (polling every 5 minutes is wasteful)?
+##### 14. When should the front end call the refresh API (polling every 5 minutes is wasteful)?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> Don't poll. Two good ways:
 - **On demand:** refresh only when an API returns 401 (interceptor, see Q13).
@@ -369,9 +368,9 @@ In short: refresh on 401 or just before `exp`, never on a fixed poll.
 
 ---
 
-15. Where should the front end store tokens (access vs refresh)? Why?
+##### 15. Where should the front end store tokens (access vs refresh)? Why?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==>
 - **Refresh token → HttpOnly + Secure + SameSite cookie.** JavaScript can't read it, so **XSS**
@@ -396,10 +395,9 @@ In short: refresh token in an HttpOnly cookie, access token in memory, nothing i
 
 ---
 
-16. If the token is in a cookie, it is sent with every request, even from another domain. How do you
-    handle that?
+##### 16. If the token is in a cookie, it is sent with every request, even from another domain. How do you handle that?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> That's the **CSRF** risk. Fix it with:
 - **`SameSite=Strict` or `Lax`** → the browser doesn't send the cookie on cross-site requests
@@ -424,9 +422,9 @@ In short: SameSite + HttpOnly + Secure, and a CSRF token for writes.
 
 ---
 
-17. Why is the access token's expiry shorter than the refresh token's?
+##### 17. Why is the access token's expiry shorter than the refresh token's?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==>
 - The access token goes out on **every** request → more exposure → more chance of theft.
@@ -439,9 +437,9 @@ In short: short access token = small damage if stolen; long refresh token = user
 
 ---
 
-18. How would a token get stolen?
+##### 18. How would a token get stolen?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==>
 - **XSS:** injected script reads it from localStorage or a non-HttpOnly cookie.
@@ -456,9 +454,9 @@ In short: XSS, sniffing, logs, malware, careless sharing.
 
 ---
 
-19. Logging out in one browser tab: how do you log the user out of all other tabs (React)?
+##### 19. Logging out in one browser tab: how do you log the user out of all other tabs (React)?
 
-    *(Asked 1×: American Express)*
+*(Asked 1×: American Express)*
 
 ==> Tell the other tabs that logout happened.
 - **BroadcastChannel API:** post a `'logout'` message; every tab listens and clears the user.
@@ -484,9 +482,9 @@ In short: BroadcastChannel (or storage event) to sync tabs + revoke on the serve
 
 ---
 
-20. How will you make a new application secure from scratch?
+##### 20. How will you make a new application secure from scratch?
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==>
 1. **Design:** roles/permissions, **least privilege**, HTTPS only.
@@ -502,9 +500,9 @@ In short: secure by design, then layer auth, validation, headers, secrets, monit
 
 ---
 
-21. What is your approach to make a secure back end?
+##### 21. What is your approach to make a secure back end?
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> Same idea as Q20, as layers:
 - **Who:** authentication (JWT/OAuth) + authorization (roles) on every route.
@@ -519,9 +517,9 @@ In short: who → what comes in → how it travels → abuse → headers → sec
 
 ---
 
-22. How do you ensure your code has no security flaws?
+##### 22. How do you ensure your code has no security flaws?
 
-    *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> You can't promise zero flaws, but you can catch most of them:
 - **Code reviews** with an **OWASP Top 10** checklist.
@@ -535,9 +533,9 @@ In short: review + automated scanning + auth tests + pen tests.
 
 ---
 
-23. What is an XSS attack?
+##### 23. What is an XSS attack?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> **XSS (Cross-Site Scripting)** = an attacker gets their JavaScript to run on **your** site in
 another user's browser.
@@ -554,9 +552,9 @@ In short: XSS = attacker's script running as your user on your site.
 
 ---
 
-24. How can we prevent XSS attacks?
+##### 24. How can we prevent XSS attacks?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==>
 - **Escape output:** React escapes `{value}` by default; avoid `dangerouslySetInnerHTML` /
@@ -578,9 +576,9 @@ In short: escape, sanitize, CSP, HttpOnly.
 
 ---
 
-25. How do you stop cookies being attached to requests from another domain (CSRF token, SameSite)?
+##### 25. How do you stop cookies being attached to requests from another domain (CSRF token, SameSite)?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> Give both answers:
 - **SameSite cookie** (first defence): `Strict` → never sent cross-site; `Lax` → only on
@@ -596,9 +594,9 @@ In short: SameSite cookie + CSRF token for writes.
 
 ---
 
-26. Have you implemented CSRF tokens?
+##### 26. Have you implemented CSRF tokens?
 
-    *(Asked 1×: Senior Node Ep.32 (YT))*
+*(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> Sample answer: "Yes. Our auth cookie was `HttpOnly; Secure; SameSite=Lax`, and for writes we
 used a CSRF token with the **double-submit cookie** pattern."
@@ -636,9 +634,9 @@ In short: random token in a cookie + same value in a header; mismatch → 403.
 
 ---
 
-27. How can HTTP headers be used to improve API security?
+##### 27. How can HTTP headers be used to improve API security?
 
-    *(Asked 1×: Persistent Systems)*
+*(Asked 1×: Persistent Systems)*
 
 ==> Security headers tell the browser to be stricter:
 - **`Strict-Transport-Security` (HSTS)** → always use HTTPS.
@@ -657,9 +655,9 @@ In short: headers = free browser-side protection; Helmet sets them for you.
 
 ---
 
-28. What is Helmet?
+##### 28. What is Helmet?
 
-    *(Asked 1×: Persistent Systems)*
+*(Asked 1×: Persistent Systems)*
 
 ==> **Helmet** is Express middleware that sets secure HTTP headers in one line (CSP, HSTS,
 X-Frame-Options, nosniff, Referrer-Policy...) and removes `X-Powered-By`.
@@ -687,10 +685,9 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ---
 
-29. Sessions vs JWT: what is the difference and when do you use each?
+##### 29. Sessions vs JWT: what is the difference and when do you use each?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
-    revision PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
 ==> Both keep a user logged in. The difference is **where the login state lives**.
 - **Session:** the server stores the user data (memory, Redis, DB); the client only gets a
@@ -726,9 +723,9 @@ In short: session = server remembers you (easy to revoke); JWT = token proves wh
 
 ---
 
-30. Why use bcrypt and not SHA-256 for passwords?
+##### 30. Why use bcrypt and not SHA-256 for passwords?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
 ==> **SHA-256 is fast** — great for files, bad for passwords. With a stolen DB, a GPU can try
 **billions of guesses per second**.
@@ -754,10 +751,9 @@ In short: password hashing must be **slow and salted**; bcrypt is, SHA-256 is no
 
 ---
 
-31. What is CORS?
+##### 31. What is CORS?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js
-    revision PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
 ==> **CORS (Cross-Origin Resource Sharing)** is a **browser** rule. By default the browser won't let
 a page read a response from a different **origin** (protocol, domain or port).
@@ -781,9 +777,9 @@ In short: CORS = the server's response headers tell the browser which other orig
 
 ---
 
-32. What is NoSQL injection and how do you prevent it?
+##### 32. What is NoSQL injection and how do you prevent it?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
 ==> **NoSQL injection** = user input changes the meaning of a MongoDB query.
 - Usual trick: send a **query operator** (`$ne`, `$gt`, `$where`) instead of a plain value.

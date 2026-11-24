@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. Generative AI vs Agentic AI
+##### 1. Generative AI vs Agentic AI
 
-   *(Asked 2×: Accenture, Deloitte USI AI (YT))*
+*(Asked 2×: Accenture, Deloitte USI AI (YT))*
 
 ==> **Generative AI** creates content from one prompt. **Agentic AI** uses an LLM to reach a goal:
 it plans, calls tools and works in several steps by itself.
@@ -34,9 +34,9 @@ In short: GenAI writes; Agentic AI writes **and acts**. The LLM (GenAI) is the a
 
 ---
 
-2. Explain step by step how RAG works behind the scenes
+##### 2. Explain step by step how RAG works behind the scenes
 
-   *(Asked 2×: Accenture, ZS)*
+*(Asked 2×: Accenture, ZS)*
 
 ==> **RAG (Retrieval-Augmented Generation)** = first **retrieve** the right chunks from your
 documents, then let the LLM **answer using them**. Like an open-book exam.
@@ -60,9 +60,9 @@ In short: chunk → embed → store; then embed question → search → stuff in
 
 ---
 
-3. What do you store in the vector database? (vector database concepts)
+##### 3. What do you store in the vector database? (vector database concepts)
 
-   *(Asked 2×: Accenture, ZS)*
+*(Asked 2×: Accenture, ZS)*
 
 ==> For every chunk, three things:
 - **Vector (embedding)** – the numbers used for similarity search.
@@ -86,9 +86,9 @@ In short: a normal DB finds exact matches; a vector DB finds **similar meaning**
 
 ---
 
-4. How do Transformers work in LLMs? Explain end to end with a sentence
+##### 4. How do Transformers work in LLMs? Explain end to end with a sentence
 
-   *(Asked 2×: Accenture, 20+ MNC AI interviews (YT))*
+*(Asked 2×: Accenture, 20+ MNC AI interviews (YT))*
 
 ==> Input: "The cat sat on the" → predict the next word.
 
@@ -108,9 +108,9 @@ In short: an LLM is a **next-token predictor** that uses attention to understand
 
 ---
 
-5. How do you evaluate / test a RAG system? Which metrics or scores?
+##### 5. How do you evaluate / test a RAG system? Which metrics or scores?
 
-   *(Asked 2×: 20+ MNC AI interviews (YT), Deloitte USI AI (YT))*
+*(Asked 2×: 20+ MNC AI interviews (YT), Deloitte USI AI (YT))*
 
 ==> Test the two halves separately: **retrieval** (did we fetch the right chunks?) and
 **generation** (is the answer good and grounded?).
@@ -144,9 +144,9 @@ In short: measure retrieval and generation separately, on a fixed test set, afte
 
 ---
 
-6. What is similarity search? What is cosine similarity?
+##### 6. What is similarity search? What is cosine similarity?
 
-   *(Asked 2×: 20+ MNC AI interviews (YT), Deloitte USI AI (YT))*
+*(Asked 2×: 20+ MNC AI interviews (YT), Deloitte USI AI (YT))*
 
 ==> **Similarity search** = find the items whose **meaning** is closest to the query, not exact
 keywords. "car price" can match "cost of a vehicle", because their embeddings are close.
@@ -171,9 +171,9 @@ In short: similarity search = "find closest vectors"; cosine = closeness measure
 
 ---
 
-7. What are Top-K, Top-P and Temperature?
+##### 7. What are Top-K, Top-P and Temperature?
 
-   *(Asked 2×: ZS, 20+ MNC AI interviews (YT))*
+*(Asked 2×: ZS, 20+ MNC AI interviews (YT))*
 
 ==> They control **how the LLM picks the next token** from its probability list.
 
@@ -202,9 +202,9 @@ Interview tip: factual / RAG / code → **low temperature**; brainstorming → h
 
 ---
 
-8. What is an AI agent, actually?
+##### 8. What is an AI agent, actually?
 
-   *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> An **AI agent** = **LLM (brain) + tools (hands) + memory + a loop**, working towards a goal.
 
@@ -221,9 +221,9 @@ In short: a chatbot only talks; an agent **decides and acts**.
 
 ---
 
-9. Is your system single-agent or multi-agent?
+##### 9. Is your system single-agent or multi-agent?
 
-   *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Sample answer: "It's **multi-agent**. A **researcher** agent collects data with a search tool,
 a **writer** agent drafts the output, and a **reviewer** agent checks quality. A
@@ -239,9 +239,9 @@ many tools or jobs.
 
 ---
 
-10. Can multiple agents work in parallel on different tasks?
+##### 10. Can multiple agents work in parallel on different tasks?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Yes – as long as the tasks **don't depend on each other**.
 
@@ -257,9 +257,9 @@ In short: independent tasks run in parallel; the task that needs their output wa
 
 ---
 
-11. Why is routing required in a multi-agent system?
+##### 11. Why is routing required in a multi-agent system?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> **Routing** = deciding **which agent (or tool) should handle this request** – like a hospital
 reception sending you to the right doctor.
@@ -275,9 +275,9 @@ In short: routing sends each request to the right specialist.
 
 ---
 
-12. Bottlenecks of AI agents; how do you manage a multi-agent architecture?
+##### 12. Bottlenecks of AI agents; how do you manage a multi-agent architecture?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Bottlenecks:**
 - **Latency and cost** – every step is another LLM call.
@@ -297,9 +297,9 @@ everything.
 
 ---
 
-13. Which model would you use and how would you orchestrate agents?
+##### 13. Which model would you use and how would you orchestrate agents?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> **Model – pick by task, not by hype:**
 - Planning / complex reasoning → a **strong frontier model** (GPT, Claude, Gemini top tiers).
@@ -315,9 +315,9 @@ In short: right model per step + a supervisor that routes, shares state and enfo
 
 ---
 
-14. With 100 tools, how do you stop the tools from hallucinating?
+##### 14. With 100 tools, how do you stop the tools from hallucinating?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> The real problem: with 100 tool descriptions in the prompt, the LLM picks the **wrong tool** or
 **invents arguments**.
@@ -333,9 +333,9 @@ In short: fewer tools per call, clear descriptions, validated arguments.
 
 ---
 
-15. How often do tools fail in production, and how do you find which tool fails?
+##### 15. How often do tools fail in production, and how do you find which tool fails?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> More often than people expect: **timeouts, rate limits, bad arguments from the LLM, API
 changes**. Treat every tool call like an external API call that can fail.
@@ -353,9 +353,9 @@ In short: log and trace every tool call, so failures show up per tool, then retr
 
 ---
 
-16. What is the role of Pydantic?
+##### 16. What is the role of Pydantic?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Pydantic** is a Python library for **data validation using type hints**. In LLM apps it turns
 the model's free text into **clean, checked data**.
@@ -384,9 +384,9 @@ In short: Pydantic is the contract between the LLM's output and your code.
 
 ---
 
-17. Which framework did you use (LangChain or CrewAI) and why?
+##### 17. Which framework did you use (LangChain or CrewAI) and why?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Sample answer: "I used **CrewAI** for the multi-agent part because I can define agents by role,
 goal and tasks very quickly. I used **LangChain** for the RAG pieces – document loaders, text
@@ -412,9 +412,9 @@ In short: LangChain = RAG building blocks; CrewAI = quick role-based agent teams
 
 ---
 
-18. What are the components of CrewAI?
+##### 18. What are the components of CrewAI?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Think of a small company:
 - **Agent** – a team member: `role`, `goal`, `backstory`, an LLM and tools.
@@ -435,9 +435,9 @@ In short: Agents do Tasks with Tools, grouped in a Crew, run by a Process.
 
 ---
 
-19. Can agents work asynchronously in CrewAI?
+##### 19. Can agents work asynchronously in CrewAI?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Yes, two ways:
 - **Task level** – `async_execution=True` on a Task, so the crew moves on without waiting. A
@@ -458,9 +458,9 @@ In short: independent tasks run async; the combining task waits via `context`.
 
 ---
 
-20. Which CrewAI tools have you used (SerperDevTool, EXA Search Tool)?
+##### 20. Which CrewAI tools have you used (SerperDevTool, EXA Search Tool)?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Sample answer: "I used **SerperDevTool** for Google search results and **EXASearchTool** for
 semantic web search, both from the `crewai_tools` package. I also used file and website reading
@@ -476,9 +476,9 @@ In short: Serper = Google results; Exa = meaning-based web search.
 
 ---
 
-21. What does the EXA Search Tool do, and how did you integrate it?
+##### 21. What does the EXA Search Tool do, and how did you integrate it?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> **What:** **Exa** is a search engine built for AI apps. Instead of keyword matching it does
 **semantic (meaning-based) web search** and can return clean page content – fresh context for the
@@ -494,9 +494,9 @@ In short: Exa gives the agent live, meaning-based web search.
 
 ---
 
-22. Write code to use the EXA Search Tool
+##### 22. Write code to use the EXA Search Tool
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> A short CrewAI example (check the current `crewai_tools` docs for exact parameters):
 
@@ -530,9 +530,9 @@ In short: create the tool, give it to an agent, and the agent decides when to se
 
 ---
 
-23. Have you heard about MCP (Model Context Protocol)?
+##### 23. Have you heard about MCP (Model Context Protocol)?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Yes. **MCP** is an **open standard from Anthropic (Nov 2024)** for connecting LLM apps to tools
 and data. Think **"USB-C for AI"**: one standard plug instead of custom glue for every tool.
@@ -547,9 +547,9 @@ In short: build a tool once as an MCP server, and any MCP-compatible app can use
 
 ---
 
-24. We already have APIs. Why was MCP introduced?
+##### 24. We already have APIs. Why was MCP introduced?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> APIs are designed for **developers**; MCP is designed for **AI models to discover and use**
 tools.
@@ -566,9 +566,9 @@ them.
 
 ---
 
-25. MCP vs LangGraph vs LangChain: which is better?
+##### 25. MCP vs LangGraph vs LangChain: which is better?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> None is "better" – they solve different problems and are often used together.
 
@@ -591,9 +591,9 @@ In short: LangChain = toolbox, LangGraph = workflow engine, MCP = standard plug 
 
 ---
 
-26. How can LangGraph and MCP be used together?
+##### 26. How can LangGraph and MCP be used together?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> **LangGraph runs the workflow; MCP provides the tools.**
 1. Run MCP servers (e.g. Jira, database, file system).
@@ -618,9 +618,9 @@ In short: LangGraph = the brain's workflow, MCP = the plug-in tool belt.
 
 ---
 
-27. LangGraph: what are nodes and edges?
+##### 27. LangGraph: what are nodes and edges?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> LangGraph models an agent as a **flowchart (graph)**.
 - **State** – a shared object (e.g. messages, results) passed through the graph.
@@ -646,9 +646,9 @@ In short: nodes = steps, edges = arrows, state = the shared notebook they all wr
 
 ---
 
-28. Why do we need RAG?
+##### 28. Why do we need RAG?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> LLMs have three gaps; RAG fixes them by supplying the right info **at question time**:
 - **Outdated knowledge** – training stopped at a **knowledge cutoff**.
@@ -664,9 +664,9 @@ In short: don't make the model memorise – let it **look things up**.
 
 ---
 
-29. Why use RAG if we can just upload a document to ChatGPT / Gemini?
+##### 29. Why use RAG if we can just upload a document to ChatGPT / Gemini?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> Uploading works for **a few files for one person**. RAG is for **many documents, many users, in
 production**.
@@ -683,9 +683,9 @@ In short: upload = personal, one-off; RAG = scalable, secure, cheap, citable.
 
 ---
 
-30. What is RAG and how did you use it in your project?
+##### 30. What is RAG and how did you use it in your project?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> **RAG** = retrieve relevant chunks from your documents, then let the LLM answer using them.
 
@@ -702,9 +702,9 @@ In short: say what you built, the pipeline choices, and how you measured it.
 
 ---
 
-31. What is RAG, and how do you stop it from hallucinating?
+##### 31. What is RAG, and how do you stop it from hallucinating?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **RAG** = look up relevant documents first, then answer from them. To reduce hallucination:
 1. **Better retrieval** – good chunking, **hybrid search** (keyword BM25 + vector), **re-ranking**.
@@ -719,9 +719,9 @@ In short: retrieve well, constrain the prompt, cite sources, verify before showi
 
 ---
 
-32. Procedure to build a notebook-based RAG application
+##### 32. Procedure to build a notebook-based RAG application
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> In a Jupyter notebook, step by step:
 1. Install libraries: `langchain`, a vector store (`chromadb` / `faiss`), an embedding model,
@@ -747,9 +747,9 @@ In short: load → split → embed → store → retrieve → prompt → LLM →
 
 ---
 
-33. What do Top-N and Top-K mean (retrieval)?
+##### 33. What do Top-N and Top-K mean (retrieval)?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> Both mean "keep the best few results", at two stages of retrieval:
 - **Top-K** – how many chunks the **vector search** returns (e.g. K = 20 most similar).
@@ -765,9 +765,9 @@ In short: K = fast shortlist from the vector DB, N = final picks after re-rankin
 
 ---
 
-34. How does the attention mechanism work?
+##### 34. How does the attention mechanism work?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Attention** lets each token **look at the other tokens and decide which ones matter** for its
 meaning.
@@ -793,9 +793,9 @@ In short: each token asks "who is relevant to me?" and mixes in their informatio
 
 ---
 
-35. Self-attention, encoder and decoder: their roles
+##### 35. Self-attention, encoder and decoder: their roles
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> - **Self-attention** – tokens in the same sequence attend to each other to build context.
 - **Encoder** – reads the whole input at once (looks **left and right**) and builds a rich
@@ -809,9 +809,9 @@ In short: encoder = reader, decoder = writer, self-attention = how both understa
 
 ---
 
-36. What is Softmax in LLMs?
+##### 36. What is Softmax in LLMs?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Softmax** turns a list of raw scores (**logits**) into **probabilities that add up to 1**.
 - The LLM's last layer gives a logit for every token in the vocabulary; softmax converts them so
@@ -832,9 +832,9 @@ In short: softmax = scores → probabilities; temperature tunes how peaked they 
 
 ---
 
-37. What is context, and what is the context window?
+##### 37. What is context, and what is the context window?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> - **Context** – everything the model sees for this request: system prompt, chat history,
   retrieved documents, tool results and the question.
@@ -849,9 +849,9 @@ In short: context = what the model sees now; context window = how much it can se
 
 ---
 
-38. What kinds of LLM models are available in the market?
+##### 38. What kinds of LLM models are available in the market?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Quick map:
 
@@ -880,9 +880,9 @@ and fast.
 
 ---
 
-39. What are BLEU and ROUGE scores?
+##### 39. What are BLEU and ROUGE scores?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> Both compare generated text with a human **reference** text by counting **overlapping
 words/phrases (n-grams)**.
@@ -915,9 +915,9 @@ In short: BLEU = precision, for translation; ROUGE = recall, for summaries.
 
 ---
 
-40. LLM benchmarks: MMLU, HELM, HumanEval, Big-Bench
+##### 40. LLM benchmarks: MMLU, HELM, HumanEval, Big-Bench
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> Benchmarks are standard "exams" used to compare models:
 - **MMLU** – multiple-choice questions across **57 subjects** (maths, law, medicine…) – general
@@ -935,9 +935,9 @@ reasoning.
 
 ---
 
-41. How do you ensure the quality of the output in your system?
+##### 41. How do you ensure the quality of the output in your system?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> I treat LLM output like code: **test it, measure it, guard it, monitor it**.
 
@@ -954,9 +954,9 @@ In short: eval set before release, guardrails at runtime, feedback after release
 
 ---
 
-42. Write a function that checks output quality or similarity score
+##### 42. Write a function that checks output quality or similarity score
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Turn the generated answer and the expected answer into **embeddings**, compare them with
 **cosine similarity**, and pass if the score is above a threshold.
@@ -985,9 +985,9 @@ In short: embeddings + cosine similarity + threshold = a quick automatic quality
 
 ---
 
-43. Which metrics would you focus on to improve model performance?
+##### 43. Which metrics would you focus on to improve model performance?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Pick the metrics the business cares about, in four groups:
 
@@ -1003,9 +1003,9 @@ In short: quality, safety, speed/cost and user feedback – measure all four.
 
 ---
 
-44. What is prompt injection?
+##### 44. What is prompt injection?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Prompt injection** = an attacker hides **instructions inside the input** so the model follows
 them instead of your system prompt. SQL injection, but with words.
@@ -1020,9 +1020,9 @@ In short: untrusted text that the model treats as commands.
 
 ---
 
-45. How do you defend against prompt injection (XML tags, delimiters)?
+##### 45. How do you defend against prompt injection (XML tags, delimiters)?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> There's no single fix, so use **layers**:
 
@@ -1039,9 +1039,9 @@ In short: delimiters reduce the risk; permissions and approvals limit the damage
 
 ---
 
-46. What is a jailbreak?
+##### 46. What is a jailbreak?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> A **jailbreak** is a trick prompt that makes the model **break its own safety rules** – e.g.
 role-play ("pretend you are an AI with no rules…"), hypothetical stories, or encoding the request.
@@ -1056,9 +1056,9 @@ In short: jailbreak = get the model to say what it shouldn't.
 
 ---
 
-47. What are guardrails and how do they help in agent architecture?
+##### 47. What are guardrails and how do they help in agent architecture?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Guardrails** are checks placed **around the LLM** – road barriers that keep it on the road.
 
@@ -1074,9 +1074,9 @@ In short: check what goes in, what comes out, and what the agent is allowed to d
 
 ---
 
-48. How do you handle RBAC and tool-calling security?
+##### 48. How do you handle RBAC and tool-calling security?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **RBAC** = Role-Based Access Control. Rule: **the agent never has more power than the user it
 acts for.**
@@ -1093,9 +1093,9 @@ In short: the prompt is not a security boundary – your backend is.
 
 ---
 
-49. How do you secure RAG?
+##### 49. How do you secure RAG?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> Secure every stage – ingestion, retrieval and output:
 
@@ -1111,9 +1111,9 @@ In short: filter by permission before the LLM ever sees a chunk.
 
 ---
 
-50. How can employees get answers from an enterprise LLM without uploading highly secured documents?
+##### 50. How can employees get answers from an enterprise LLM without uploading highly secured documents?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> **Bring the AI to the data**, not the data to a public AI.
 
@@ -1128,9 +1128,9 @@ In short: private RAG + private model + per-user access control.
 
 ---
 
-51. Explain prompting techniques
+##### 51. Explain prompting techniques
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> - **Zero-shot** – just ask, no examples.
 - **Few-shot** – give 2–5 input → output examples first.
@@ -1146,9 +1146,9 @@ In short: examples, reasoning, role, format and structure are the main levers.
 
 ---
 
-52. What are zero-shot and few-shot prompting?
+##### 52. What are zero-shot and few-shot prompting?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> - **Zero-shot** – only the instruction: "Classify this review as positive or negative: …"
 - **Few-shot** – a few solved examples first, then the new input. The model copies the pattern
@@ -1169,9 +1169,9 @@ In short: zero-shot = tell; few-shot = show, then tell.
 
 ---
 
-53. What is Chain of Thought (CoT) reasoning?
+##### 53. What is Chain of Thought (CoT) reasoning?
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> **CoT** = the model **writes out its reasoning step by step before the final answer** – like
 showing your working in a maths exam.
@@ -1194,9 +1194,9 @@ In short: "show your working" makes multi-step answers more accurate.
 
 ---
 
-54. How do you manage prompt versioning?
+##### 54. How do you manage prompt versioning?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> Treat prompts like code:
 
@@ -1211,9 +1211,9 @@ In short: version it, test it, log it, roll back if needed.
 
 ---
 
-55. How do you evaluate and optimize a prompt?
+##### 55. How do you evaluate and optimize a prompt?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Evaluate:**
 
@@ -1234,9 +1234,9 @@ In short: measure on a test set, change one thing, measure again.
 
 ---
 
-56. What is context engineering?
+##### 56. What is context engineering?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> **Prompt engineering** = writing good instructions. **Context engineering** = choosing
 **everything that goes into the context window** on each LLM call, so the model has exactly what
@@ -1256,9 +1256,9 @@ In short: the right information, in the right amount, on every call.
 
 ---
 
-57. How does machine learning actually work?
+##### 57. How does machine learning actually work?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> Instead of writing rules, we **show the computer many examples and let it learn the pattern**.
 
@@ -1275,9 +1275,9 @@ In short: guess → measure error → adjust weights → repeat.
 
 ---
 
-58. Regression vs classification; name some algorithms
+##### 58. Regression vs classification; name some algorithms
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> **Regression** predicts a **number**; **classification** predicts a **category**.
 
@@ -1304,9 +1304,9 @@ In short: "how much?" = regression; "which one?" = classification.
 
 ---
 
-59. What is overfitting? How do you detect and reduce it?
+##### 59. What is overfitting? How do you detect and reduce it?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> **Overfitting** = the model **memorises the training data** instead of learning the general
 pattern – like a student who memorised last year's answers but fails new questions.
@@ -1332,9 +1332,9 @@ In short: great on training, bad on new data = overfitting.
 
 ---
 
-60. Decision Trees vs Random Forest vs XGBoost
+##### 60. Decision Trees vs Random Forest vs XGBoost
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> Three steps up in power:
 
@@ -1366,9 +1366,9 @@ In short: tree = one guess; **bagging** = average many; **boosting** = fix error
 
 ---
 
-61. What are precision and recall (and F1)? When would you use recall?
+##### 61. What are precision and recall (and F1)? When would you use recall?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> - **Precision** = of everything the model said "yes" to, how many were really yes?
   `TP / (TP + FP)` – "when I raise an alarm, am I right?"
@@ -1393,9 +1393,9 @@ In short: precision = "am I right when I say yes?"; recall = "did I catch them a
 
 ---
 
-62. Generator and Discriminator in GANs
+##### 62. Generator and Discriminator in GANs
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> A **GAN** (Generative Adversarial Network) is two neural networks competing:
 
@@ -1412,9 +1412,9 @@ In short: counterfeiter vs police, both improving until the fakes look real.
 
 ---
 
-63. What are embeddings and the embedding matrix?
+##### 63. What are embeddings and the embedding matrix?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> - **Embedding** – a vector of numbers that represents the **meaning** of a word, sentence or
   image. Similar meaning → nearby vectors ("king" is close to "queen", far from "banana").
@@ -1432,9 +1432,9 @@ In short: embedding = meaning as numbers; the matrix = one learned vector per to
 
 ---
 
-64. What do 1536 or 3072 mean in embeddings?
+##### 64. What do 1536 or 3072 mean in embeddings?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> They are the **number of dimensions** – how many numbers each embedding vector has.
 OpenAI `text-embedding-3-small` gives **1536**; `text-embedding-3-large` gives **3072**.
@@ -1451,9 +1451,9 @@ In short: 1536 = 1536 numbers per vector; bigger is richer but costlier.
 
 ---
 
-65. Which chunking strategy is the best?
+##### 65. Which chunking strategy is the best?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> There's **no single best** – it depends on the documents. Test options with your eval set.
 
@@ -1483,9 +1483,9 @@ In short: start with recursive + overlap, then tune using your eval set.
 
 ---
 
-66. What are Graph RAG, Agentic RAG, Adaptive RAG and Corrective RAG?
+##### 66. What are Graph RAG, Agentic RAG, Adaptive RAG and Corrective RAG?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> All four fix basic RAG's weakness: "retrieve once and hope it's right".
 
@@ -1517,9 +1517,9 @@ Corrective = check and fix retrieval.
 
 ---
 
-67. What are citation, grounding and abstaining in RAG?
+##### 67. What are citation, grounding and abstaining in RAG?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> - **Grounding** – the answer comes only from the retrieved sources, not the model's memory.
 - **Citation** – the answer shows **which source** each fact came from (doc name, page, link), so
@@ -1536,9 +1536,9 @@ In short: use the sources, show the sources, and say "don't know" when they're s
 
 ---
 
-68. Hybrid RAG, multimodal agents and MoE LLaVA
+##### 68. Hybrid RAG, multimodal agents and MoE LLaVA
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> - **Hybrid RAG** – combines **keyword search (BM25)** with **vector search** (sometimes a
   knowledge graph too), then merges and **re-ranks** the results. Keywords catch exact terms
@@ -1554,9 +1554,9 @@ token.
 
 ---
 
-69. Token costs grow with usage. How do you keep agent costs under control?
+##### 69. Token costs grow with usage. How do you keep agent costs under control?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> Cut tokens and use cheaper models where you can:
 
@@ -1573,9 +1573,9 @@ In short: cheaper model, fewer tokens, cache what repeats, and watch the bill.
 
 ---
 
-70. What is system prompt caching and how does it help?
+##### 70. What is system prompt caching and how does it help?
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> Many requests start with the **same long prefix** (system prompt, tool definitions, a big
 document). With **prompt caching** the provider stores that processed prefix and **reuses it** on
@@ -1597,9 +1597,9 @@ In short: pay once for the long fixed prefix, reuse it on every call.
 
 ---
 
-71. AWS Bedrock: experience and use
+##### 71. AWS Bedrock: experience and use
 
-    *(Asked 1×: ZS)*
+*(Asked 1×: ZS)*
 
 ==> **Amazon Bedrock** is a fully managed AWS service for using **foundation models through one
 API**, with no servers to manage.
@@ -1628,9 +1628,9 @@ In short: managed models + managed RAG + guardrails, inside your AWS account.
 
 ---
 
-72. Challenges when turning an AI POC into a production system
+##### 72. Challenges when turning an AI POC into a production system
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> A POC works on 10 happy-path questions; production has thousands of messy real users.
 
@@ -1648,9 +1648,9 @@ In short: the demo is easy; quality, cost, security and reliability at scale are
 
 ---
 
-73. What are backpropagation and forward propagation?
+##### 73. What are backpropagation and forward propagation?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> - **Forward propagation** – input flows **forward** through the layers to produce a
   prediction. ("Make a guess.")
@@ -1666,9 +1666,9 @@ In short: forward = guess, backward = blame each weight, then update.
 
 ---
 
-74. How does the change of derivatives work in backpropagation?
+##### 74. How does the change of derivatives work in backpropagation?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> A **derivative (gradient)** answers: "if I change this weight a little, how much does the error
 change, and in which direction?"
@@ -1694,9 +1694,9 @@ In short: chain rule passes the blame back; each weight steps against its gradie
 
 ---
 
-75. What are neurons?
+##### 75. What are neurons?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> A **neuron** is the basic unit of a neural network – a tiny calculator:
 
@@ -1719,9 +1719,9 @@ In short: weighted sum + bias, then activation.
 
 ---
 
-76. Why choose U-Net++ instead of YOLO?
+##### 76. Why choose U-Net++ instead of YOLO?
 
-    *(Asked 1×: Deloitte USI AI (YT))*
+*(Asked 1×: Deloitte USI AI (YT))*
 
 ==> They solve **different problems**:
 
@@ -1747,10 +1747,9 @@ In short: YOLO = where is it (box); U-Net++ = exactly which pixels.
 
 ---
 
-77. 10 crore daily payments, 1% fail or double-transfer, "Ravi" vs "Ravi K": solve with
-    probabilistic and deterministic methods
+##### 77. 10 crore daily payments, 1% fail or double-transfer, "Ravi" vs "Ravi K": solve with probabilistic and deterministic methods
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> Key idea: **money movement must be deterministic; AI (probabilistic) only helps with fuzzy
 matching and detection.**
@@ -1773,9 +1772,9 @@ In short: rules decide, AI suggests and flags.
 
 ---
 
-78. How would you deploy a multilingual chatbot in Oracle Digital Assistant?
+##### 78. How would you deploy a multilingual chatbot in Oracle Digital Assistant?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> In **Oracle Digital Assistant (ODA)** (exact settings depend on the version):
 
@@ -1795,9 +1794,9 @@ tests.
 
 ---
 
-79. How do you make sure an ODA intent gives the correct answer?
+##### 79. How do you make sure an ODA intent gives the correct answer?
 
-    *(Asked 1×: Accenture)*
+*(Asked 1×: Accenture)*
 
 ==> Good data in, threshold and tests around it:
 
@@ -1815,9 +1814,9 @@ logs.
 
 ---
 
-80. Fine-tuning vs RAG vs prompting
+##### 80. Fine-tuning vs RAG vs prompting
 
-    *(Asked 1×: 20+ MNC AI interviews (YT))*
+*(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> Three ways to adapt an LLM, from cheapest to most expensive:
 

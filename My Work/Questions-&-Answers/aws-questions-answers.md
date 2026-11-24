@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What is a cold start? How can you tackle it?
+##### 1. What is a cold start? How can you tackle it?
 
-   *(Asked 2×: TCS, TechM)*
+*(Asked 2×: TCS, TechM)*
 
 ==> A **cold start** in **AWS Lambda** is the extra delay when Lambda has no ready instance and
 must create a new one before running your handler.
@@ -43,9 +43,9 @@ SnapStart, a small package and a light init.
 
 ---
 
-2. What is a Lambda function?
+##### 2. What is a Lambda function?
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> **AWS Lambda** is a **serverless** compute service: you upload a function and AWS runs it
 when an **event** triggers it.
@@ -60,9 +60,9 @@ In short: Lambda = run code on events, no servers, pay only while it runs.
 
 ---
 
-3. Write a simple Lambda function
+##### 3. Write a simple Lambda function
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> A Node.js handler that returns an HTTP response through **API Gateway**:
 
@@ -91,9 +91,9 @@ Calling `GET /hello?name=Saurabh` returns:
 
 ---
 
-4. How are you deploying Lambda functions?
+##### 4. How are you deploying Lambda functions?
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> Sample answer: "We deploy with **Infrastructure as Code** through a **CI/CD pipeline**."
 - Push to Git → **GitHub Actions** (or **CodePipeline**) runs tests → deploys to the stage.
@@ -117,9 +117,9 @@ In short: Git → CI/CD → SAM/Serverless/CDK deploy, with stages and aliases f
 
 ---
 
-5. How many parameters can we pass to a Lambda function?
+##### 5. How many parameters can we pass to a Lambda function?
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> A Node.js Lambda handler gets **up to 3 parameters**: `event`, `context`, `callback`.
 - **`event`** – the input data. Put all your values inside this one object.
@@ -142,9 +142,9 @@ the **6 MB** payload limit for sync calls.
 
 ---
 
-6. How do you call one Lambda function from another?
+##### 6. How do you call one Lambda function from another?
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> Use the AWS SDK **`Invoke`** API from the first Lambda. Its execution role needs the
 **`lambda:InvokeFunction`** permission.
@@ -172,9 +172,9 @@ In short: SDK `InvokeCommand` + IAM permission; sync or async via `InvocationTyp
 
 ---
 
-7. Cold vs warm Lambda functions
+##### 7. Cold vs warm Lambda functions
 
-   *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> Comparison:
 
@@ -210,9 +210,9 @@ In short: cold = new instance + init; warm = reused instance, init skipped.
 
 ---
 
-8. What is a Step Function?
+##### 8. What is a Step Function?
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> **AWS Step Functions** lets you build a **workflow (state machine)** out of steps.
 - Each step is a **state**: `Task` (call a Lambda or AWS service), `Choice` (if/else),
@@ -229,9 +229,9 @@ together.
 
 ---
 
-9. Write a Step Function config that calls 2 Lambda functions in sequence
+##### 9. Write a Step Function config that calls 2 Lambda functions in sequence
 
-   *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> In ASL, the first state points to the second with **`Next`**; the last state has
 **`End: true`**.
@@ -260,9 +260,9 @@ its `event`.
 
 ---
 
-10. In a Step Function, how is the second function called?
+##### 10. In a Step Function, how is the second function called?
 
-    *(Asked 1×: UST)*
+*(Asked 1×: UST)*
 
 ==> **Step Functions calls it**, not the first Lambda.
 - When the first state finishes, the state machine reads its **`"Next"`** field and moves to that
@@ -280,9 +280,9 @@ In short: `"Next": "SecondLambda"` + step 1's output is passed as step 2's input
 
 ---
 
-11. How do you monitor production in serverless?
+##### 11. How do you monitor production in serverless?
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> On AWS there are no servers to watch, so I monitor **logs, metrics, traces and failed
 events**:
@@ -303,9 +303,9 @@ In short: CloudWatch (logs, metrics, alarms) + X-Ray (tracing) + DLQ (failed eve
 
 ---
 
-12. What is X-Ray tracing?
+##### 12. What is X-Ray tracing?
 
-    *(Asked 1×: TechM)*
+*(Asked 1×: TechM)*
 
 ==> **AWS X-Ray** follows one request as it moves through several AWS services and shows it as a
 **service map** with timings.
@@ -319,9 +319,9 @@ In short: X-Ray = end-to-end request tracing across AWS services, to find where 
 
 ---
 
-13. How do you monitor AWS applications?
+##### 13. How do you monitor AWS applications?
 
-    *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==>
 - **CloudWatch** – logs, metrics, dashboards and alarms (the main tool).
@@ -336,9 +336,9 @@ changed what".
 
 ---
 
-14. How do you design a highly available AWS architecture?
+##### 14. How do you design a highly available AWS architecture?
 
-    *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==> **Highly available** = the app keeps working even if one server or one data center
 (**Availability Zone**) fails.
@@ -363,9 +363,9 @@ In short: no single point of failure — spread across AZs, load balance, auto s
 
 ---
 
-15. What is AWS Secrets Manager?
+##### 15. What is AWS Secrets Manager?
 
-    *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==> **AWS Secrets Manager** stores secrets (DB passwords, API keys, tokens) safely, so they are
 not in your code or `.env` file.
@@ -391,9 +391,9 @@ In short: encrypted, IAM-controlled, auto-rotated secrets instead of hard-coded 
 
 ---
 
-16. ECS vs EKS
+##### 16. ECS vs EKS
 
-    *(Asked 1×: Wipro)*
+*(Asked 1×: Wipro)*
 
 ==> Both run **Docker containers** on AWS.
 
@@ -422,9 +422,9 @@ In short: ECS = simple and AWS-native; EKS = Kubernetes on AWS, more power and m
 
 ---
 
-17. How does Lambda handle concurrency? How do you check the limits?
+##### 17. How does Lambda handle concurrency? How do you check the limits?
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> **Concurrency** = how many requests a function is handling at the same moment.
 - Each Lambda instance handles **one request at a time**. For more parallel requests Lambda
@@ -452,9 +452,9 @@ it with reserved and provisioned concurrency.
 
 ---
 
-18. What is Provisioned Concurrency?
+##### 18. What is Provisioned Concurrency?
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> **Provisioned Concurrency** keeps a fixed number of Lambda instances **already initialized**
 and ready to answer.
@@ -474,9 +474,9 @@ In short: pay to keep N instances warm, so there are no cold starts for the firs
 
 ---
 
-19. What is SQS? Short polling vs long polling
+##### 19. What is SQS? Short polling vs long polling
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> **Amazon SQS** is a fully managed **message queue**: one service puts messages in, another
 reads and processes them later.
@@ -515,9 +515,9 @@ In short: SQS = managed queue; long polling waits for messages instead of asking
 
 ---
 
-20. What is SNS?
+##### 20. What is SNS?
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> **Amazon SNS** is a **publish/subscribe (pub/sub)** service: you publish one message to a
 **topic**, and every subscriber gets a copy.
@@ -537,9 +537,9 @@ In short: SNS = one message, many subscribers, pushed instantly.
 
 ---
 
-21. What are keys in DynamoDB?
+##### 21. What are keys in DynamoDB?
 
-    *(Asked 1×: Hitachi)*
+*(Asked 1×: Hitachi)*
 
 ==> Keys uniquely identify each **item** (row) in a **DynamoDB** table.
 - **Partition key** (simple primary key) – one attribute, e.g. `userId`; must be unique.
@@ -569,9 +569,9 @@ add other query patterns.
 
 ---
 
-22. Design an architecture to upload large files (100 MB–GB) to S3 and process them
+##### 22. Design an architecture to upload large files (100 MB–GB) to S3 and process them
 
-    *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==>
 1. Client asks the backend for upload permission.

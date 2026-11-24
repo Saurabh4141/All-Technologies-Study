@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What are Promises? What is the use of async and await?
+##### 1. What are Promises? What is the use of async and await?
 
-   *(Asked 5×: Algoworks, TCS (online), Hyland Software, Kyndryl, Capsitech)*
+*(Asked 5×: Algoworks, TCS (online), Hyland Software, Kyndryl, Capsitech)*
 
 ==> A **Promise** is a JavaScript object that stands for a value you will get **later** – or an
 error. Think of it as a receipt: "your result is coming".
@@ -44,9 +44,9 @@ In short: a Promise = a future value; async/await = write Promise code like norm
 
 ---
 
-2. Output: Promise.resolve(1) .then(+1) .then(throw) .catch(() => 1) .then(+1) .then(log)
+##### 2. Output: Promise.resolve(1) .then(+1) .then(throw) .catch(() => 1) .then(+1) .then(log)
 
-   *(Asked 2×: Algoworks, Irpgrammer Solutions)*
+*(Asked 2×: Algoworks, Irpgrammer Solutions)*
 
 ==> Code (from the interview):
 
@@ -72,9 +72,9 @@ In short: whatever `.catch` returns becomes the next value – the chain goes ba
 
 ---
 
-3. What is the difference between var, let and const?
+##### 3. What is the difference between var, let and const?
 
-   *(Asked 2×: TCS (online), Capsitech)*
+*(Asked 2×: TCS (online), Capsitech)*
 
 ==>
 ```text
@@ -115,9 +115,9 @@ In short: `const` by default, `let` when the value changes, avoid `var`.
 
 ---
 
-4. What are the different types of functions in JavaScript?
+##### 4. What are the different types of functions in JavaScript?
 
-   *(Asked 2×: Fundwave, Capsitech)*
+*(Asked 2×: Fundwave, Capsitech)*
 
 ==>
 - **Function declaration** – `function add(a, b) { return a + b; }` → **fully hoisted**, can be
@@ -145,9 +145,9 @@ In short: declaration, expression, arrow are the main 3; the rest are roles (cal
 
 ---
 
-5. What is a closure and what is it used for?
+##### 5. What is a closure and what is it used for?
 
-   *(Asked 2×: TCS, Hyland Software)*
+*(Asked 2×: TCS, Hyland Software)*
 
 ==> A **closure** is a function that **remembers the variables of the scope it was created in**,
 even after that outer function has returned. In JavaScript every function gets one automatically.
@@ -182,9 +182,9 @@ In short: closure = function + the variables it remembers from where it was born
 
 ---
 
-6. What are the types / states of a Promise?
+##### 6. What are the types / states of a Promise?
 
-   *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> A Promise has **3 states**:
 - **Pending** – starting state, still working.
@@ -206,9 +206,9 @@ In short: pending → fulfilled or rejected, and it settles only once.
 
 ---
 
-7. Can we use try...catch with async/await?
+##### 7. Can we use try...catch with async/await?
 
-   *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==> Yes. Inside an `async` function, `await` on a **rejected Promise throws**, so a normal
 `try...catch` catches it. This is the standard way to handle async errors.
@@ -232,9 +232,9 @@ In short: await + try/catch = async error handling that looks like sync code.
 
 ---
 
-8. Does an async function work synchronously or asynchronously?
+##### 8. Does an async function work synchronously or asynchronously?
 
-   *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> Both, in a way:
 - The body runs **synchronously until the first `await`**.
@@ -257,9 +257,9 @@ In short: sync until the first `await`, async after it – and it never blocks t
 
 ---
 
-9. How have you used promises in your backend?
+##### 9. How have you used promises in your backend?
 
-   *(Asked 1×: Web3Dev)*
+*(Asked 1×: Web3Dev)*
 
 ==> Sample answer: "In my Node.js/Express backend almost every async task uses Promises with
 async/await:"
@@ -288,9 +288,9 @@ In short: async/await everywhere, `Promise.all` for parallel work, one central e
 
 ---
 
-10. Output: Promise chain that logs, throws, catches and returns 10
+##### 10. Output: Promise chain that logs, throws, catches and returns 10
 
-    *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==> Code (from the interview):
 
@@ -329,10 +329,9 @@ In short: a throw jumps to `.catch`; `.catch`'s return value continues the chain
 
 ---
 
-11. Output: async function that awaits a rejected promise inside try/catch, then
-    .then(console.log(5))
+##### 11. Output: async function that awaits a rejected promise inside try/catch, then .then(console.log(5))
 
-    *(Asked 1×: Irpgrammer Solutions)*
+*(Asked 1×: Irpgrammer Solutions)*
 
 ==> Code (from the interview):
 
@@ -365,9 +364,9 @@ In short: `.then(fn())` calls fn immediately – pass a function, not a call.
 
 ---
 
-12. What is hoisting?
+##### 12. What is hoisting?
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> **Hoisting**: before running a scope, the JS engine registers all its declarations first, so
 they behave as if "moved to the top".
@@ -393,9 +392,9 @@ In short: declarations are set up before the code runs; only `var` and functions
 
 ---
 
-13. What is the TDZ (Temporal Dead Zone)?
+##### 13. What is the TDZ (Temporal Dead Zone)?
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> The **TDZ** is the time from the **start of the block** until the line where a `let` / `const`
 / `class` is declared. The variable exists (it is hoisted) but touching it throws a
@@ -416,9 +415,9 @@ In short: TDZ = "declared but not ready yet" – it stops you using `let`/`const
 
 ---
 
-14. What is the difference between find() and filter()?
+##### 14. What is the difference between find() and filter()?
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==>
 ```text
@@ -444,9 +443,9 @@ In short: `find` → one item; `filter` → an array of items.
 
 ---
 
-15. What is the difference between map, filter and reduce?
+##### 15. What is the difference between map, filter and reduce?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 ```text
@@ -475,9 +474,9 @@ In short: map = transform, filter = select, reduce = combine.
 
 ---
 
-16. Do map, filter and reduce mutate the original array?
+##### 16. Do map, filter and reduce mutate the original array?
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> **No.** They return a new value and leave the original array as it was.
 - But if the array holds **objects** and your callback changes them (`item.price = 0`), the
@@ -501,9 +500,9 @@ In short: the array isn't mutated, but objects inside it can be.
 
 ---
 
-17. Practical use cases of map, filter and reduce
+##### 17. Practical use cases of map, filter and reduce
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==>
 - **map** – shape API data for the UI: `users.map(u => u.name)`; render a list in React.
@@ -533,9 +532,9 @@ In short: map for display, filter for search/remove, reduce for totals and group
 
 ---
 
-18. What is the difference between null and undefined?
+##### 18. What is the difference between null and undefined?
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==>
 ```text
@@ -564,9 +563,9 @@ In short: `undefined` = JS says "nothing here yet"; `null` = you say "intentiona
 
 ---
 
-19. Output: [] == false
+##### 19. Output: [] == false
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> Code (from the interview):
 
@@ -588,9 +587,9 @@ In short: `==` coerces types – always use `===`.
 
 ---
 
-20. Output: undefined > 0
+##### 20. Output: undefined > 0
 
-    *(Asked 1×: Algoworks)*
+*(Asked 1×: Algoworks)*
 
 ==> Code (from the interview):
 
@@ -612,9 +611,9 @@ In short: undefined → NaN, and NaN compares false with everything.
 
 ---
 
-21. JavaScript data types and how values are stored
+##### 21. JavaScript data types and how values are stored
 
-    *(Asked 1×: Fundwave)*
+*(Asked 1×: Fundwave)*
 
 ==> 2 groups of types:
 - **Primitives (7)**: `string`, `number`, `boolean`, `undefined`, `null`, `bigint`, `symbol` –
@@ -643,9 +642,9 @@ In short: 7 primitives copied by value; everything else is an object shared by r
 
 ---
 
-22. What is the difference between the Promise methods (all, allSettled, race, any)?
+##### 22. What is the difference between the Promise methods (all, allSettled, race, any)?
 
-    *(Asked 1×: Deloitte)*
+*(Asked 1×: Deloitte)*
 
 ==>
 ```text
@@ -679,9 +678,9 @@ success.
 
 ---
 
-23. How do you call multiple APIs simultaneously (Promise.all)?
+##### 23. How do you call multiple APIs simultaneously (Promise.all)?
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> Start all requests **at the same time**, then wait for all of them with **`Promise.all`**.
 They run in parallel, so total time ≈ the **slowest** request, not the sum.
@@ -709,9 +708,9 @@ In short: fire all requests first, then `await Promise.all` – time = slowest c
 
 ---
 
-24. What is the difference between Promise.all and Promise.allSettled?
+##### 24. What is the difference between Promise.all and Promise.allSettled?
 
-    *(Asked 1×: Senior Node.js round (YT))*
+*(Asked 1×: Senior Node.js round (YT))*
 
 ==>
 ```text
@@ -743,9 +742,9 @@ In short: all = all-or-nothing; allSettled = give me every outcome.
 
 ---
 
-25. What is a callback function?
+##### 25. What is a callback function?
 
-    *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> A **callback** is a function you pass to another function so it can **call it later** – for
 example when a click happens, a timer ends or data arrives. It works because functions are
@@ -775,9 +774,9 @@ In short: a callback = "here's a function, call it when you're done".
 
 ---
 
-26. What is callback hell? (what do we call the problem of nesting many callbacks?)
+##### 26. What is callback hell? (what do we call the problem of nesting many callbacks?)
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> **Callback hell** (or the **pyramid of doom**) is when async callbacks are nested inside each
 other. The code drifts to the right, is hard to read, and every level repeats its own error check.
@@ -811,9 +810,9 @@ In short: nested callbacks = pyramid of doom; async/await flattens it.
 
 ---
 
-27. What is the difference between a Promise and a callback?
+##### 27. What is the difference between a Promise and a callback?
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==>
 ```text
@@ -847,9 +846,9 @@ In short: Promises give you a value you can chain, combine and catch once – ca
 
 ---
 
-28. Output: obj.greet assigned to a variable and called (this binding lost)
+##### 28. Output: obj.greet assigned to a variable and called (this binding lost)
 
-    *(Asked 1×: Hitachi)*
+*(Asked 1×: Hitachi)*
 
 ==> Code (from the interview):
 
@@ -886,9 +885,9 @@ In short: copy a method into a variable and `this` is lost – use `bind`.
 
 ---
 
-29. Write any one AJAX method
+##### 29. Write any one AJAX method
 
-    *(Asked 1×: Bajaj Finserv)*
+*(Asked 1×: Bajaj Finserv)*
 
 ==> **AJAX** = the browser fetches data from the server **without reloading the page**. The
 modern way is **`fetch`** (returns a Promise):
@@ -918,9 +917,9 @@ In short: AJAX = update the page with server data without a reload; today use `f
 
 ---
 
-30. Making HTTP requests with async/await in Node.js / Express
+##### 30. Making HTTP requests with async/await in Node.js / Express
 
-    *(Asked 1×: Capsitech)*
+*(Asked 1×: Capsitech)*
 
 ==> Use **`fetch`** (built into Node 18+) or **axios** inside an `async` route handler, with
 `try...catch` for errors.
@@ -951,9 +950,9 @@ In short: `await fetch(...)` in an async route, check `ok`, and catch errors.
 
 ---
 
-31. Fetch an API so that it completes within 3 seconds (timeout)
+##### 31. Fetch an API so that it completes within 3 seconds (timeout)
 
-    *(Asked 1×: Capsitech)*
+*(Asked 1×: Capsitech)*
 
 ==> Use **`AbortController`**: start a 3-second timer that **aborts** the request if it's still
 running.
@@ -988,9 +987,9 @@ In short: AbortController (or `AbortSignal.timeout`) actually cancels the reques
 
 ---
 
-32. What is function currying? (e.g. multi(4)(5))
+##### 32. What is function currying? (e.g. multi(4)(5))
 
-    *(Asked 1×: TCS)*
+*(Asked 1×: TCS)*
 
 ==> **Currying** turns `f(a, b)` into `f(a)(b)` – a chain of functions that each take **one
 argument**. It works because of **closures**: the inner function remembers `a`.
@@ -1023,10 +1022,9 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ---
 
-33. Sequential vs parallel await: what is wrong with `await` inside a loop, and when should you use
-    Promise.all (and limit concurrency)?
+##### 33. Sequential vs parallel await: what is wrong with `await` inside a loop, and when should you use Promise.all (and limit concurrency)?
 
-    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+*(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
 ==> `await` inside a `for` loop waits for each call to finish **before starting the next**. If the
 calls don't depend on each other, that's slow.

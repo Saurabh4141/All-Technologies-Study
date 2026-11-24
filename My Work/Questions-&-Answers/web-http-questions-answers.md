@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What is HTTP?
+##### 1. What is HTTP?
 
-   *(Asked 1×: Technovert)*
+*(Asked 1×: Technovert)*
 
 ==> **HTTP** (HyperText Transfer Protocol) is how a browser (client) and a server talk on the web.
 - Client sends a **request**: method (`GET`, `POST`...), URL, **headers**, optional **body**.
@@ -31,9 +31,9 @@ In short: HTTP = the stateless request/response language of the web.
 
 ---
 
-2. Difference between HTTP and HTTPS
+##### 2. Difference between HTTP and HTTPS
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> **HTTPS = HTTP inside an encrypted TLS connection.**
 
@@ -61,10 +61,9 @@ In short: HTTPS = HTTP + encryption + server identity check.
 
 ---
 
-3. What happens when you type google.com and press Enter? (cache, critical rendering path,
-   render-blocking JS)
+##### 3. What happens when you type google.com and press Enter? (cache, critical rendering path, render-blocking JS)
 
-   *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> Step by step:
 1. **Cache check** – browser checks its cache (and **HSTS** list, so it goes straight to HTTPS).
@@ -89,9 +88,9 @@ In short: find the server, connect securely, get HTML, then turn HTML + CSS into
 
 ---
 
-4. Normal script vs async vs defer: how do scripts affect rendering?
+##### 4. Normal script vs async vs defer: how do scripts affect rendering?
 
-   *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> The browser builds the page while reading HTML. A script can pause that.
 
@@ -122,9 +121,9 @@ In short: plain script blocks, async runs ASAP, defer runs after parsing in orde
 
 ---
 
-5. Why do we use Nginx as a proxy server?
+##### 5. Why do we use Nginx as a proxy server?
 
-   *(Asked 1×: One97 Paytm)*
+*(Asked 1×: One97 Paytm)*
 
 ==> Nginx sits **in front of your app** as a **reverse proxy**: it takes client requests and
 forwards them to the backend (Node, PHP-FPM, Python...).
@@ -156,9 +155,9 @@ handles business logic.
 
 ---
 
-6. Nginx server vs Apache server
+##### 6. Nginx server vs Apache server
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==>
 ```text
@@ -186,9 +185,9 @@ Nginx sits in front of Apache or Node.
 
 ---
 
-7. Difference between span and div
+##### 7. Difference between span and div
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==>
 ```text
@@ -219,9 +218,9 @@ In short: div = block box, span = inline piece of text.
 
 ---
 
-8. What is a pseudo-class in CSS?
+##### 8. What is a pseudo-class in CSS?
 
-   *(Asked 1×: Interview, no company)*
+*(Asked 1×: Interview, no company)*
 
 ==> A **pseudo-class** styles an element in a **special state** – no extra class in HTML needed.
 Starts with **one colon** `:`.
@@ -242,9 +241,9 @@ In short: `:state` = pseudo-class, `::part` = pseudo-element.
 
 ---
 
-9. What are 401, 402, 403 and 502? Common status codes you use
+##### 9. What are 401, 402, 403 and 502? Common status codes you use
 
-   *(Asked 1×: UST)*
+*(Asked 1×: UST)*
 
 ==>
 - **401 Unauthorized** – not logged in: token missing, expired or invalid (authentication
@@ -296,9 +295,9 @@ Interview tip: 401 = "who are you?", 403 = "I know you, but no".
 
 ---
 
-10. Performance tools (React Profiler, Lighthouse, GTmetrix) and metrics FCP, LCP, CLS
+##### 10. Performance tools (React Profiler, Lighthouse, GTmetrix) and metrics FCP, LCP, CLS
 
-    *(Asked 1×: EZ Works)*
+*(Asked 1×: EZ Works)*
 
 ==> Tools:
 - **React Profiler** (React DevTools) – which components re-render, and how long each render
@@ -344,9 +343,9 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ---
 
-11. What is a CDN, and what are its benefits?
+##### 11. What is a CDN, and what are its benefits?
 
-    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
+*(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> A **CDN** (Content Delivery Network) is a set of **edge servers** around the world that keep
 **cached copies** of your files. Users get them from the **nearest edge** instead of your

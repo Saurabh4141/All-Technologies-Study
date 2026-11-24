@@ -6,9 +6,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ---
 
-1. What is the difference between Git and GitHub?
+##### 1. What is the difference between Git and GitHub?
 
-   *(Asked 2×: HashedIn by Deloitte, rtCamp)*
+*(Asked 2×: HashedIn by Deloitte, rtCamp)*
 
 ==> **Git** is the version control tool on your machine. **GitHub** is a website that hosts Git
 repos and adds team features on top.
@@ -40,9 +40,9 @@ In short: Git is the tool; GitHub is a place to host Git repos and collaborate.
 
 ---
 
-2. Common and advanced Git commands
+##### 2. Common and advanced Git commands
 
-   *(Asked 2×: HashedIn by Deloitte, Interview, no company)*
+*(Asked 2×: HashedIn by Deloitte, Interview, no company)*
 
 ==> **Daily commands:**
 
@@ -79,9 +79,9 @@ and **revert** (adds a new undo commit, safe for shared branches).
 
 ---
 
-3. Have you worked on Docker? Explain
+##### 3. Have you worked on Docker? Explain
 
-   *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> Sample answer: "Yes. I containerized our Node.js APIs with Docker. I wrote the Dockerfiles, used
 **Docker Compose** to run the API with MongoDB and Redis locally, and in CI/CD we build the image,
@@ -105,9 +105,9 @@ In short: Docker = build once, run the same everywhere.
 
 ---
 
-4. Docker architecture
+##### 4. Docker architecture
 
-   *(Asked 1×: Inorg Global)*
+*(Asked 1×: Inorg Global)*
 
 ==> Docker uses a **client–server** architecture:
 - **Docker Client** – the `docker` CLI where you type commands.
@@ -130,9 +130,9 @@ In short: CLI sends commands, the daemon does the work, the registry stores imag
 
 ---
 
-5. What is a Docker registry?
+##### 5. What is a Docker registry?
 
-   *(Asked 1×: Inorg Global)*
+*(Asked 1×: Inorg Global)*
 
 ==> A Docker registry is a **storage place for Docker images** – like GitHub, but for images.
 - Public: **Docker Hub**. Private: **AWS ECR**, GitHub Container Registry (GHCR), Azure ACR.
@@ -150,9 +150,9 @@ In short: registry = image store; repository = one image; tag = its version.
 
 ---
 
-6. Virtualization vs containerization
+##### 6. Virtualization vs containerization
 
-   *(Asked 1×: Inorg Global)*
+*(Asked 1×: Inorg Global)*
 
 ==>
 
@@ -184,9 +184,9 @@ kernel, so they are lighter and faster.
 
 ---
 
-7. Write a Dockerfile for a Node.js application
+##### 7. Write a Dockerfile for a Node.js application
 
-   *(Asked 1×: Inorg Global)*
+*(Asked 1×: Inorg Global)*
 
 ==>
 
@@ -241,9 +241,9 @@ In short: small base image, copy package files first, `npm ci`, non-root user, `
 
 ---
 
-8. What is a Docker volume?
+##### 8. What is a Docker volume?
 
-   *(Asked 1×: rtCamp)*
+*(Asked 1×: rtCamp)*
 
 ==> A **volume** is storage **outside the container's writable layer**, so data survives when the
 container is deleted.
@@ -266,9 +266,9 @@ In short: containers are throwaway; volumes keep the data.
 
 ---
 
-9. Docker image vs container
+##### 9. Docker image vs container
 
-   *(Asked 1×: rtCamp)*
+*(Asked 1×: rtCamp)*
 
 ==>
 
@@ -299,9 +299,9 @@ In short: image = class, container = object.
 
 ---
 
-10. Docker vs Kubernetes
+##### 10. Docker vs Kubernetes
 
-    *(Asked 1×: Visa)*
+*(Asked 1×: Visa)*
 
 ==>
 
@@ -332,9 +332,9 @@ They are used together.
 
 ---
 
-11. Common Docker commands
+##### 11. Common Docker commands
 
-    *(Asked 1×: HashedIn by Deloitte)*
+*(Asked 1×: HashedIn by Deloitte)*
 
 ==>
 
@@ -359,9 +359,9 @@ In short: build → run → ps/logs/exec to inspect → stop/rm to clean up.
 
 ---
 
-12. What is git rebase?
+##### 12. What is git rebase?
 
-    *(Asked 1×: UST)*
+*(Asked 1×: UST)*
 
 ==> `git rebase` takes your branch's commits and **replays them on top of another branch**. Result:
 a straight, **linear history** with no merge commit.
@@ -399,9 +399,9 @@ In short: rebase = clean, linear history; merge = safe, keeps everything.
 
 ---
 
-13. How do you resolve merge conflicts in Git?
+##### 13. How do you resolve merge conflicts in Git?
 
-    *(Asked 1×: American Express)*
+*(Asked 1×: American Express)*
 
 ==> A **conflict** happens when two branches change the same lines and Git can't decide which
 one to keep.
@@ -429,9 +429,9 @@ In short: find the markers, pick the right code, `git add`, commit.
 
 ---
 
-14. Can we use Git without GitHub?
+##### 14. Can we use Git without GitHub?
 
-    *(Asked 1×: rtCamp)*
+*(Asked 1×: rtCamp)*
 
 ==> **Yes.** Git is a standalone, **distributed** tool – every clone has the full history locally.
 - `git init`, commit, branch, merge, log all work offline with no GitHub.
@@ -448,9 +448,9 @@ In short: GitHub is optional; Git works on its own.
 
 ---
 
-15. Where does Git store data?
+##### 15. Where does Git store data?
 
-    *(Asked 1×: rtCamp)*
+*(Asked 1×: rtCamp)*
 
 ==> In the hidden **`.git` folder** at the root of the project.
 - `.git/objects` – all content as objects: **blobs** (file contents), **trees** (folders),
@@ -471,9 +471,9 @@ In short: everything lives in `.git`; your working files are just a checkout of 
 
 ---
 
-16. What steps do you include in a CI/CD pipeline?
+##### 16. What steps do you include in a CI/CD pipeline?
 
-    *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==> A CI/CD pipeline automatically **builds, tests and deploys** code on every change. Typical
 steps for a Node.js service:
@@ -492,9 +492,9 @@ In short: trigger → install → lint → test → build → scan → push → 
 
 ---
 
-17. What does a basic CI/CD workflow look like? (whiteboard)
+##### 17. What does a basic CI/CD workflow look like? (whiteboard)
 
-    *(Asked 1×: Visa)*
+*(Asked 1×: Visa)*
 
 ==> **CI (Continuous Integration)** = every push is built and tested automatically.
 **CD (Continuous Delivery/Deployment)** = tested code is released automatically (Delivery stops
@@ -547,9 +547,9 @@ In short: push → CI tests and builds → CD deploys, each step only if the pre
 
 ---
 
-18. CI/CD, test automation and code review processes
+##### 18. CI/CD, test automation and code review processes
 
-    *(Asked 1×: Hyland Software)*
+*(Asked 1×: Hyland Software)*
 
 ==> Sample answer:
 - **CI/CD:** every PR runs a GitHub Actions workflow – install, lint, unit + integration tests,
@@ -564,9 +564,9 @@ In short: PR → automatic checks → human review → merge → automatic deplo
 
 ---
 
-19. Do you configure CI/CD pipelines?
+##### 19. Do you configure CI/CD pipelines?
 
-    *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> Sample answer: "Yes. I have written **GitHub Actions** workflows for our Node.js services:
 install, lint, test, build the Docker image, push to ECR and deploy to ECS / Lambda (with
@@ -587,9 +587,9 @@ In short: yes – YAML workflows in the repo, secrets kept in the CI tool.
 
 ---
 
-20. How do you deploy your applications / microservices?
+##### 20. How do you deploy your applications / microservices?
 
-    *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> Sample answer:
 1. Each microservice has its own repo/folder, Dockerfile and pipeline.
@@ -607,9 +607,9 @@ In short: test → build image → push to ECR → rolling update on ECS → hea
 
 ---
 
-21. What is DevOps and which tools are used?
+##### 21. What is DevOps and which tools are used?
 
-    *(Asked 1×: HashedIn by Deloitte)*
+*(Asked 1×: HashedIn by Deloitte)*
 
 ==> **DevOps** = development and operations teams working together and **automating** build, test,
 deploy and monitoring, so releases are faster and safer.
@@ -640,9 +640,9 @@ In short: DevOps = culture + automation; Git → CI/CD → Docker/K8s → IaC �
 
 ---
 
-22. What is your testing approach: TDD or after coding?
+##### 22. What is your testing approach: TDD or after coding?
 
-    *(Asked 1×: Kyndryl)*
+*(Asked 1×: Kyndryl)*
 
 ==> Two approaches:
 - **TDD (Test-Driven Development):** write a failing test first → write just enough code to pass
@@ -667,9 +667,9 @@ In short: TDD = test first, code second; I use it where bugs are expensive.
 
 ---
 
-23. Which unit testing frameworks have you used in Node.js?
+##### 23. Which unit testing frameworks have you used in Node.js?
 
-    *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> Sample answer: "Mainly **Jest**, with **Supertest** for API tests. I have also used **Mocha +
 Chai** (with Sinon for mocks)."
@@ -699,9 +699,9 @@ In short: Jest for unit tests, Supertest for APIs.
 
 ---
 
-24. How do you ensure code quality (no bugs)?
+##### 24. How do you ensure code quality (no bugs)?
 
-    *(Asked 1×: Tech Mahindra (YT))*
+*(Asked 1×: Tech Mahindra (YT))*
 
 ==> No code is 100% bug-free, but I reduce bugs with layers of checks:
 - **Tests** – unit, integration and API tests with good coverage (Jest, Supertest).
@@ -716,9 +716,9 @@ In short: catch bugs early – types, lint, tests, review, CI – and watch prod
 
 ---
 
-25. What is code reusability?
+##### 25. What is code reusability?
 
-    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+*(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> Code reusability = **write code once and use it in many places** instead of copy-pasting
 (**DRY**: Don't Repeat Yourself).
