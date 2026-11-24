@@ -90,15 +90,7 @@ In short: the event loop lets one JS thread handle thousands of async tasks with
 
 *(Asked 4×: Persistent Systems, TCS (online), Capsitech, EarlyCoder 5-yr Node (YT))*
 
-==> In Express, **middleware** is a function `(req, res, next)` that runs **between the request
-arriving and the response being sent**.
-- It can read or change `req` / `res`.
-- It can end the request (`res.send(...)`) or pass control on with **`next()`**.
-- Middleware runs **in the order you add it** with `app.use()`.
-- Common uses: logging, auth, validation, body parsing, rate limiting, error handling.
-- Types: application-level (`app.use`), router-level (`router.use`), built-in
-  (`express.json()`), third-party (`cors`, `helmet`), **error-handling** (4 args:
-  `(err, req, res, next)`).
+==> Middleware is a function that runs between receiving a client's request and sending the server's response. We use middleware to perform tasks like authentication, validation, and logging before passing control to the next middleware or route handler.
 
 ```js
 const express = require('express');
@@ -135,7 +127,7 @@ In short: middleware = a chain of `(req, res, next)` functions that every reques
 
 *(Asked 2×: EarlyCoder 5-yr Node (YT), Senior Node Ep.32 (YT))*
 
-==> Sample answer: "Yes. I used **Socket.io** for notifications, chat and live status updates. I
+==> "Yes. I used **Socket.io** for notifications, chat and live status updates. I
 attached Socket.io to the same HTTP server as Express, checked the JWT once in the
 **handshake** with `io.use()`, and used **rooms** so events go only to the right users."
 
@@ -192,7 +184,7 @@ In short: Express = routing + middleware on top of Node's HTTP server.
 
 ---
 
-##### 5. How do you create a server in Express.js? Write a basic Express server with an API endpoint
+##### 5. How do you create a server in Express.js? Write a basic Express server with an API endpoint.
 
 *(Asked 2×: Persistent Systems, Tech Mahindra (YT))*
 
@@ -223,7 +215,72 @@ In short: `express()` → `app.use()` → `app.get/post()` → `app.listen()`.
 
 ---
 
-##### 6. If Node.js is single-threaded, how does it handle concurrency?
+
+
+##### 6. What exactly is Non-Blocking I/O?
+
+*(Not asked in a real interview yet · From: my notes)*
+
+==> Non-Blocking I/O means the program does not wait for an input/output operation to finish
+before continuing with other tasks.
+
+---
+
+##### 7. What is libuv?
+
+*(Not asked in a real interview yet · From: my notes)*
+
+==> libuv is a C library used by Node.js that provides support for asynchronous I/O operations,
+the event loop, and a thread pool.
+
+```text
+NODE.JS INTERNAL WORKING
+|
++-- 1. JavaScript Application Code
+|      |
+|      +-- Your application code
+|      +-- fs.readFile()
+|      +-- setTimeout()
+|      +-- HTTP requests
+|
++-- 2. Node.js Runtime
+|      |
+|      +-- V8 Engine
+|      |      +-- Executes JavaScript code
+|      |
+|      +-- Node.js APIs
+|             +-- File System (fs)
+|             +-- HTTP
+|             +-- Timers
+|
++-- 3. libuv (C Library)
+|      |
+|      +-- Event Loop
+|      |      +-- Manages asynchronous callbacks
+|      |
+|      +-- Thread Pool
+|      |      +-- Handles certain background operations
+|      |
+|      +-- Asynchronous I/O
+|             +-- Coordinates I/O operations
+|
++-- 4. Operating System
+|      |
+|      +-- File System Operations
+|      +-- Network Operations
+|      +-- Other System Operations
+|
++-- 5. Result / Completion
+       |
+       +-- Operation completes
+       +-- Completion is communicated back
+       +-- Callback is scheduled
+       +-- Node.js executes the callback
+```
+
+---
+
+##### 8. If Node.js is single-threaded, how does it handle concurrency?
 
 *(Asked 2×: Kyndryl, Bajaj Finserv)*
 
@@ -249,7 +306,7 @@ In short: Node doesn't wait for I/O, so one thread can juggle thousands of reque
 
 ---
 
-##### 7. Which npm modules do you commonly use, and why that library (e.g. nodemon)?
+##### 9. Which npm modules do you commonly use, and why that library (e.g. nodemon)?
 
 *(Asked 2×: Tech Mahindra (YT), Web3Dev)*
 
@@ -305,7 +362,7 @@ dev restarts.
 
 ---
 
-##### 8. What is Node.js?
+##### 10. What is Node.js?
 
 *(Asked 2×: Algoworks, Technovert)*
 
@@ -329,7 +386,7 @@ In short: Node.js = V8 + libuv + built-in modules like `fs` and `http`.
 
 ---
 
-##### 9. What are the phases of the Node.js event loop?
+##### 11. What are the phases of the Node.js event loop?
 
 *(Asked 1×: Senior Node.js round (YT))*
 
@@ -364,7 +421,7 @@ Memory trick: **T-P-I-P-C-C** → Timers, Pending, Idle, Poll, Check, Close.
 
 ---
 
-##### 10. Output: setTimeout vs Promise order
+##### 12. Output: setTimeout vs Promise order
 
 *(Asked 1×: Hitachi)*
 
@@ -396,7 +453,7 @@ In short: sync → microtasks → timers.
 
 ---
 
-##### 11. Output: console.log / setTimeout / Promise.then / process.nextTick order
+##### 13. Output: console.log / setTimeout / Promise.then / process.nextTick order
 
 *(Asked 1×: Irpgrammer Solutions)*
 
@@ -429,7 +486,7 @@ In short: sync → nextTick → Promise → setTimeout.
 
 ---
 
-##### 12. Output: console.log, two Promise.then chains and setTimeout(0) (A D E C F B)
+##### 14. Output: console.log, two Promise.then chains and setTimeout(0) (A D E C F B)
 
 *(Asked 1×: TechM)*
 
@@ -476,7 +533,7 @@ In short: a chained `.then` joins the queue only when the previous `.then` finis
 
 ---
 
-##### 13. Output: console.log('first'), setTimeout logging 'second', console.log('third')
+##### 15. Output: console.log('first'), setTimeout logging 'second', console.log('third')
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -502,7 +559,7 @@ In short: `setTimeout 0` means "as soon as the stack is empty", not "now".
 
 ---
 
-##### 14. What is the difference between an HTTP connection and a socket connection?
+##### 16. What is the difference between an HTTP connection and a socket connection?
 
 *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
@@ -543,7 +600,7 @@ In short: HTTP = ask and get one answer; socket = an open two-way phone line.
 
 ---
 
-##### 15. How do you authenticate a socket connection? How do you pass the JWT?
+##### 17. How do you authenticate a socket connection? How do you pass the JWT?
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
@@ -578,7 +635,7 @@ In short: token in `auth` → verify in `io.use()` → attach user to `socket`.
 
 ---
 
-##### 16. Does the socket handshake start from the front end or the back end?
+##### 18. Does the socket handshake start from the front end or the back end?
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
@@ -594,7 +651,7 @@ In short: the client always knocks first; the server opens the door.
 
 ---
 
-##### 17. How do you validate the token when there is no middleware on the front end?
+##### 19. How do you validate the token when there is no middleware on the front end?
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
@@ -620,7 +677,7 @@ per event.
 
 ---
 
-##### 18. Is passing the token directly in the socket payload secure?
+##### 20. Is passing the token directly in the socket payload secure?
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
@@ -637,7 +694,7 @@ In short: token once in the handshake, over `wss://`, never in every message or 
 
 ---
 
-##### 19. Which socket handshake objects can carry the token (e.g. auth, query)?
+##### 21. Which socket handshake objects can carry the token (e.g. auth, query)?
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
@@ -668,7 +725,7 @@ In short: use `auth`; avoid `query`.
 
 ---
 
-##### 20. Create a Node.js server using the http module
+##### 22. Create a Node.js server using the http module
 
 *(Asked 1×: TCS)*
 
@@ -708,7 +765,7 @@ In short: `http.createServer((req, res) => ...)` + `res.writeHead()` + `res.end(
 
 ---
 
-##### 21. Create an API using any backend framework (Node.js)
+##### 23. Create an API using any backend framework (Node.js)
 
 *(Asked 1×: Bajaj Finserv)*
 
@@ -759,7 +816,7 @@ In short: `express.json()` + one route per HTTP method + proper status codes.
 
 ---
 
-##### 22. Which framework have you used for Node.js in your projects / microservices?
+##### 24. Which framework have you used for Node.js in your projects / microservices?
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -787,7 +844,7 @@ In short: Express for most services, NestJS when the project needs strong struct
 
 ---
 
-##### 23. Why is Node.js single-threaded?
+##### 25. Why is Node.js single-threaded?
 
 *(Asked 1×: Bajaj Finserv)*
 
@@ -817,7 +874,7 @@ In short: one JS thread = simple and memory-cheap; the heavy waiting is done by 
 
 ---
 
-##### 24. How do you handle high concurrency (non-blocking code)?
+##### 26. How do you handle high concurrency (non-blocking code)?
 
 *(Asked 1×: Wipro)*
 
@@ -845,7 +902,7 @@ enough.
 
 ---
 
-##### 25. Why is Node.js able to handle many requests? Is Node.js multi-threaded?
+##### 27. Why is Node.js able to handle many requests? Is Node.js multi-threaded?
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -864,7 +921,7 @@ In short: "single-threaded for running JS, multi-threaded under the hood."
 
 ---
 
-##### 26. How would you define the term I/O?
+##### 28. How would you define the term I/O?
 
 *(Asked 1×: Bajaj Finserv)*
 
@@ -886,7 +943,7 @@ In short: I/O is waiting on the outside world – Node never sits and waits for 
 
 ---
 
-##### 27. What is the difference between module.exports and exports? (purpose of module.exports)
+##### 29. What is the difference between module.exports and exports? (purpose of module.exports)
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -921,7 +978,7 @@ In short: always safe to use `module.exports`; use `exports.x` only to add prope
 
 ---
 
-##### 28. What is a circular dependency in Node.js?
+##### 30. What is a circular dependency in Node.js?
 
 *(Asked 1×: Senior Node.js round (YT))*
 
@@ -948,7 +1005,7 @@ In short: circular require = half-loaded module = `undefined` values.
 
 ---
 
-##### 29. What are the globals / global object in Node.js?
+##### 31. What are the globals / global object in Node.js?
 
 *(Asked 1×: Senior Node.js round (YT))*
 
@@ -973,7 +1030,7 @@ are per-module.
 
 ---
 
-##### 30. What is the difference between Node and Node.js?
+##### 32. What is the difference between Node and Node.js?
 
 *(Asked 1×: Deloitte (YT))*
 
@@ -982,7 +1039,7 @@ are per-module.
 
 ---
 
-##### 31. What are the drawbacks of Node.js?
+##### 33. What are the drawbacks of Node.js?
 
 *(Asked 1×: Bajaj Finserv)*
 
@@ -1000,7 +1057,7 @@ In short: great for I/O-heavy apps, weak for CPU-heavy ones.
 
 ---
 
-##### 32. Explain REST APIs
+##### 34. Explain REST APIs
 
 *(Asked 1×: TCS (online))*
 
@@ -1025,7 +1082,7 @@ In short: resources as URLs + HTTP methods as verbs + JSON + status codes, state
 
 ---
 
-##### 33. How does an API work?
+##### 35. How does an API work?
 
 *(Asked 1×: Web3Dev)*
 
@@ -1047,7 +1104,7 @@ In short: request in → middleware → logic → response out.
 
 ---
 
-##### 34. Which REST API methods have you used (GET, POST, PUT, PATCH, DELETE)?
+##### 36. Which REST API methods have you used (GET, POST, PUT, PATCH, DELETE)?
 
 *(Asked 1×: American Express)*
 
@@ -1074,7 +1131,7 @@ is not (it creates a new record each time). PATCH is not guaranteed to be idempo
 
 ---
 
-##### 35. Explain the architecture and implementation of a RESTful API you developed
+##### 37. Explain the architecture and implementation of a RESTful API you developed
 
 *(Asked 1×: Upelars)*
 
@@ -1102,7 +1159,7 @@ the body and returns 201. All responses have the same JSON shape and proper stat
 
 ---
 
-##### 36. What is the difference between process.nextTick() and setImmediate()? Which runs first?
+##### 38. What is the difference between process.nextTick() and setImmediate()? Which runs first?
 
 *(Asked 1×: TCS/Infosys/Accenture short (YT))*
 
@@ -1136,7 +1193,7 @@ In short: nextTick = "right now, before anything else"; setImmediate = "next che
 
 ---
 
-##### 37. Why does process.nextTick() run before setImmediate()?
+##### 39. Why does process.nextTick() run before setImmediate()?
 
 *(Asked 1×: TCS/Infosys/Accenture short (YT))*
 
@@ -1151,7 +1208,7 @@ In short: nextTick skips the queue; setImmediate waits its turn in the loop.
 
 ---
 
-##### 38. What is the difference between setImmediate() and setTimeout()?
+##### 40. What is the difference between setImmediate() and setTimeout()?
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -1190,7 +1247,7 @@ In short: setTimeout = timers phase, after a delay; setImmediate = check phase, 
 
 ---
 
-##### 39. How do you implement centralized error handling in Express?
+##### 41. How do you implement centralized error handling in Express?
 
 *(Asked 1×: Wipro)*
 
@@ -1227,7 +1284,7 @@ In short: throw / `next(err)` everywhere, handle in one 4-argument middleware at
 
 ---
 
-##### 40. How do you handle unexpected exceptions (uncaughtException / unhandledRejection)?
+##### 42. How do you handle unexpected exceptions (uncaughtException / unhandledRejection)?
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -1255,7 +1312,7 @@ In short: handle errors where they happen; use these events only to log and rest
 
 ---
 
-##### 41. How do you get the error object in a callback (error-first callbacks)?
+##### 43. How do you get the error object in a callback (error-first callbacks)?
 
 *(Asked 1×: Tech Mahindra (YT))*
 
@@ -1279,7 +1336,7 @@ In short: `(err, result) => { if (err) return ...; }` – error always comes fir
 
 ---
 
-##### 42. How can you improve Node.js application performance?
+##### 44. How can you improve Node.js application performance?
 
 *(Asked 1×: Deloitte)*
 
@@ -1297,7 +1354,7 @@ In short: free event loop + cache + fast DB + all CPU cores + measure first.
 
 ---
 
-##### 43. If 10k requests hit your API, how will you handle them efficiently?
+##### 45. If 10k requests hit your API, how will you handle them efficiently?
 
 *(Asked 1×: American Express)*
 
@@ -1315,7 +1372,7 @@ In short: non-blocking code + cache + pool + more processes + queues.
 
 ---
 
-##### 44. An API takes 10 seconds and must respond in 2–3 seconds. What steps do you take to optimize it?
+##### 46. An API takes 10 seconds and must respond in 2–3 seconds. What steps do you take to optimize it?
 
 *(Asked 1×: Senior Node.js round (YT))*
 
@@ -1340,7 +1397,7 @@ In short: measure → fix the biggest bottleneck → measure again.
 
 ---
 
-##### 45. Write sample code to connect a Node.js application to a database
+##### 47. Write sample code to connect a Node.js application to a database
 
 *(Asked 1×: Persistent Systems)*
 
@@ -1387,7 +1444,7 @@ startup and reuse the connection / pool.
 
 ---
 
-##### 46. How do you do database operations in Node.js?
+##### 48. How do you do database operations in Node.js?
 
 *(Asked 1×: Wipro)*
 
@@ -1412,7 +1469,7 @@ In short: driver/ORM + async/await + placeholders + pool.
 
 ---
 
-##### 47. Write a GET API that queries MongoDB and finds the employee with a given id
+##### 49. Write a GET API that queries MongoDB and finds the employee with a given id
 
 *(Asked 1×: Bajaj Finserv)*
 
@@ -1458,7 +1515,7 @@ In short: validate id → `findById` → 400 / 404 / 200, wrapped in try/catch.
 
 ---
 
-##### 48. How do you handle asynchronous operations in Node.js?
+##### 50. How do you handle asynchronous operations in Node.js?
 
 *(Asked 1×: Deloitte)*
 
@@ -1497,11 +1554,11 @@ In short: callbacks → Promises → async/await; the main thread never sits wai
 
 ---
 
-##### 49. How do you implement asynchronous programming in Node.js?
+##### 51. How do you implement asynchronous programming in Node.js?
 
 *(Asked 1×: Tech Mahindra (YT))*
 
-==> Same base tools as Q48 (callbacks, Promises, async/await), plus these Node tools:
+==> Same base tools as Q50 (callbacks, Promises, async/await), plus these Node tools:
 - **`util.promisify`** – turns an old callback API into a Promise one.
 - **`Promise.all` / `Promise.allSettled`** – run independent tasks in parallel.
 - **EventEmitter** – react to events (`on` / `emit`).
@@ -1525,7 +1582,7 @@ workers for heavy CPU.
 
 ---
 
-##### 50. What is libuv and what role does it play in Node.js?
+##### 52. What is libuv and what role does it play in Node.js?
 
 *(Asked 1×: Persistent Systems)*
 
@@ -1552,7 +1609,7 @@ thread pool.
 
 ---
 
-##### 51. Explain Node.js and its event-driven model (what does event-driven programming mean?)
+##### 53. Explain Node.js and its event-driven model (what does event-driven programming mean?)
 
 *(Asked 1×: One97 Paytm)*
 
@@ -1577,7 +1634,7 @@ without blocking.
 
 ---
 
-##### 52. What are streams in Node.js?
+##### 54. What are streams in Node.js?
 
 *(Asked 1×: Wipro)*
 
@@ -1616,7 +1673,7 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ---
 
-##### 53. Output: setTimeout(0) and setImmediate scheduled inside an fs.readFile callback — which prints first?
+##### 55. Output: setTimeout(0) and setImmediate scheduled inside an fs.readFile callback — which prints first?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1643,7 +1700,7 @@ In short: inside I/O, poll → check (immediate) → next loop's timers (timeout
 
 ---
 
-##### 54. A route runs a 5-second synchronous loop. What happens to other requests (e.g. /health) during that time?
+##### 56. A route runs a 5-second synchronous loop. What happens to other requests (e.g. /health) during that time?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1671,7 +1728,7 @@ In short: blocking the event loop blocks the whole process, not just one request
 
 ---
 
-##### 55. Polling vs Server-Sent Events (SSE) vs WebSocket: when do you use each?
+##### 57. Polling vs Server-Sent Events (SSE) vs WebSocket: when do you use each?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1710,7 +1767,7 @@ In short: rare updates → polling; server-only push → SSE; real-time two-way 
 
 ---
 
-##### 56. Socket.io vs plain WebSocket: what is the difference?
+##### 58. Socket.io vs plain WebSocket: what is the difference?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1755,7 +1812,7 @@ fallbacks out of the box.
 
 ---
 
-##### 57. How do you scale Socket.io across multiple servers?
+##### 59. How do you scale Socket.io across multiple servers?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1781,7 +1838,7 @@ In short: **Redis adapter + sticky sessions**.
 
 ---
 
-##### 58. Why use Express if Node.js already has the http module?
+##### 60. Why use Express if Node.js already has the http module?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1810,7 +1867,7 @@ In short: Express is a thin layer over `http` that cuts boilerplate and organise
 
 ---
 
-##### 59. How do you read route params, query string, body and headers in Express? Why is req.body undefined without express.json() (body-parser)?
+##### 61. How do you read route params, query string, body and headers in Express? Why is req.body undefined without express.json() (body-parser)?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -1848,7 +1905,7 @@ In short: params, query, body, headers – and no `express.json()` means no `req
 
 ---
 
-##### 60. Why do you get "Cannot set headers after they are sent to the client"?
+##### 62. Why do you get "Cannot set headers after they are sent to the client"?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1877,7 +1934,7 @@ In short: one request = one response. Use `return res...` to stop the handler.
 
 ---
 
-##### 61. Express vs Fastify
+##### 63. Express vs Fastify
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -1916,7 +1973,7 @@ validation matter.
 
 ---
 
-##### 62. CommonJS vs ES Modules (require vs import)
+##### 64. CommonJS vs ES Modules (require vs import)
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -1962,7 +2019,7 @@ In short: CommonJS is Node's classic default; ESM is the standard – pick one p
 
 ---
 
-##### 63. What happens when you require() the same file twice? (module caching)
+##### 65. What happens when you require() the same file twice? (module caching)
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -1988,7 +2045,7 @@ In short: `require()` caches modules, so every module acts like a **singleton**.
 
 ---
 
-##### 64. What is npx?
+##### 66. What is npx?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2007,7 +2064,7 @@ In short: **npm installs** packages; **npx runs** them.
 
 ---
 
-##### 65. Semantic versioning: what do ^ and ~ mean in package.json?
+##### 67. Semantic versioning: what do ^ and ~ mean in package.json?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2036,7 +2093,7 @@ In short: **^** = same major, **~** = same minor, no symbol = exact.
 
 ---
 
-##### 66. npm install vs npm ci
+##### 68. npm install vs npm ci
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2063,7 +2120,7 @@ In short: `npm ci` = clean, exact, reproducible install from the lock file.
 
 ---
 
-##### 67. What does idempotent mean? Which HTTP methods are idempotent?
+##### 69. What does idempotent mean? Which HTTP methods are idempotent?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2093,7 +2150,7 @@ In short: same request repeated = same result on the server.
 
 ---
 
-##### 68. REST API design best practices: resource naming, versioning (/api/v1) and pagination
+##### 70. REST API design best practices: resource naming, versioning (/api/v1) and pagination
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2128,7 +2185,7 @@ In short: nouns in URLs, verbs as HTTP methods, version in the path, always pagi
 
 ---
 
-##### 69. What is a health check endpoint?
+##### 71. What is a health check endpoint?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2157,7 +2214,7 @@ In short: an endpoint that tells the infrastructure "I'm alive and ready".
 
 ---
 
-##### 70. What is API documentation (Swagger / OpenAPI)?
+##### 72. What is API documentation (Swagger / OpenAPI)?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2182,7 +2239,7 @@ In short: OpenAPI is the spec; Swagger UI turns it into interactive docs at `/ap
 
 ---
 
-##### 71. Is Node.js a programming language or a framework?
+##### 73. Is Node.js a programming language or a framework?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2197,7 +2254,7 @@ In short: JavaScript is the language, Node.js is the runtime, Express is a frame
 
 ---
 
-##### 72. What is the REPL in Node.js?
+##### 74. What is the REPL in Node.js?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2220,7 +2277,7 @@ In short: the REPL is Node's playground to run JavaScript line by line.
 
 ---
 
-##### 73. What are compression and morgan middleware?
+##### 75. What are compression and morgan middleware?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2244,7 +2301,7 @@ In short: compression makes responses smaller; morgan logs every HTTP request.
 
 ---
 
-##### 74. What is a memory leak in Node.js? Common causes and how do you detect it?
+##### 76. What is a memory leak in Node.js? Common causes and how do you detect it?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2276,7 +2333,7 @@ caches, `off()`/`removeListener()` and `clearInterval()`.
 
 ---
 
-##### 75. What is heap memory, and how does garbage collection work in Node.js (V8)?
+##### 77. What is heap memory, and how does garbage collection work in Node.js (V8)?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2302,7 +2359,7 @@ reachable.
 
 ---
 
-##### 76. How do you debug a Node.js application?
+##### 78. How do you debug a Node.js application?
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2324,7 +2381,7 @@ guessing with console.log.
 
 ---
 
-##### 77. Logging in Node.js: console vs winston / pino / morgan
+##### 79. Logging in Node.js: console vs winston / pino / morgan
 
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
@@ -2363,7 +2420,7 @@ HTTP request logs.
 
 ---
 
-##### 78. How do async errors reach the Express error handler (Express 4 vs Express 5)?
+##### 80. How do async errors reach the Express error handler (Express 4 vs Express 5)?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2402,7 +2459,7 @@ automatically.
 
 ---
 
-##### 79. What is util.promisify?
+##### 81. What is util.promisify?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2429,7 +2486,7 @@ In short: promisify converts an error-first callback function into a promise-ret
 
 ---
 
-##### 80. What is the libuv thread pool? Which tasks use it, and what is its default size?
+##### 82. What is the libuv thread pool? Which tasks use it, and what is its default size?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2465,7 +2522,7 @@ not use them.
 
 ---
 
-##### 81. What is backpressure in streams?
+##### 83. What is backpressure in streams?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2490,7 +2547,7 @@ pipe/pipeline do it for you.
 
 ---
 
-##### 82. pipe() vs pipeline() in streams
+##### 84. pipe() vs pipeline() in streams
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2532,7 +2589,7 @@ In short: both handle backpressure, but pipeline() also handles errors and clean
 
 ---
 
-##### 83. Are EventEmitter listeners synchronous or asynchronous? (include output: `e.on('x', () => console.log('1')); e.emit('x'); console.log('2');` → 1 2; also mention the two classic bugs: emitting 'error' with no listener crashes the process, and adding listeners per request leaks memory / MaxListenersExceededWarning)
+##### 85. Are EventEmitter listeners synchronous or asynchronous? (include output: `e.on('x', () => console.log('1')); e.emit('x'); console.log('2');` → 1 2; also mention the two classic bugs: emitting 'error' with no listener crashes the process, and adding listeners per request leaks memory / MaxListenersExceededWarning)
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2566,7 +2623,7 @@ request.
 
 ---
 
-##### 84. What is clustering in Node.js? Cluster vs worker threads
+##### 86. What is clustering in Node.js? Cluster vs worker threads
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2612,7 +2669,7 @@ work inside one process.
 
 ---
 
-##### 85. exec vs spawn in child_process
+##### 87. exec vs spawn in child_process
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
@@ -2651,7 +2708,7 @@ processes).
 
 ---
 
-##### 86. What is PM2?
+##### 88. What is PM2?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2674,7 +2731,7 @@ zero-downtime reloads.
 
 ---
 
-##### 87. What is the process object? (process.argv, process.cwd(), process.memoryUsage(), process.exit codes)
+##### 89. What is the process object? (process.argv, process.cwd(), process.memoryUsage(), process.exit codes)
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2700,7 +2757,7 @@ exit and signals.
 
 ---
 
-##### 88. What is process.env, and how do you load a .env file (dotenv / node --env-file)?
+##### 90. What is process.env, and how do you load a .env file (dotenv / node --env-file)?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2726,7 +2783,7 @@ In short: process.env holds config as strings; load .env with dotenv or `node --
 
 ---
 
-##### 89. What is graceful shutdown, and how do you implement it?
+##### 91. What is graceful shutdown, and how do you implement it?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2760,7 +2817,7 @@ In short: on SIGTERM/SIGINT stop new requests, finish old ones, close DB connect
 
 ---
 
-##### 90. Three ways to read a file with fs (sync, callback, promises). Why not use readFileSync in a server?
+##### 92. Three ways to read a file with fs (sync, callback, promises). Why not use readFileSync in a server?
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
@@ -2798,7 +2855,7 @@ user.
 
 ---
 
-##### 91. path.join vs path.resolve; why use __dirname instead of './'? (__dirname / __filename)
+##### 93. path.join vs path.resolve; why use __dirname instead of './'? (__dirname / __filename)
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
