@@ -7,256 +7,334 @@ Ordered by priority: the question asked by the most interviewers comes first.
 ---
 
 1. What is HTTP?
+
    *(Asked 1×: Technovert)*
 
-==> HTTP (HyperText Transfer Protocol) is the set of rules a browser (client) and a server use to
-    talk on the web.
-    - The client sends a **request** (method like GET/POST, URL, headers, optional body).
-    - The server sends back a **response** (status code like 200/404, headers, body).
-    - It is **stateless**: each request is independent. We use cookies, sessions or tokens to
-      remember the user.
+==> **HTTP** (HyperText Transfer Protocol) is how a browser (client) and a server talk on the web.
+- Client sends a **request**: method (`GET`, `POST`...), URL, **headers**, optional **body**.
+- Server sends a **response**: **status code** (`200`, `404`...), headers, body.
+- It is **stateless**: each request stands alone. To remember the user we add **cookies**,
+  **sessions** or **tokens** (JWT).
 
-    In short: HTTP = request/response language of the web.
+```http
+GET /api/users/1 HTTP/1.1
+Host: example.com
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id":1,"name":"Saurabh"}
+```
+
+In short: HTTP = the stateless request/response language of the web.
 
 ---
 
 2. Difference between HTTP and HTTPS
+
    *(Asked 1×: Interview, no company)*
 
-==> HTTPS is HTTP sent inside an encrypted TLS connection.
+==> **HTTPS = HTTP inside an encrypted TLS connection.**
 
-    +--------------+--------------------------------------------+--------------------------------------------+
-    |              | HTTP                                       | HTTPS                                      |
-    +==============+============================================+============================================+
-    | Security     | Plain text, anyone in the middle can       | Encrypted with TLS                         |
-    |              | read/change it                             |                                            |
-    +--------------+--------------------------------------------+--------------------------------------------+
-    | Default port | 80                                         | 443                                        |
-    +--------------+--------------------------------------------+--------------------------------------------+
-    | Certificate  | Not needed                                 | Needs an SSL/TLS certificate (proves the   |
-    |              |                                            | server's identity)                         |
-    +--------------+--------------------------------------------+--------------------------------------------+
-    | Use          | Old / local testing                        | Everything in production (logins,          |
-    |              |                                            | payments, SEO boost)                       |
-    +--------------+--------------------------------------------+--------------------------------------------+
+```text
++--------------+-------------------------------------+-------------------------------------+
+|              | HTTP                                | HTTPS                               |
++==============+=====================================+=====================================+
+| Data         | Plain text - anyone in the middle   | Encrypted with TLS                  |
+|              | can read or change it               |                                     |
++--------------+-------------------------------------+-------------------------------------+
+| Default port | 80                                  | 443                                 |
++--------------+-------------------------------------+-------------------------------------+
+| Certificate  | Not needed                          | TLS certificate proves the server's |
+|              |                                     | identity                            |
++--------------+-------------------------------------+-------------------------------------+
+| Use          | Local testing only                  | Everything in production (logins,   |
+|              |                                     | payments, SEO, HTTP/2 in browsers)  |
++--------------+-------------------------------------+-------------------------------------+
+```
 
-    In short: HTTPS = HTTP + encryption + server identity check.
+HTTPS gives 3 things: **encryption** (no one can read it), **integrity** (no one can change it),
+**authentication** (you are really talking to that server).
+
+In short: HTTPS = HTTP + encryption + server identity check.
 
 ---
 
 3. What happens when you type google.com and press Enter? (cache, critical rendering path,
    render-blocking JS)
+
    *(Asked 1×: EZ Works)*
 
 ==> Step by step:
-    1. **Cache check** – browser checks its own cache (and HSTS list) for the page and DNS record.
-    2. **DNS lookup** – finds the IP address of google.com (browser cache → OS cache → DNS
-       resolver).
-    3. **TCP + TLS handshake** – connects to the server on port 443 and sets up encryption.
-    4. **HTTP request** – browser sends `GET /`; server replies with HTML (may be a redirect,
-       301/302).
-    5. **Critical rendering path** (turning code into pixels):
-        - Parse HTML → **DOM**
-        - Parse CSS → **CSSOM**
-        - DOM + CSSOM → **Render tree**
-        - **Layout** (sizes/positions) → **Paint** → **Composite** on screen.
-    6. **Render-blocking JS** – a normal `<script>` stops HTML parsing until it is downloaded and
-       run. CSS also blocks rendering. Fix with `defer`/`async`, and keep critical CSS small.
-    7. Extra resources (images, fonts, JS) load; the page becomes interactive.
+1. **Cache check** – browser checks its cache (and **HSTS** list, so it goes straight to HTTPS).
+2. **DNS lookup** – finds google.com's IP (browser cache → OS cache → DNS resolver).
+3. **TCP + TLS handshake** – connects on port 443 and sets up encryption.
+4. **HTTP request** – browser sends `GET /`; server replies with HTML (maybe a `301` redirect
+   first).
+5. **Critical rendering path** (code → pixels):
+   - HTML → **DOM**
+   - CSS → **CSSOM**
+   - DOM + CSSOM → **render tree**
+   - **Layout** (sizes/positions) → **Paint** → **Composite** on screen.
+6. **Render-blocking resources** – a normal `<script>` pauses HTML parsing until it downloads
+   and runs; CSS blocks rendering until the CSSOM is ready. Fix: `defer`/`async`, small critical
+   CSS.
+7. Images, fonts and other JS load; the page becomes interactive.
 
-    Interview tip: say "DNS → TCP/TLS → request → response → DOM/CSSOM → render tree → layout →
-    paint".
+Interview tip: say "DNS → TCP/TLS → request → response → DOM/CSSOM → render tree → layout →
+paint".
+
+In short: find the server, connect securely, get HTML, then turn HTML + CSS into pixels.
 
 ---
 
 4. Normal script vs async vs defer: how do scripts affect rendering?
+
    *(Asked 1×: EZ Works)*
 
-==> The browser builds the page while reading HTML. Scripts can pause that.
+==> The browser builds the page while reading HTML. A script can pause that.
 
-    +------------------+---------------------------+--------------------------------------------+----------------------+-------------+
-    |                  | Download                  | Runs when                                  | Blocks HTML parsing? | Order kept? |
-    +==================+===========================+============================================+======================+=============+
-    | `<script>`       | Stops parsing to download | Immediately after download                 | Yes                  | Yes         |
-    +------------------+---------------------------+--------------------------------------------+----------------------+-------------+
-    | `<script async>` | In parallel               | As soon as downloaded                      | Only while running   | No          |
-    +------------------+---------------------------+--------------------------------------------+----------------------+-------------+
-    | `<script defer>` | In parallel               | After HTML is fully parsed (before         | No                   | Yes         |
-    |                  |                           | DOMContentLoaded)                          |                      |             |
-    +------------------+---------------------------+--------------------------------------------+----------------------+-------------+
+```text
++----------------+-------------------+-----------------------------+---------------+--------+
+| Tag            | Download          | Runs when                   | Blocks parse? | Order  |
++================+===================+=============================+===============+========+
+| <script>       | Stops parsing     | Right after download        | Yes           | Kept   |
++----------------+-------------------+-----------------------------+---------------+--------+
+| <script async> | In parallel       | As soon as downloaded       | While running | Not    |
+|                |                   |                             |               | kept   |
++----------------+-------------------+-----------------------------+---------------+--------+
+| <script defer> | In parallel       | After HTML is parsed,       | No            | Kept   |
+|                |                   | before DOMContentLoaded     |               |        |
++----------------+-------------------+-----------------------------+---------------+--------+
+```
 
-    - Use `defer` for your app scripts that need the DOM.
-    - Use `async` for independent scripts like analytics.
+```html
+<script src="app.js" defer></script>        <!-- needs the DOM, keeps order -->
+<script src="analytics.js" async></script>  <!-- independent, order doesn't matter -->
+```
+
+- `defer` → your app scripts that touch the DOM.
+- `async` → independent scripts like analytics or ads.
+- `type="module"` scripts are deferred by default.
+
+In short: plain script blocks, async runs ASAP, defer runs after parsing in order.
 
 ---
 
 5. Why do we use Nginx as a proxy server?
+
    *(Asked 1×: One97 Paytm)*
 
-==> A **reverse proxy** is a server that sits in front of one or more backend app servers: it
-    receives client requests and forwards them to the right backend. Nginx is a popular choice for
-    this with any backend (Node.js, PHP-FPM, Python, Java ...).
-    - **Load balancing** – spreads traffic across many app instances/servers.
-    - **SSL/HTTPS termination** – handles certificates so the app does not have to.
-    - **Serves static files** (images, JS, CSS) very fast.
-    - **Caching and gzip compression**.
-    - **Security** – hides the app server, rate limiting, request size limits.
-    - Handles thousands of connections with little memory.
+==> Nginx sits **in front of your app** as a **reverse proxy**: it takes client requests and
+forwards them to the backend (Node, PHP-FPM, Python...).
+- **Load balancing** – spreads traffic across many app instances.
+- **SSL/TLS termination** – Nginx handles HTTPS, the app speaks plain HTTP inside.
+- **Static files** – serves images/JS/CSS very fast, without touching the app.
+- **Caching + gzip** compression.
+- **Security** – hides the app server, rate limiting, request size limits.
+- **Event-driven**, so it holds thousands of connections with little memory.
 
-    Node.js example: the Node app listens on port 3000 and Nginx forwards public traffic to it
-    (and can balance across several Node processes).
+```nginx
+upstream app {
+  server 127.0.0.1:3000;
+  server 127.0.0.1:3001;          # load-balanced across two app processes
+}
 
-    ```nginx
-    server {
-      listen 80;
-      location / {
-        proxy_pass http://localhost:3000;
-      }
-    }
-    ```
+server {
+  listen 80;
+  location / {
+    proxy_pass http://app;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+```
+
+In short: Nginx is the fast front door – HTTPS, static files, load balancing – and the app just
+handles business logic.
 
 ---
 
 6. Nginx server vs Apache server
+
    *(Asked 1×: Interview, no company)*
 
 ==>
-    +-----------------------+--------------------------------------------+-----------------------------------------+
-    |                       | Nginx                                      | Apache                                  |
-    +=======================+============================================+=========================================+
-    | Architecture          | Event-driven, async (few workers handle    | Process/thread per connection (classic) |
-    |                       | many connections)                          |                                         |
-    +-----------------------+--------------------------------------------+-----------------------------------------+
-    | Static files          | Very fast                                  | Slower                                  |
-    +-----------------------+--------------------------------------------+-----------------------------------------+
-    | Many connections      | Low memory, scales well                    | Uses more memory                        |
-    +-----------------------+--------------------------------------------+-----------------------------------------+
-    | Config                | Central config only                        | Supports per-folder `.htaccess` files   |
-    +-----------------------+--------------------------------------------+-----------------------------------------+
-    | Dynamic content (PHP) | Passes to PHP-FPM                          | Can run PHP inside (mod_php)            |
-    +-----------------------+--------------------------------------------+-----------------------------------------+
-    | Common use            | Reverse proxy, load balancer               | Shared hosting, PHP apps                |
-    +-----------------------+--------------------------------------------+-----------------------------------------+
+```text
++------------------+--------------------------------------+-----------------------------------+
+|                  | Nginx                                | Apache                            |
++==================+======================================+===================================+
+| Architecture     | Event-driven, async: few workers     | Process/thread per connection     |
+|                  | handle many connections              | (prefork/worker; event MPM newer) |
++------------------+--------------------------------------+-----------------------------------+
+| Static files     | Very fast                            | Slower                            |
++------------------+--------------------------------------+-----------------------------------+
+| Memory at high   | Low, scales well                     | Grows with connections            |
+| traffic          |                                      |                                   |
++------------------+--------------------------------------+-----------------------------------+
+| Config           | Central config only                  | Per-folder .htaccess files        |
++------------------+--------------------------------------+-----------------------------------+
+| PHP              | Passes to PHP-FPM                    | Can run PHP inside (mod_php)      |
++------------------+--------------------------------------+-----------------------------------+
+| Common use       | Reverse proxy, load balancer         | Shared hosting, classic PHP apps  |
++------------------+--------------------------------------+-----------------------------------+
+```
 
-    In short: Nginx is better for high traffic and proxying; Apache is flexible with `.htaccess`.
-    Often Nginx is put in front of Apache or Node.
+In short: Nginx wins for high traffic and proxying; Apache is flexible with `.htaccess`. Often
+Nginx sits in front of Apache or Node.
 
 ---
 
 7. Difference between span and div
+
    *(Asked 1×: Interview, no company)*
 
 ==>
-    +--------+----------------------------------------+--------------------------------------------+
-    |        | `<div>`                                | `<span>`                                   |
-    +========+========================================+============================================+
-    | Type   | Block element                          | Inline element                             |
-    +--------+----------------------------------------+--------------------------------------------+
-    | Layout | Starts on a new line, takes full width | Stays in the same line, takes only needed  |
-    |        |                                        | width                                      |
-    +--------+----------------------------------------+--------------------------------------------+
-    | Use    | Group big sections/layout              | Style a small part of text                 |
-    +--------+----------------------------------------+--------------------------------------------+
+```text
++--------+----------------------------------------+--------------------------------------------+
+|        | <div>                                  | <span>                                     |
++========+========================================+============================================+
+| Type   | Block element                          | Inline element                             |
++--------+----------------------------------------+--------------------------------------------+
+| Layout | Starts on a new line, takes full width | Stays in the line, takes only the width it |
+|        |                                        | needs                                      |
++--------+----------------------------------------+--------------------------------------------+
+| Use    | Group big sections / layout            | Style a small piece of text                |
++--------+----------------------------------------+--------------------------------------------+
+```
 
-    ```html
-    <div>Box on its own line</div>
-    <p>Hello <span style="color:red">red word</span> here</p>
-    ```
+```html
+<div>Box on its own line</div>
+<p>Hello <span style="color:red">red word</span> here</p>
+```
+
+Output: the div sits on its own full-width line; "red word" turns red but stays inside the
+sentence.
+
+Both have no meaning of their own – prefer semantic tags (`<section>`, `<nav>`, `<strong>`) when
+they fit.
+
+In short: div = block box, span = inline piece of text.
 
 ---
 
 8. What is a pseudo-class in CSS?
+
    *(Asked 1×: Interview, no company)*
 
-==> A pseudo-class styles an element in a **special state**, without adding a class in HTML. It
-    starts with one colon `:`.
-    - `:hover` – mouse is over it
-    - `:focus` – input is selected
-    - `:first-child`, `:nth-child(2)` – position in parent
-    - `:checked`, `:disabled` – form states
+==> A **pseudo-class** styles an element in a **special state** – no extra class in HTML needed.
+Starts with **one colon** `:`.
+- `:hover` – mouse is over it
+- `:focus` – input is selected
+- `:first-child`, `:nth-child(2)` – position inside the parent
+- `:checked`, `:disabled` – form states
 
-    ```css
-    button:hover { background: blue; }
-    li:nth-child(odd) { background: #eee; }
-    ```
+```css
+button:hover { background: blue; }
+li:nth-child(odd) { background: #eee; }   /* rows 1, 3, 5... get grey */
+```
 
-    Note: pseudo-**elements** use two colons (`::before`, `::after`) and style a part of an element.
+Don't mix up: **pseudo-elements** use **two colons** (`::before`, `::after`) and style a *part*
+of an element, not a state.
+
+In short: `:state` = pseudo-class, `::part` = pseudo-element.
 
 ---
 
 9. What are 401, 402, 403 and 502? Common status codes you use
+
    *(Asked 1×: UST)*
 
 ==>
-    - **401 Unauthorized** – you are not logged in / token missing or invalid (authentication
-      failed).
-    - **402 Payment Required** – reserved for payment; rarely used (some APIs use it when a
-      plan/payment is needed).
-    - **403 Forbidden** – you are logged in, but you do not have permission.
-    - **502 Bad Gateway** – a proxy/gateway (like Nginx) got a bad or no response from the upstream
-      server (e.g. the Node app crashed).
+- **401 Unauthorized** – not logged in: token missing, expired or invalid (authentication
+  failed).
+- **402 Payment Required** – reserved; rarely used (some APIs return it when a plan/payment is
+  needed).
+- **403 Forbidden** – logged in, but **no permission** for this resource.
+- **502 Bad Gateway** – a proxy (like Nginx) got a bad or no response from the app behind it
+  (e.g. the app crashed).
 
-    Common codes:
+Common codes:
 
-    +---------------------------+-------------------------------------+
-    | Code                      | Meaning                             |
-    +===========================+=====================================+
-    | 200 OK                    | Success                             |
-    +---------------------------+-------------------------------------+
-    | 201 Created               | New resource created (POST)         |
-    +---------------------------+-------------------------------------+
-    | 204 No Content            | Success, nothing to return (DELETE) |
-    +---------------------------+-------------------------------------+
-    | 301 / 302                 | Permanent / temporary redirect      |
-    +---------------------------+-------------------------------------+
-    | 304 Not Modified          | Use cached copy                     |
-    +---------------------------+-------------------------------------+
-    | 400 Bad Request           | Invalid input                       |
-    +---------------------------+-------------------------------------+
-    | 404 Not Found             | Resource does not exist             |
-    +---------------------------+-------------------------------------+
-    | 409 Conflict              | Duplicate / conflicting data        |
-    +---------------------------+-------------------------------------+
-    | 422 Unprocessable Entity  | Validation error                    |
-    +---------------------------+-------------------------------------+
-    | 429 Too Many Requests     | Rate limit hit                      |
-    +---------------------------+-------------------------------------+
-    | 500 Internal Server Error | Bug on the server                   |
-    +---------------------------+-------------------------------------+
-    | 503 Service Unavailable   | Server down / overloaded            |
-    +---------------------------+-------------------------------------+
-    | 504 Gateway Timeout       | Upstream took too long              |
-    +---------------------------+-------------------------------------+
+```text
++---------------------------+-------------------------------------+
+| Code                      | Meaning                             |
++===========================+=====================================+
+| 200 OK                    | Success                             |
++---------------------------+-------------------------------------+
+| 201 Created               | New resource created (POST)         |
++---------------------------+-------------------------------------+
+| 204 No Content            | Success, nothing to return (DELETE) |
++---------------------------+-------------------------------------+
+| 301 / 302                 | Permanent / temporary redirect      |
++---------------------------+-------------------------------------+
+| 304 Not Modified          | Use your cached copy                |
++---------------------------+-------------------------------------+
+| 400 Bad Request           | Invalid input                       |
++---------------------------+-------------------------------------+
+| 404 Not Found             | Resource does not exist             |
++---------------------------+-------------------------------------+
+| 409 Conflict              | Duplicate / conflicting data        |
++---------------------------+-------------------------------------+
+| 422 Unprocessable Entity  | Validation error                    |
++---------------------------+-------------------------------------+
+| 429 Too Many Requests     | Rate limit hit                      |
++---------------------------+-------------------------------------+
+| 500 Internal Server Error | Bug on the server                   |
++---------------------------+-------------------------------------+
+| 503 Service Unavailable   | Server down / overloaded            |
++---------------------------+-------------------------------------+
+| 504 Gateway Timeout       | Proxy waited too long for the app   |
++---------------------------+-------------------------------------+
+```
 
-    Interview tip: 401 = "who are you?", 403 = "I know you, but no".
+Easy grouping: **2xx** success, **3xx** redirect, **4xx** client's mistake, **5xx** server's
+mistake.
+
+Interview tip: 401 = "who are you?", 403 = "I know you, but no".
 
 ---
 
 10. Performance tools (React Profiler, Lighthouse, GTmetrix) and metrics FCP, LCP, CLS
+
     *(Asked 1×: EZ Works)*
 
 ==> Tools:
-    - **React Profiler** (React DevTools) – shows which components re-render and how long they take.
-    - **Lighthouse** (Chrome DevTools) – gives scores for performance, SEO, accessibility with fix
-      suggestions.
-    - **GTmetrix** – online test of page speed, waterfall of all requests, history.
+- **React Profiler** (React DevTools) – which components re-render, and how long each render
+  takes.
+- **Lighthouse** (Chrome DevTools) – scores for performance, SEO, accessibility, with fix
+  suggestions.
+- **GTmetrix** – online page-speed test with a **waterfall** of every request and history.
 
-    Metrics (Core Web Vitals and friends):
+Metrics:
 
-    +--------------------------------+--------------------------------------------+------------+
-    | Metric                         | Meaning                                    | Good value |
-    +================================+============================================+============+
-    | FCP – First Contentful Paint   | Time until the first text/image appears    | < 1.8 s    |
-    +--------------------------------+--------------------------------------------+------------+
-    | LCP – Largest Contentful Paint | Time until the biggest element (hero       | < 2.5 s    |
-    |                                | image/heading) appears                     |            |
-    +--------------------------------+--------------------------------------------+------------+
-    | CLS – Cumulative Layout Shift  | How much the page jumps around while       | < 0.1      |
-    |                                | loading                                    |            |
-    +--------------------------------+--------------------------------------------+------------+
+```text
++--------------------------------+--------------------------------------------+------------+
+| Metric                         | Meaning                                    | Good value |
++================================+============================================+============+
+| FCP - First Contentful Paint   | Time until the first text/image appears    | < 1.8 s    |
++--------------------------------+--------------------------------------------+------------+
+| LCP - Largest Contentful Paint | Time until the biggest element (hero       | < 2.5 s    |
+|                                | image / heading) appears                   |            |
++--------------------------------+--------------------------------------------+------------+
+| CLS - Cumulative Layout Shift  | How much the page jumps while loading      | < 0.1      |
++--------------------------------+--------------------------------------------+------------+
+| INP - Interaction to Next      | How fast the page reacts to clicks/typing  | < 200 ms   |
+| Paint                          |                                            |            |
++--------------------------------+--------------------------------------------+------------+
+```
 
-    Fixes: compress/lazy-load images, set image width/height (helps CLS), code splitting, CDN,
-    caching, `defer` scripts.
+The **Core Web Vitals** are **LCP, CLS and INP** (INP replaced FID in 2024). FCP is a helpful
+extra metric.
+
+Fixes:
+- LCP → compress / preload the hero image, CDN, caching.
+- CLS → set image `width`/`height`, reserve space for ads/fonts.
+- INP / FCP → code splitting, `defer` scripts, less JS on the main thread.
+
+In short: Profiler finds slow React renders; Lighthouse/GTmetrix measure the page; aim for LCP <
+2.5 s, CLS < 0.1, INP < 200 ms.
 
 ---
 
@@ -267,24 +345,28 @@ Ordered by topic priority: questions from the most-asked topics come first.
 ---
 
 11. What is a CDN, and what are its benefits?
-   *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
-==> A CDN (Content Delivery Network) is a network of servers spread around the world (edge servers)
-    that keep cached copies of your content. A user gets the content from the nearest edge server
-    instead of your main (origin) server.
-    - Typically used for static files: images, CSS, JS, videos, fonts. Can also cache some API
-      responses.
-    - Examples: Cloudflare, AWS CloudFront, Akamai.
-    Benefits:
-    - Faster load times (lower latency, content is closer to the user).
-    - Less load and bandwidth on your origin server.
-    - Better availability: if one edge goes down, others serve.
-    - Security: DDoS protection, HTTPS/TLS at the edge, WAF.
-    - Caching is controlled with headers like `Cache-Control`; use versioned file names
-      (`app.3f2a.js`) so new deploys are picked up.
+    *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
-    In short: A CDN serves cached content from servers near the user - faster, cheaper and more
-    reliable.
+==> A **CDN** (Content Delivery Network) is a set of **edge servers** around the world that keep
+**cached copies** of your files. Users get them from the **nearest edge** instead of your
+**origin** server.
+- Used for static files: images, CSS, JS, videos, fonts (sometimes cacheable API responses).
+- Examples: **Cloudflare**, **AWS CloudFront**, **Akamai**.
+
+Benefits:
+- **Faster** – lower latency, content is close to the user.
+- **Less load** and bandwidth on your origin.
+- **Availability** – if one edge goes down, others serve.
+- **Security** – DDoS protection, TLS at the edge, WAF.
+
+Caching is controlled with headers; use **versioned file names** so a new deploy is picked up:
+
+```http
+Cache-Control: public, max-age=31536000, immutable    (for app.3f2a.js)
+```
+
+In short: a CDN serves cached files from a server near the user – faster, cheaper, more reliable.
 
 ======================================================================================================================================
 

@@ -7,539 +7,735 @@ Ordered by priority: the question asked by the most interviewers comes first.
 ---
 
 1. What is the difference between Git and GitHub?
+
    *(Asked 2×: HashedIn by Deloitte, rtCamp)*
 
-==> Comparison:
+==> **Git** is the version control tool on your machine. **GitHub** is a website that hosts Git
+repos and adds team features on top.
 
-    +---------------+----------------------------------+--------------------------------------------+
-    | Feature       | Git                              | GitHub                                     |
-    +===============+==================================+============================================+
-    | What          | Version control tool             | Website/hosting service for Git repos      |
-    +---------------+----------------------------------+--------------------------------------------+
-    | Where         | Installed on your computer       | In the cloud (github.com)                  |
-    +---------------+----------------------------------+--------------------------------------------+
-    | Works offline | Yes                              | No                                         |
-    +---------------+----------------------------------+--------------------------------------------+
-    | Main use      | Track changes, branches, commits | Share code, pull requests, code review,    |
-    |               |                                  | issues, GitHub Actions                     |
-    +---------------+----------------------------------+--------------------------------------------+
-    | Alternatives  | SVN, Mercurial                   | GitLab, Bitbucket                          |
-    +---------------+----------------------------------+--------------------------------------------+
+```text
++---------------+----------------------------------+--------------------------------------------+
+| Feature       | Git                              | GitHub                                     |
++===============+==================================+============================================+
+| What          | Version control tool (CLI)       | Hosting service for Git repos              |
++---------------+----------------------------------+--------------------------------------------+
+| Where         | Installed on your computer       | In the cloud (github.com)                  |
++---------------+----------------------------------+--------------------------------------------+
+| Works offline | Yes                              | No                                         |
++---------------+----------------------------------+--------------------------------------------+
+| Main use      | Commits, branches, merges,       | Pull requests, code review, issues,        |
+|               | history                          | GitHub Actions (CI/CD)                     |
++---------------+----------------------------------+--------------------------------------------+
+| Alternatives  | SVN, Mercurial                   | GitLab, Bitbucket                          |
++---------------+----------------------------------+--------------------------------------------+
+```
 
-    In short: Git is the tool, GitHub is a place to host Git repositories and collaborate.
+```bash
+git init && git commit -m "first"          # Git only – no internet needed
+git remote add origin https://github.com/me/app.git
+git push -u origin main                     # now the code is on GitHub
+```
+
+In short: Git is the tool; GitHub is a place to host Git repos and collaborate.
 
 ---
 
 2. Common and advanced Git commands
+
    *(Asked 2×: HashedIn by Deloitte, Interview, no company)*
 
-==> Common:
+==> **Daily commands:**
 
-    ```bash
-    git init                      # start a new repo
-    git clone <url>               # copy a remote repo
-    git status                    # see changed files
-    git add .                     # stage changes
-    git commit -m "message"       # save a snapshot
-    git push origin main          # send commits to remote
-    git pull                      # fetch + merge remote changes
-    git branch feature-x          # create branch
-    git checkout -b feature-x     # create + switch (or: git switch -c feature-x)
-    git merge feature-x           # merge branch into current
-    git log --oneline             # short history
-    git diff                      # see line changes
-    ```
+```bash
+git init                      # start a new repo
+git clone <url>               # copy a remote repo
+git status                    # see changed / staged files
+git add .                     # stage changes
+git commit -m "message"       # save a snapshot
+git push origin main          # send commits to the remote
+git pull                      # fetch + merge remote changes
+git switch -c feature-x       # create + switch branch (old way: git checkout -b)
+git merge feature-x           # merge a branch into the current one
+git log --oneline             # short history
+git diff                      # see line changes
+```
 
-    Advanced:
+**Advanced commands:**
 
-    ```bash
-    git rebase main               # replay my commits on top of main
-    git stash / git stash pop     # save unfinished work, bring it back
-    git cherry-pick <commit>      # copy one commit to current branch
-    git reset --soft HEAD~1       # undo last commit, keep changes
-    git revert <commit>           # new commit that undoes an old one (safe for shared branches)
-    git reflog                    # history of HEAD, recover "lost" commits
-    git bisect                    # binary search to find the commit that added a bug
-    git tag v1.0.0                # mark a release
-    ```
+```bash
+git rebase main               # replay my commits on top of main
+git stash                     # park unfinished work...
+git stash pop                 # ...and bring it back
+git cherry-pick <commit>      # copy one commit to the current branch
+git reset --soft HEAD~1       # undo last commit, keep the changes staged
+git revert <commit>           # new commit that undoes an old one (safe on shared branches)
+git reflog                    # history of HEAD – recover "lost" commits
+git bisect start              # binary search for the commit that added a bug
+git tag v1.0.0                # mark a release
+```
+
+Interview tip: know the difference between **reset** (moves the branch back, rewrites history)
+and **revert** (adds a new undo commit, safe for shared branches).
 
 ---
 
 3. Have you worked on Docker? Explain
+
    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> Sample answer: "Yes. I containerized our Node.js APIs with Docker. I wrote the Dockerfiles, used
-    docker-compose to run the API with MongoDB/Redis locally, and in CI/CD we build the image, push
-    it to a registry (ECR / Docker Hub) and deploy it to ECS."
-    Technical point:
-    - **Docker** packages the app + its runtime + libraries into an **image**, so it runs the same
-      on every machine ("works on my machine" problem solved).
-    - A running image is a **container** – light, starts in seconds, isolated from others.
+**Docker Compose** to run the API with MongoDB and Redis locally, and in CI/CD we build the image,
+push it to a registry (ECR / Docker Hub) and deploy it to ECS."
+
+**Key points:**
+- **Docker** packages the app + runtime + libraries into an **image**, so it runs the same on every
+  machine – no more "works on my machine".
+- A running image is a **container** – lightweight, starts in seconds, isolated from other
+  containers.
+
+```bash
+docker build -t my-api .
+docker run -d -p 3000:3000 my-api
+docker ps
+# Output: CONTAINER ID  IMAGE   ...  PORTS                   NAMES
+#         a1b2c3d4e5f6  my-api  ...  0.0.0.0:3000->3000/tcp  eager_turing
+```
+
+In short: Docker = build once, run the same everywhere.
 
 ---
 
 4. Docker architecture
+
    *(Asked 1×: Inorg Global)*
 
 ==> Docker uses a **client–server** architecture:
-    - **Docker Client** – the `docker` CLI you type commands in.
-    - **Docker Daemon (dockerd)** – background service that builds images and runs containers.
-    - **Images** – read-only templates (built from a Dockerfile, in layers).
-    - **Containers** – running instances of images.
-    - **Registry** – stores images (Docker Hub, AWS ECR).
+- **Docker Client** – the `docker` CLI where you type commands.
+- **Docker Daemon (`dockerd`)** – background service that builds images and runs containers. The
+  CLI talks to it through a **REST API**.
+- **Images** – read-only templates built from a Dockerfile, made of **layers**.
+- **Containers** – running instances of images.
+- **Registry** – stores images (Docker Hub, AWS ECR).
 
-    ```
-    docker CLI ──REST API──> Docker Daemon ──> Images ──run──> Containers
-                                  │
-                                  └──pull / push──> Registry (Docker Hub / ECR)
-    ```
+```text
+docker CLI --REST API--> Docker Daemon --> Images --run--> Containers
+                               |
+                               +--pull / push--> Registry (Docker Hub / ECR)
+```
+
+Example: `docker run nginx` → the CLI asks the daemon → the daemon pulls `nginx` from Docker Hub
+if it's not local → creates and starts the container.
+
+In short: CLI sends commands, the daemon does the work, the registry stores images.
 
 ---
 
 5. What is a Docker registry?
+
    *(Asked 1×: Inorg Global)*
 
-==> A Docker registry is a **storage place for Docker images**, like GitHub but for images.
-    - Public: **Docker Hub**. Private: **AWS ECR**, GitHub Container Registry, Azure ACR.
-    - `docker push` uploads an image, `docker pull` downloads it.
-    - Inside a registry, a **repository** holds versions of one image, marked by **tags** (e.g.
-      `my-api:1.0`).
+==> A Docker registry is a **storage place for Docker images** – like GitHub, but for images.
+- Public: **Docker Hub**. Private: **AWS ECR**, GitHub Container Registry (GHCR), Azure ACR.
+- `docker push` uploads an image, `docker pull` downloads it.
+- Inside a registry, a **repository** holds all versions of one image, marked by **tags** (e.g.
+  `my-api:1.0`). No tag means `:latest`.
 
-    ```bash
-    docker tag my-api myuser/my-api:1.0
-    docker push myuser/my-api:1.0
-    docker pull myuser/my-api:1.0
-    ```
+```bash
+docker tag my-api myuser/my-api:1.0
+docker push myuser/my-api:1.0
+docker pull myuser/my-api:1.0
+```
+
+In short: registry = image store; repository = one image; tag = its version.
 
 ---
 
 6. Virtualization vs containerization
+
    *(Asked 1×: Inorg Global)*
 
-==> Comparison:
+==>
 
-    +---------------------+---------------------------------+-------------------------------------+
-    | Feature             | Virtualization (VMs)            | Containerization (Docker)           |
-    +=====================+=================================+=====================================+
-    | What is virtualized | Hardware                        | Operating system                    |
-    +---------------------+---------------------------------+-------------------------------------+
-    | OS                  | Each VM has a full guest OS     | Containers share the host OS kernel |
-    +---------------------+---------------------------------+-------------------------------------+
-    | Managed by          | Hypervisor (VMware, VirtualBox) | Container engine (Docker)           |
-    +---------------------+---------------------------------+-------------------------------------+
-    | Size                | GBs                             | MBs                                 |
-    +---------------------+---------------------------------+-------------------------------------+
-    | Start time          | Minutes                         | Seconds                             |
-    +---------------------+---------------------------------+-------------------------------------+
-    | Isolation           | Stronger                        | Lighter (process level)             |
-    +---------------------+---------------------------------+-------------------------------------+
+```text
++---------------------+---------------------------------+-------------------------------------+
+| Feature             | Virtualization (VMs)            | Containerization (Docker)           |
++=====================+=================================+=====================================+
+| What is virtualized | Hardware                        | Operating system                    |
++---------------------+---------------------------------+-------------------------------------+
+| OS                  | Each VM has a full guest OS     | Containers share the host OS kernel |
++---------------------+---------------------------------+-------------------------------------+
+| Managed by          | Hypervisor (VMware, VirtualBox) | Container engine (Docker)           |
++---------------------+---------------------------------+-------------------------------------+
+| Size                | GBs                             | MBs                                 |
++---------------------+---------------------------------+-------------------------------------+
+| Start time          | Minutes                         | Seconds                             |
++---------------------+---------------------------------+-------------------------------------+
+| Isolation           | Stronger (separate kernel)      | Lighter (namespaces + cgroups)      |
++---------------------+---------------------------------+-------------------------------------+
+```
 
-    In short: VMs = many full computers on one machine; containers = isolated apps sharing one OS,
-    so they are lighter and faster.
+- Docker isolates containers with Linux **namespaces** (own processes, network, files) and limits
+  resources with **cgroups** (CPU, memory).
+- Because containers share the host kernel, a Linux container needs a Linux kernel (Docker
+  Desktop on Windows/Mac runs a small Linux VM for this).
+
+In short: VMs = many full computers on one machine; containers = isolated apps sharing one
+kernel, so they are lighter and faster.
 
 ---
 
 7. Write a Dockerfile for a Node.js application
+
    *(Asked 1×: Inorg Global)*
 
 ==>
-    ```dockerfile
-    # 1. Base image with Node.js
-    FROM node:20-alpine
 
-    # 2. Folder inside the container
-    WORKDIR /app
+```dockerfile
+# 1. Base image with Node.js
+FROM node:20-alpine
 
-    # 3. Copy package files first (better layer caching)
-    COPY package*.json ./
+# 2. Working folder inside the container
+WORKDIR /app
 
-    # 4. Install only production dependencies
-    RUN npm ci --omit=dev
+# 3. Copy package files first – this layer is cached until dependencies change
+COPY package*.json ./
 
-    # 5. Copy the rest of the code
-    COPY . .
+# 4. Install only production dependencies
+RUN npm ci --omit=dev
 
-    # 6. Run as non-root user (safer)
-    USER node
+# 5. Copy the rest of the code
+COPY . .
 
-    # 7. Port the app listens on
-    EXPOSE 3000
+# 6. Run as the non-root "node" user (safer)
+USER node
 
-    # 8. Start the app
-    CMD ["node", "server.js"]
-    ```
+# 7. Document the port the app listens on
+EXPOSE 3000
 
-    Also add a `.dockerignore` with `node_modules` and `.env`. Build and run:
+# 8. Start the app
+CMD ["node", "server.js"]
+```
 
-    ```bash
-    docker build -t my-node-app .
-    docker run -d -p 3000:3000 --name api my-node-app
-    ```
+Add a **`.dockerignore`** so junk and secrets don't go into the image:
+
+```text
+node_modules
+.env
+.git
+```
+
+Build and run:
+
+```bash
+docker build -t my-node-app .
+docker run -d -p 3000:3000 --name api my-node-app
+curl localhost:3000
+# Output: whatever your app returns, e.g. {"status":"ok"}
+```
+
+- **Layer caching**: copying `package*.json` before the code means `npm ci` reruns only when
+  dependencies change, not on every code change.
+- `EXPOSE` only documents the port; `-p 3000:3000` actually publishes it.
+
+In short: small base image, copy package files first, `npm ci`, non-root user, `CMD` to start.
 
 ---
 
 8. What is a Docker volume?
+
    *(Asked 1×: rtCamp)*
 
-==> A volume is **storage outside the container** that keeps data even when the container is
-    deleted.
-    - Container files are lost when the container is removed; volumes keep them.
-    - Used for databases (MongoDB/MySQL data), uploads, logs.
-    - Types: **named volume** (managed by Docker), **bind mount** (a host folder, useful in
-      development).
+==> A **volume** is storage **outside the container's writable layer**, so data survives when the
+container is deleted.
+- Without a volume, files written inside a container are lost when you `docker rm` it.
+- Used for database data (MongoDB/MySQL), uploads, logs.
+- Types:
+  - **Named volume** – managed by Docker, best for databases.
+  - **Bind mount** – a host folder mapped in; handy in development for live code reload.
 
-    ```bash
-    docker volume create mongo-data
-    docker run -d -v mongo-data:/data/db mongo        # named volume
-    docker run -d -v $(pwd):/app my-node-app          # bind mount
-    ```
+```bash
+docker volume create mongo-data
+docker run -d -v mongo-data:/data/db mongo        # named volume
+docker run -d -v $(pwd):/app my-node-app          # bind mount
+docker volume ls
+# Output: DRIVER  VOLUME NAME
+#         local   mongo-data
+```
+
+In short: containers are throwaway; volumes keep the data.
 
 ---
 
 9. Docker image vs container
+
    *(Asked 1×: rtCamp)*
 
-==> Comparison:
+==>
 
-    +------------+--------------------------------+------------------------------+
-    | Feature    | Image                          | Container                    |
-    +============+================================+==============================+
-    | What       | Read-only template / blueprint | Running instance of an image |
-    +------------+--------------------------------+------------------------------+
-    | State      | Static, does not run           | Running (or stopped) process |
-    +------------+--------------------------------+------------------------------+
-    | Created by | `docker build`                 | `docker run`                 |
-    +------------+--------------------------------+------------------------------+
-    | Changeable | No (build a new one)           | Has a thin writable layer    |
-    +------------+--------------------------------+------------------------------+
-    | Analogy    | Class                          | Object                       |
-    +------------+--------------------------------+------------------------------+
+```text
++------------+--------------------------------+------------------------------+
+| Feature    | Image                          | Container                    |
++============+================================+==============================+
+| What       | Read-only template / blueprint | Running instance of an image |
++------------+--------------------------------+------------------------------+
+| State      | Static, does not run           | Running (or stopped) process |
++------------+--------------------------------+------------------------------+
+| Created by | docker build                   | docker run                   |
++------------+--------------------------------+------------------------------+
+| Changeable | No (build a new one)           | Has a thin writable layer    |
++------------+--------------------------------+------------------------------+
+| Analogy    | Class                          | Object                       |
++------------+--------------------------------+------------------------------+
+```
 
-    One image can start many containers.
+One image can start many containers:
+
+```bash
+docker run -d --name api1 my-api
+docker run -d --name api2 my-api     # same image, second container
+```
+
+In short: image = class, container = object.
 
 ---
 
 10. Docker vs Kubernetes
-   *(Asked 1×: Visa)*
 
-==> Comparison:
+    *(Asked 1×: Visa)*
 
-    +-----------------+----------------------------+----------------------------------------+
-    | Feature         | Docker                     | Kubernetes (K8s)                       |
-    +=================+============================+========================================+
-    | What            | Builds and runs containers | Manages (orchestrates) many containers |
-    +-----------------+----------------------------+----------------------------------------+
-    | Scope           | Usually one machine        | Cluster of many machines               |
-    +-----------------+----------------------------+----------------------------------------+
-    | Scaling         | Manual                     | Auto-scaling                           |
-    +-----------------+----------------------------+----------------------------------------+
-    | Self-healing    | No                         | Restarts/replaces failed containers    |
-    +-----------------+----------------------------+----------------------------------------+
-    | Load balancing  | Basic                      | Built-in (Services)                    |
-    +-----------------+----------------------------+----------------------------------------+
-    | Rolling updates | No                         | Yes, with rollback                     |
-    +-----------------+----------------------------+----------------------------------------+
+==>
 
-    In short: Docker makes the containers; Kubernetes runs and manages lots of them in production.
-    They are used together.
+```text
++-----------------+----------------------------+----------------------------------------+
+| Feature         | Docker                     | Kubernetes (K8s)                       |
++=================+============================+========================================+
+| What            | Builds and runs containers | Manages (orchestrates) many containers |
++-----------------+----------------------------+----------------------------------------+
+| Scope           | Usually one machine        | Cluster of many machines (nodes)       |
++-----------------+----------------------------+----------------------------------------+
+| Scaling         | Manual (docker run again)  | Auto-scaling (HPA)                     |
++-----------------+----------------------------+----------------------------------------+
+| Self-healing    | Only restart policies      | Restarts/replaces failed pods          |
++-----------------+----------------------------+----------------------------------------+
+| Load balancing  | Basic                      | Built-in (Services)                    |
++-----------------+----------------------------+----------------------------------------+
+| Rolling updates | No (plain Docker)          | Yes, with rollback                     |
++-----------------+----------------------------+----------------------------------------+
+```
+
+- In Kubernetes you describe the **desired state** in YAML (e.g. "3 replicas of my-api") and K8s
+  keeps it that way.
+- Docker's own orchestrator is **Docker Swarm**, but Kubernetes is the industry standard.
+
+In short: Docker makes the containers; Kubernetes runs and manages lots of them in production.
+They are used together.
 
 ---
 
 11. Common Docker commands
-   *(Asked 1×: HashedIn by Deloitte)*
+
+    *(Asked 1×: HashedIn by Deloitte)*
 
 ==>
-    ```bash
-    docker build -t my-app .            # build image from Dockerfile
-    docker images                       # list images
-    docker run -d -p 3000:3000 my-app   # run container (detached, map port)
-    docker ps                           # running containers (-a = all)
-    docker logs -f <container>          # view logs
-    docker exec -it <container> sh      # open shell inside container
-    docker stop <container>             # stop
-    docker rm <container>               # remove container
-    docker rmi <image>                  # remove image
-    docker pull node:20-alpine          # download image
-    docker push myuser/my-app:1.0       # upload image
-    docker compose up -d                # start all services in docker-compose.yml
-    docker compose down                 # stop them
-    ```
+
+```bash
+docker build -t my-app .            # build image from Dockerfile
+docker images                       # list images
+docker run -d -p 3000:3000 my-app   # run container (detached, map host:container port)
+docker ps                           # running containers (-a = all, including stopped)
+docker logs -f <container>          # follow logs
+docker exec -it <container> sh      # open a shell inside the container
+docker stop <container>             # stop
+docker rm <container>               # remove container
+docker rmi <image>                  # remove image
+docker pull node:20-alpine          # download image
+docker push myuser/my-app:1.0       # upload image
+docker compose up -d                # start all services in docker-compose.yml
+docker compose down                 # stop and remove them
+docker system prune                 # clean up unused containers, networks, images
+```
+
+In short: build → run → ps/logs/exec to inspect → stop/rm to clean up.
 
 ---
 
 12. What is git rebase?
-   *(Asked 1×: UST)*
 
-==> `git rebase` moves your branch's commits and **replays them on top of another branch**, giving a
-    straight (linear) history without merge commits.
+    *(Asked 1×: UST)*
 
-    ```bash
-    git checkout feature
-    git rebase main        # put feature commits on top of latest main
-    git rebase -i HEAD~3   # interactive: squash / edit last 3 commits
-    ```
+==> `git rebase` takes your branch's commits and **replays them on top of another branch**. Result:
+a straight, **linear history** with no merge commit.
 
-    +-------------------------+--------------------------------+--------------------------+
-    |                         | Merge                          | Rebase                   |
-    +=========================+================================+==========================+
-    | History                 | Keeps all, adds a merge commit | Linear, rewrites commits |
-    +-------------------------+--------------------------------+--------------------------+
-    | Safe on shared branches | Yes                            | No (changes commit ids)  |
-    +-------------------------+--------------------------------+--------------------------+
+```bash
+git switch feature
+git rebase main        # put feature commits on top of the latest main
+git rebase -i HEAD~3   # interactive: squash / reword / drop the last 3 commits
+```
 
-    Interview tip: never rebase a branch others are already using (public/shared branch).
+```text
+Before:  main:    A---B---C
+                       \
+         feature:       D---E
+
+After:   main:    A---B---C
+                           \
+         feature:           D'---E'    (new commit ids)
+```
+
+```text
++-------------------------+--------------------------------+--------------------------+
+|                         | Merge                          | Rebase                   |
++=========================+================================+==========================+
+| History                 | Keeps all, adds a merge commit | Linear, rewrites commits |
++-------------------------+--------------------------------+--------------------------+
+| Safe on shared branches | Yes                            | No (changes commit ids)  |
++-------------------------+--------------------------------+--------------------------+
+```
+
+Interview tip: never rebase a branch others are already using – it rewrites commit ids, and
+they would need a force push.
+
+In short: rebase = clean, linear history; merge = safe, keeps everything.
 
 ---
 
 13. How do you resolve merge conflicts in Git?
-   *(Asked 1×: American Express)*
 
-==> A conflict happens when two branches change the same lines.
-    1. Run `git merge` / `git pull` – Git lists the conflicted files.
-    2. Open each file and find the conflict markers (shown below).
-    3. Keep the right code (yours, theirs or both) and delete the markers. (VS Code shows "Accept
-       Current / Incoming / Both".)
-    4. `git add <file>` to mark it resolved.
-    5. `git commit` (or `git rebase --continue` during a rebase).
-    6. Run tests before pushing. To give up: `git merge --abort`.
+    *(Asked 1×: American Express)*
 
-    ```
-    <<<<<<< HEAD
-    my change
-    =======
-    their change
-    >>>>>>> feature
-    ```
+==> A **conflict** happens when two branches change the same lines and Git can't decide which
+one to keep.
+1. Run `git merge` / `git pull` – Git lists the conflicted files (`git status` shows "both
+   modified").
+2. Open each file and find the **conflict markers**:
 
-    Interview tip: pull often and keep PRs small to avoid big conflicts.
+   ```text
+   <<<<<<< HEAD
+   my change
+   =======
+   their change
+   >>>>>>> feature
+   ```
+
+3. Keep the right code (yours, theirs or both) and delete the markers. VS Code shows "Accept
+   Current / Incoming / Both".
+4. `git add <file>` to mark it resolved.
+5. `git commit` (or `git rebase --continue` during a rebase).
+6. Run tests before pushing. To give up: `git merge --abort`.
+
+Interview tip: pull often and keep PRs small to avoid big conflicts.
+
+In short: find the markers, pick the right code, `git add`, commit.
 
 ---
 
 14. Can we use Git without GitHub?
-   *(Asked 1×: rtCamp)*
 
-==> **Yes.** Git is a standalone tool that works fully on your local machine.
-    - `git init`, commit, branch, merge all work offline with no GitHub.
-    - For sharing, you can use other hosts (GitLab, Bitbucket, Azure Repos) or your own server, or
-      even a shared folder as a remote.
+    *(Asked 1×: rtCamp)*
+
+==> **Yes.** Git is a standalone, **distributed** tool – every clone has the full history locally.
+- `git init`, commit, branch, merge, log all work offline with no GitHub.
+- To share code, use any other host (GitLab, Bitbucket, Azure Repos), your own server, or even a
+  shared folder as a remote.
+
+```bash
+git init --bare /shared/app.git          # a plain folder acting as the "server"
+git remote add origin /shared/app.git
+git push origin main
+```
+
+In short: GitHub is optional; Git works on its own.
 
 ---
 
 15. Where does Git store data?
-   *(Asked 1×: rtCamp)*
+
+    *(Asked 1×: rtCamp)*
 
 ==> In the hidden **`.git` folder** at the root of the project.
-    - `.git/objects` – all content as objects: blobs (file contents), trees (folders), commits,
-      tags.
-    - `.git/refs` – branches and tags (pointers to commits).
-    - `.git/HEAD` – which branch you are on.
-    - `.git/config` – repo settings (remotes etc.).
-    Delete `.git` and the folder is no longer a Git repo (history is gone).
+- `.git/objects` – all content as objects: **blobs** (file contents), **trees** (folders),
+  **commits**, tags. Each is named by its hash.
+- `.git/refs` – branches and tags (pointers to commits).
+- `.git/HEAD` – which branch you are on.
+- `.git/config` – repo settings (remotes etc.).
+- `.git/index` – the **staging area**.
+
+```bash
+cat .git/HEAD
+# Output: ref: refs/heads/main
+```
+
+Delete `.git` and the folder is no longer a Git repo – the history is gone.
+
+In short: everything lives in `.git`; your working files are just a checkout of it.
 
 ---
 
 16. What steps do you include in a CI/CD pipeline?
-   *(Asked 1×: Kyndryl)*
 
-==> A CI/CD pipeline is an automated sequence that builds, tests and deploys code on every change.
-    Typical steps (tool examples for a Node.js project in brackets):
-    1. Code push / pull request (Git) triggers the pipeline.
-    2. Install dependencies (e.g. `npm ci`; `pip install`, `mvn install` in other stacks).
-    3. Lint and static analysis (e.g. ESLint, SonarQube).
-    4. Unit tests (+ coverage).
-    5. Integration tests.
-    6. Build (e.g. TypeScript compile, Docker image) and security scan (e.g. `npm audit`, Trivy).
-    7. Push artifact/image to a registry (ECR / Docker Hub).
-    8. Deploy to staging → smoke tests → approval → production.
-    9. Monitoring and rollback if something breaks.
+    *(Asked 1×: Kyndryl)*
+
+==> A CI/CD pipeline automatically **builds, tests and deploys** code on every change. Typical
+steps for a Node.js service:
+1. **Trigger** – push or pull request.
+2. **Install** dependencies – `npm ci`.
+3. **Lint / static analysis** – ESLint, SonarQube.
+4. **Unit tests** + coverage – Jest.
+5. **Integration / API tests** – Supertest, test DB in a service container.
+6. **Build** – TypeScript compile, Docker image.
+7. **Security scan** – `npm audit`, Trivy for the image.
+8. **Push** the image to a registry (ECR / Docker Hub).
+9. **Deploy** to staging → smoke tests → approval → production.
+10. **Monitor**, and roll back if something breaks.
+
+In short: trigger → install → lint → test → build → scan → push → deploy → monitor.
 
 ---
 
 17. What does a basic CI/CD workflow look like? (whiteboard)
-   *(Asked 1×: Visa)*
 
-==> CI (Continuous Integration) = every push is built and tested automatically. CD (Continuous
-    Delivery/Deployment) = tested code is deployed automatically.
+    *(Asked 1×: Visa)*
 
-    ```
-    Developer ──push──> GitHub ──trigger──> CI: install → lint → test → build image
-                                                                     │
-                                                   push image to registry (ECR)
-                                                                     │
-                                       CD: deploy staging → tests → approve → deploy prod
-                                                                     │
-                                                           monitor / rollback
-    ```
+==> **CI (Continuous Integration)** = every push is built and tested automatically.
+**CD (Continuous Delivery/Deployment)** = tested code is released automatically (Delivery stops
+at a manual approval; Deployment goes to production with no manual step).
 
-    Example with GitHub Actions:
+```text
+Developer --push--> GitHub --trigger--> CI: install -> lint -> test -> build image
+                                                                  |
+                                                push image to registry (ECR)
+                                                                  |
+                                    CD: deploy staging -> tests -> approve -> deploy prod
+                                                                  |
+                                                        monitor / rollback
+```
 
-    ```yaml
-    # .github/workflows/ci-cd.yml
-    name: CI-CD
-    on:
-      push:
-        branches: [main]
-      pull_request:
+Example with **GitHub Actions**:
 
-    jobs:
-      build-test:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-          - uses: actions/setup-node@v4
-            with:
-              node-version: 20
-              cache: npm
-          - run: npm ci
-          - run: npm run lint
-          - run: npm test
+```yaml
+# .github/workflows/ci-cd.yml
+name: CI-CD
+on:
+  push:
+    branches: [main]
+  pull_request:
 
-      deploy:
-        needs: build-test
-        if: github.ref == 'refs/heads/main'
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-          - run: docker build -t my-api:${{ github.sha }} .
-          - run: echo "push image to registry and deploy (e.g. ECS) here"
-    ```
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  deploy:
+    needs: build-test                      # runs only if build-test passed
+    if: github.ref == 'refs/heads/main'    # only on main, not on PRs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t my-api:${{ github.sha }} .
+      - run: echo "push image to registry and deploy (e.g. ECS) here"
+```
+
+In short: push → CI tests and builds → CD deploys, each step only if the previous one passed.
 
 ---
 
 18. CI/CD, test automation and code review processes
-   *(Asked 1×: Hyland Software)*
+
+    *(Asked 1×: Hyland Software)*
 
 ==> Sample answer:
-    - **CI/CD:** every PR runs GitHub Actions – install, lint, unit + integration tests, build.
-      Merge to `main` deploys to staging; production after approval.
-    - **Test automation:** Jest unit tests and Supertest API tests run on every PR; the PR is
-      blocked if tests fail or coverage drops.
-    - **Code review:** feature branch → pull request → at least 1–2 reviewers approve → merge.
-      Reviewers check logic, naming, error handling, security and tests. Branch protection stops
-      direct pushes to `main`.
+- **CI/CD:** every PR runs a GitHub Actions workflow – install, lint, unit + integration tests,
+  build. Merge to `main` deploys to staging; production after approval.
+- **Test automation:** Jest unit tests and Supertest API tests run on every PR. The PR is blocked
+  if tests fail or coverage drops.
+- **Code review:** feature branch → pull request → 1–2 reviewers approve → merge. Reviewers check
+  logic, naming, error handling, security and tests.
+- **Branch protection** on `main`: no direct pushes, required status checks, required approvals.
+
+In short: PR → automatic checks → human review → merge → automatic deploy.
 
 ---
 
 19. Do you configure CI/CD pipelines?
-   *(Asked 1×: Tech Mahindra (YT))*
 
-==> Sample answer: "Yes. I have written GitHub Actions workflows for our Node.js services: install,
-    lint, test, build the Docker image, push to ECR and deploy to ECS / Lambda (with Serverless
-    Framework). Secrets like AWS keys are stored in GitHub Secrets, not in code."
-    Technical point: a pipeline is a YAML file in the repo (`.github/workflows/*.yml`,
-    `.gitlab-ci.yml`, `Jenkinsfile`) with triggers (`on: push`) and jobs made of steps (see the YAML
-    in question 17).
+    *(Asked 1×: Tech Mahindra (YT))*
+
+==> Sample answer: "Yes. I have written **GitHub Actions** workflows for our Node.js services:
+install, lint, test, build the Docker image, push to ECR and deploy to ECS / Lambda (with
+Serverless Framework). Secrets like AWS keys are stored in **GitHub Secrets**, not in code."
+
+**Key point:** a pipeline is a YAML file in the repo – `.github/workflows/*.yml`, `.gitlab-ci.yml`
+or a `Jenkinsfile` – with **triggers** (`on: push`) and **jobs** made of **steps** (see the YAML
+in question 17).
+
+```yaml
+- run: aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URL
+  env:
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}       # from GitHub Secrets
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
+In short: yes – YAML workflows in the repo, secrets kept in the CI tool.
 
 ---
 
 20. How do you deploy your applications / microservices?
-   *(Asked 1×: Tech Mahindra (YT))*
+
+    *(Asked 1×: Tech Mahindra (YT))*
 
 ==> Sample answer:
-    1. Each microservice has its own repo/folder, Dockerfile and pipeline.
-    2. On merge to `main`, CI runs tests and builds a Docker image tagged with the commit id.
-    3. Image is pushed to **AWS ECR**.
-    4. Pipeline updates the **ECS (Fargate) service** (or Kubernetes deployment) with the new image
-       – a **rolling update**, so there is no downtime.
-    5. Load balancer health checks confirm the new version; if it fails, roll back to the previous
-       image.
-    6. Serverless parts are deployed as Lambdas with Serverless Framework / SAM.
-    Config and secrets come from environment variables / Secrets Manager.
+1. Each microservice has its own repo/folder, Dockerfile and pipeline.
+2. On merge to `main`, CI runs tests and builds a Docker image **tagged with the commit SHA**.
+3. The image is pushed to **AWS ECR**.
+4. The pipeline updates the **ECS (Fargate) service** (or Kubernetes Deployment) with the new
+   image – a **rolling update**, so there is no downtime.
+5. Load balancer **health checks** confirm the new version; if it fails, we roll back to the
+   previous image.
+6. Serverless parts are deployed as Lambdas with Serverless Framework / SAM.
+
+Config and secrets come from environment variables / AWS Secrets Manager, never from the image.
+
+In short: test → build image → push to ECR → rolling update on ECS → health check or rollback.
 
 ---
 
 21. What is DevOps and which tools are used?
-   *(Asked 1×: HashedIn by Deloitte)*
 
-==> DevOps is a way of working where **development and operations teams work together** and automate
-    building, testing, deploying and monitoring, so software is released faster and more reliably.
+    *(Asked 1×: HashedIn by Deloitte)*
 
-    +------------------------+--------------------------------------------+
-    | Area                   | Tools                                      |
-    +========================+============================================+
-    | Version control        | Git, GitHub, GitLab                        |
-    +------------------------+--------------------------------------------+
-    | CI/CD                  | GitHub Actions, Jenkins, GitLab CI, AWS    |
-    |                        | CodePipeline                               |
-    +------------------------+--------------------------------------------+
-    | Containers             | Docker                                     |
-    +------------------------+--------------------------------------------+
-    | Orchestration          | Kubernetes, AWS ECS                        |
-    +------------------------+--------------------------------------------+
-    | Infrastructure as Code | Terraform, CloudFormation, AWS CDK         |
-    +------------------------+--------------------------------------------+
-    | Config management      | Ansible                                    |
-    +------------------------+--------------------------------------------+
-    | Monitoring / logs      | CloudWatch, Prometheus, Grafana, ELK,      |
-    |                        | Datadog                                    |
-    +------------------------+--------------------------------------------+
+==> **DevOps** = development and operations teams working together and **automating** build, test,
+deploy and monitoring, so releases are faster and safer.
+
+```text
++------------------------+--------------------------------------------+
+| Area                   | Tools                                      |
++========================+============================================+
+| Version control        | Git, GitHub, GitLab                        |
++------------------------+--------------------------------------------+
+| CI/CD                  | GitHub Actions, Jenkins, GitLab CI, AWS    |
+|                        | CodePipeline                               |
++------------------------+--------------------------------------------+
+| Containers             | Docker                                     |
++------------------------+--------------------------------------------+
+| Orchestration          | Kubernetes, AWS ECS                        |
++------------------------+--------------------------------------------+
+| Infrastructure as Code | Terraform, CloudFormation, AWS CDK         |
++------------------------+--------------------------------------------+
+| Config management      | Ansible                                    |
++------------------------+--------------------------------------------+
+| Monitoring / logs      | CloudWatch, Prometheus, Grafana, ELK,      |
+|                        | Datadog                                    |
++------------------------+--------------------------------------------+
+```
+
+In short: DevOps = culture + automation; Git → CI/CD → Docker/K8s → IaC → monitoring.
 
 ---
 
 22. What is your testing approach: TDD or after coding?
-   *(Asked 1×: Kyndryl)*
+
+    *(Asked 1×: Kyndryl)*
 
 ==> Two approaches:
-    - **TDD (Test-Driven Development):** write a failing test first → write code to pass it →
-      refactor ("red, green, refactor").
-    - **Test after coding:** write the feature first, then add tests.
-    Sample answer: "I use a hybrid. For critical business logic (payments, calculations) I prefer
-    TDD. For UI or quick changes I write tests right after coding. Either way, every PR must include
-    tests and pass CI."
+- **TDD (Test-Driven Development):** write a failing test first → write just enough code to pass
+  → refactor. This is the **red → green → refactor** cycle.
+- **Test after coding:** write the feature first, then add tests.
+
+```js
+// TDD step 1 (red): test first – fails because applyDiscount doesn't exist yet
+test('10% off on orders above 1000', () => {
+  expect(applyDiscount(2000)).toBe(1800);
+});
+
+// step 2 (green): simplest code that passes
+const applyDiscount = (total) => (total > 1000 ? total * 0.9 : total);
+```
+
+Sample answer: "I use a hybrid. For critical business logic (payments, calculations) I prefer
+TDD. For UI or quick changes I write tests right after coding. Either way, every PR must include
+tests and pass CI."
+
+In short: TDD = test first, code second; I use it where bugs are expensive.
 
 ---
 
 23. Which unit testing frameworks have you used in Node.js?
-   *(Asked 1×: Tech Mahindra (YT))*
+
+    *(Asked 1×: Tech Mahindra (YT))*
 
 ==> Sample answer: "Mainly **Jest**, with **Supertest** for API tests. I have also used **Mocha +
-    Chai** (with Sinon for mocks)."
-    - Jest – all-in-one: test runner, assertions, mocks, coverage.
-    - Mocha – test runner; Chai – assertions; Sinon – spies/stubs/mocks.
-    - Supertest – call Express routes in tests without starting a real server.
-    - Node.js also has a built-in runner: `node:test`.
+Chai** (with Sinon for mocks)."
+- **Jest** – all-in-one: test runner, assertions, mocks, coverage.
+- **Mocha** – test runner; **Chai** – assertions; **Sinon** – spies/stubs/mocks.
+- **Supertest** – call Express routes in tests without starting a real server.
+- Node.js also has a built-in runner: **`node:test`** (`node --test`).
 
-    ```js
-    // sum.test.js (Jest)
-    const sum = (a, b) => a + b;
+```js
+// sum.test.js (Jest)
+const sum = (a, b) => a + b;
 
-    test("adds 2 + 3", () => {
-      expect(sum(2, 3)).toBe(5);
-    });
-    ```
+test('adds 2 + 3', () => {
+  expect(sum(2, 3)).toBe(5);
+});
+```
+
+```bash
+npx jest
+# Output:
+#  PASS  ./sum.test.js
+#   ✓ adds 2 + 3 (2 ms)
+# Tests: 1 passed, 1 total
+```
+
+In short: Jest for unit tests, Supertest for APIs.
 
 ---
 
 24. How do you ensure code quality (no bugs)?
-   *(Asked 1×: Tech Mahindra (YT))*
 
-==> No code is 100% bug-free, but I reduce bugs with:
-    - **Tests** – unit, integration and API tests with good coverage (Jest, Supertest).
-    - **Linting & formatting** – ESLint + Prettier; TypeScript for type safety.
-    - **Code reviews** – every PR reviewed before merge.
-    - **CI checks** – lint, tests and SonarQube must pass before merge.
-    - **Input validation and error handling** – Joi/Zod, central error middleware.
-    - **Monitoring** – logs and alerts to catch issues early in production.
+    *(Asked 1×: Tech Mahindra (YT))*
+
+==> No code is 100% bug-free, but I reduce bugs with layers of checks:
+- **Tests** – unit, integration and API tests with good coverage (Jest, Supertest).
+- **Linting & formatting** – ESLint + Prettier; **TypeScript** for type safety.
+- **Pre-commit hooks** – Husky + lint-staged run lint/tests before a commit.
+- **Code reviews** – every PR reviewed before merge.
+- **CI checks** – lint, tests and SonarQube quality gate must pass before merge.
+- **Input validation and error handling** – Joi/Zod, central error middleware.
+- **Monitoring** – logs and alerts to catch production issues early.
+
+In short: catch bugs early – types, lint, tests, review, CI – and watch production.
 
 ---
 
 25. What is code reusability?
-   *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
-==> Code reusability = **write code once and use it in many places**, instead of copy-pasting (DRY:
-    Don't Repeat Yourself).
-    - Ways: functions, modules, classes, middleware, React components, shared npm packages.
-    - Benefits: less code, fewer bugs, fix in one place, faster development.
+    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
-    ```js
-    // utils/response.js – reused by every controller
-    export const sendSuccess = (res, data, status = 200) =>
-      res.status(status).json({ success: true, data });
+==> Code reusability = **write code once and use it in many places** instead of copy-pasting
+(**DRY**: Don't Repeat Yourself).
+- Ways: functions, modules, classes, middleware, React components, shared npm packages.
+- Benefits: less code, fewer bugs, fix in one place, faster development.
 
-    // in any controller
-    sendSuccess(res, user);
-    sendSuccess(res, order, 201);
-    ```
+```js
+// utils/response.js – reused by every controller
+export const sendSuccess = (res, data, status = 200) =>
+  res.status(status).json({ success: true, data });
+
+// in any controller
+sendSuccess(res, user);        // Output: 200 {"success":true,"data":{...user}}
+sendSuccess(res, order, 201);  // Output: 201 {"success":true,"data":{...order}}
+```
+
+In short: write it once, import it everywhere.
 
 ======================================================================================================================================
 

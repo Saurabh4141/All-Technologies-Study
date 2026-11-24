@@ -7,792 +7,1013 @@ Ordered by priority: the question asked by the most interviewers comes first.
 ---
 
 1. What are Promises? What is the use of async and await?
+
    *(Asked 5×: Algoworks, TCS (online), Hyland Software, Kyndryl, Capsitech)*
 
-==> A **Promise** is an object for a value that will come later (or fail). It is like a token: "I
-    will give you the result when it is ready."
-    - It has 3 states: pending, fulfilled, rejected.
-    - You read the result with `.then()` and handle errors with `.catch()`.
-    - **async/await** is a cleaner way to use Promises. `async` makes a function return a Promise.
-      `await` pauses inside that function until the Promise settles, so async code reads like normal
-      top-to-bottom code.
+==> A **Promise** is a JavaScript object that stands for a value you will get **later** – or an
+error. Think of it as a receipt: "your result is coming".
+- 3 states: **pending → fulfilled** or **pending → rejected**.
+- Read the result with `.then()`, handle errors with `.catch()`, clean up with `.finally()`.
 
-    ```js
-    // Promise style
-    fetchUser().then(user => console.log(user)).catch(err => console.error(err));
+**async / await** is just nicer syntax on top of Promises:
+- `async` → the function **always returns a Promise**.
+- `await` → pauses **only that function** until the Promise settles, then gives you the value (or
+  throws the error). The rest of the page/app keeps running.
 
-    // async/await style
-    async function show() {
-      try {
-        const user = await fetchUser();
-        console.log(user);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    ```
+```js
+const getUser = () =>
+  new Promise(resolve => setTimeout(() => resolve({ name: 'Ravi' }), 1000));
 
-    In short: Promises avoid callback hell; async/await makes Promise code easy to read.
+// Promise style
+getUser().then(user => console.log(user.name)).catch(console.error);
+
+// async/await style – same thing, reads top to bottom
+async function show() {
+  try {
+    const user = await getUser();
+    console.log(user.name);
+  } catch (err) {
+    console.error(err);
+  }
+}
+show();
+// Output (after 1 s): Ravi  Ravi
+```
+
+In short: a Promise = a future value; async/await = write Promise code like normal sync code.
 
 ---
 
 2. Output: Promise.resolve(1) .then(+1) .then(throw) .catch(() => 1) .then(+1) .then(log)
+
    *(Asked 2×: Algoworks, Irpgrammer Solutions)*
 
 ==> Code (from the interview):
 
-    ```js
-    Promise.resolve(1)
-      .then((x) => x + 1)
-      .then((x) => { throw new Error('My Error') })
-      .catch(() => 1)
-      .then((x) => x + 1)
-      .then((x) => console.log(x))
-      .catch(console.error)
-    ```
+```js
+Promise.resolve(1)
+  .then((x) => x + 1)
+  .then((x) => { throw new Error('My Error') })
+  .catch(() => 1)
+  .then((x) => x + 1)
+  .then((x) => console.log(x))
+  .catch(console.error)
+```
 
-    **Output:** `2`
+**Output:** `2`
 
-    Why:
-    - `1` → first `.then` gives `2`.
-    - Next `.then` throws, so the chain jumps to `.catch`.
-    - `.catch` returns `1`, so the chain is "fixed" and continues with `1`.
-    - `1 + 1 = 2` → printed. The last `.catch` never runs.
+Why:
+- `1` → first `.then` returns `2`.
+- Next `.then` **throws**, so the chain skips to the nearest `.catch`.
+- `.catch` **returns `1`** → the chain is "recovered" and continues as fulfilled with `1`.
+- `1 + 1 = 2` → printed. The last `.catch` never runs.
+
+In short: whatever `.catch` returns becomes the next value – the chain goes back to normal.
 
 ---
 
 3. What is the difference between var, let and const?
+
    *(Asked 2×: TCS (online), Capsitech)*
 
 ==>
-    +----------------------------------+-------------------------+---------------------------------------+-----------------+
-    |                                  | `var`                   | `let`                                 | `const`         |
-    +==================================+=========================+=======================================+=================+
-    | Scope                            | Function                | Block `{}`                            | Block `{}`      |
-    +----------------------------------+-------------------------+---------------------------------------+-----------------+
-    | Re-declare in same scope         | Yes                     | No                                    | No              |
-    +----------------------------------+-------------------------+---------------------------------------+-----------------+
-    | Re-assign                        | Yes                     | Yes                                   | No              |
-    +----------------------------------+-------------------------+---------------------------------------+-----------------+
-    | Hoisted                          | Yes, set to `undefined` | Yes, but in TDZ (error if used early) | Yes, but in TDZ |
-    +----------------------------------+-------------------------+---------------------------------------+-----------------+
-    | Must give a value at declaration | No                      | No                                    | Yes             |
-    +----------------------------------+-------------------------+---------------------------------------+-----------------+
+```text
++---------------------+----------------------+----------------------+----------------------+
+|                     | var                  | let                  | const                |
++=====================+======================+======================+======================+
+| Scope               | Function             | Block { }            | Block { }            |
++---------------------+----------------------+----------------------+----------------------+
+| Re-declare (same    | Yes                  | No (SyntaxError)     | No (SyntaxError)     |
+| scope)              |                      |                      |                      |
++---------------------+----------------------+----------------------+----------------------+
+| Re-assign           | Yes                  | Yes                  | No (TypeError)       |
++---------------------+----------------------+----------------------+----------------------+
+| Hoisting            | Hoisted as undefined | Hoisted, but in TDZ  | Hoisted, but in TDZ  |
++---------------------+----------------------+----------------------+----------------------+
+| Value required at   | No                   | No                   | Yes                  |
+| declaration         |                      |                      |                      |
++---------------------+----------------------+----------------------+----------------------+
+| Global var creates  | Yes (window.x)       | No                   | No                   |
+| window property     |                      |                      |                      |
++---------------------+----------------------+----------------------+----------------------+
+```
 
-    ```js
-    if (true) { var a = 1; let b = 2; }
-    console.log(a); // 1
-    console.log(b); // ReferenceError
+```js
+if (true) { var a = 1; let b = 2; }
+console.log(a); // 1
+console.log(b); // ReferenceError: b is not defined
 
-    const obj = { x: 1 };
-    obj.x = 2;      // allowed (object content can change)
-    // obj = {};    // TypeError (cannot re-assign)
-    ```
+const obj = { x: 1 };
+obj.x = 2;      // OK – the object's content can change
+obj = {};       // TypeError: Assignment to constant variable
+```
 
-    Interview tip: use `const` by default, `let` when the value changes, avoid `var`.
+Note: `const` means the **binding** can't change, not that the object is frozen (use
+`Object.freeze` for that).
+
+In short: `const` by default, `let` when the value changes, avoid `var`.
 
 ---
 
 4. What are the different types of functions in JavaScript?
+
    *(Asked 2×: Fundwave, Capsitech)*
 
 ==>
-    - **Function declaration**: `function add(a, b) { return a + b; }` (hoisted, can call before it
-      is written).
-    - **Function expression**: `const add = function (a, b) { return a + b; };` (not hoisted).
-    - **Arrow function**: `const add = (a, b) => a + b;` (short; no own `this` or `arguments`).
-    - **Anonymous function**: a function with no name, e.g. passed as a callback.
-    - **IIFE** (Immediately Invoked Function Expression): runs right away: `(function () { ...
-      })();`
-    - **Callback function**: a function passed to another function to call later.
-    - **Higher-order function**: takes or returns a function (e.g. `map`, `filter`).
-    - **Constructor function**: used with `new` to create objects.
-    - **Async function**: `async function f() {}` returns a Promise.
-    - **Generator function**: `function* gen() { yield 1; }` can pause and resume.
+- **Function declaration** – `function add(a, b) { return a + b; }` → **fully hoisted**, can be
+  called before the line.
+- **Function expression** – `const add = function (a, b) { ... };` → not callable before the line.
+- **Arrow function** – `const add = (a, b) => a + b;` → short, **no own `this`**, no
+  `arguments`, can't be used with `new`.
+- **Anonymous function** – no name, usually passed as a callback.
+- **IIFE** – runs immediately: `(function () { ... })();` (old way to make private scope).
+- **Callback** – a function passed to another function, called later.
+- **Higher-order function** – takes or returns a function (`map`, `filter`, `setTimeout`).
+- **Constructor function** – called with `new` to create objects: `new Person('Ravi')`.
+- **Async function** – `async function f() {}` → always returns a Promise.
+- **Generator function** – `function* gen() { yield 1; }` → can pause and resume.
+
+```js
+console.log(add(2, 3)); // 5 – declaration is hoisted
+function add(a, b) { return a + b; }
+
+console.log(sub(5, 1)); // ReferenceError – const expression is in TDZ
+const sub = (a, b) => a - b;
+```
+
+In short: declaration, expression, arrow are the main 3; the rest are roles (callback, HOF, IIFE).
 
 ---
 
 5. What is a closure and what is it used for?
+
    *(Asked 2×: TCS, Hyland Software)*
 
-==> A **closure** is when an inner function remembers the variables of its outer function, even
-    after the outer function has finished running.
+==> A **closure** is a function that **remembers the variables of the scope it was created in**,
+even after that outer function has returned. In JavaScript every function gets one automatically.
 
-    ```js
-    function counter() {
-      let count = 0;
-      return function () {
-        count++;
-        return count;
-      };
-    }
-    const next = counter();
-    next(); // 1
-    next(); // 2  (count is remembered)
-    ```
+```js
+function counter() {
+  let count = 0;          // private – nobody outside can touch it
+  return function () {
+    count++;
+    return count;
+  };
+}
+const next = counter();
+console.log(next()); // 1
+console.log(next()); // 2  – count is remembered
+```
 
-    Uses:
-    - Data privacy (private variables, like `count` above).
-    - Function factories and currying.
-    - Keeping state in callbacks, event handlers, `setTimeout`.
-    - Memoization (caching results).
+Uses:
+- **Data privacy** – private variables (like `count`).
+- **Function factories / currying** – `multiply(2)` returns a "double" function.
+- Keeping state in **event handlers** and `setTimeout` callbacks.
+- **Memoization** – caching results in a remembered object.
+
+Classic trap: `var` in a loop shares one variable; `let` gives each iteration its own.
+
+```js
+for (var i = 0; i < 3; i++) setTimeout(() => console.log(i)); // 3 3 3
+for (let j = 0; j < 3; j++) setTimeout(() => console.log(j)); // 0 1 2
+```
+
+In short: closure = function + the variables it remembers from where it was born.
 
 ---
 
 6. What are the types / states of a Promise?
+
    *(Asked 1×: TCS)*
 
-==> A Promise has 3 states:
-    - **Pending**: the starting state, still working.
-    - **Fulfilled**: finished successfully (`resolve` was called).
-    - **Rejected**: failed (`reject` was called or an error was thrown).
+==> A Promise has **3 states**:
+- **Pending** – starting state, still working.
+- **Fulfilled** – `resolve(value)` was called.
+- **Rejected** – `reject(reason)` was called, or an error was thrown inside.
 
-    Once a Promise is fulfilled or rejected, it is **settled** and its state never changes again.
+Once fulfilled or rejected, it is **settled** – the state can **never change again**. Extra
+`resolve`/`reject` calls are ignored.
 
-    ```js
-    const p = new Promise((resolve, reject) => {
-      resolve("success"); // pending -> fulfilled
-    });
-    ```
+```js
+const p = new Promise((resolve, reject) => {
+  resolve('first');
+  reject('ignored');   // no effect – already settled
+});
+p.then(console.log);   // Output: first
+```
+
+In short: pending → fulfilled or rejected, and it settles only once.
 
 ---
 
 7. Can we use try...catch with async/await?
+
    *(Asked 1×: Kyndryl)*
 
-==> Yes. With `await`, a rejected Promise throws an error, so a normal `try...catch` catches it.
-    This is the usual way to handle errors in async/await.
+==> Yes. Inside an `async` function, `await` on a **rejected Promise throws**, so a normal
+`try...catch` catches it. This is the standard way to handle async errors.
 
-    ```js
-    async function getData() {
-      try {
-        const res = await fetch('/api/data');
-        return await res.json();
-      } catch (err) {
-        console.error('Failed:', err.message);
-      }
-    }
-    ```
+```js
+async function getData() {
+  try {
+    const res = await fetch('/api/data');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`); // fetch doesn't reject on 404/500
+    return await res.json();
+  } catch (err) {
+    console.error('Failed:', err.message);
+  }
+}
+```
 
-    Note: `try...catch` only catches errors from Promises you `await`. A Promise you don't await
-    won't be caught.
+Catch: `try...catch` only catches Promises you **`await`**. A Promise you start without `await`
+rejects outside the `try` → "Uncaught (in promise)" error.
+
+In short: await + try/catch = async error handling that looks like sync code.
 
 ---
 
 8. Does an async function work synchronously or asynchronously?
+
    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> Both, in a way:
-    - The code inside an async function runs **synchronously until the first `await`**.
-    - At `await`, the function pauses and gives control back to the caller. The rest runs later
-      (asynchronously), as a microtask.
-    - An async function **always returns a Promise**.
+- The body runs **synchronously until the first `await`**.
+- At `await`, the function pauses and control goes back to the caller. The rest resumes later as
+  a **microtask**.
+- It **always returns a Promise**, even if you `return 5`.
 
-    ```js
-    async function demo() {
-      console.log('A');
-      await null;
-      console.log('C');
-    }
-    demo();
-    console.log('B');
-    // A, B, C
-    ```
+```js
+async function demo() {
+  console.log('A');
+  await null;
+  console.log('C');
+}
+demo();
+console.log('B');
+// Output: A B C
+```
 
-    In short: async functions are asynchronous, but they don't block the thread; the part before the
-    first `await` runs right away.
+In short: sync until the first `await`, async after it – and it never blocks the thread.
 
 ---
 
 9. How have you used promises in your backend?
+
    *(Asked 1×: Web3Dev)*
 
-==> Sample answer: "In my Node.js/Express backend almost everything async uses Promises with
-    async/await:"
-    - Database queries (Mongoose / MySQL / Sequelize return Promises).
-    - Calling other APIs with `axios` or `fetch`.
-    - Running independent calls in parallel with `Promise.all` (e.g. load user, orders and settings
-      together).
-    - Using `Promise.allSettled` when some calls may fail but I still want the others.
-    - File reading with `fs.promises`.
-    - Error handling with `try...catch` and a central error middleware.
+==> Sample answer: "In my Node.js/Express backend almost every async task uses Promises with
+async/await:"
+- **Database queries** – Mongoose / mysql2 / Sequelize all return Promises.
+- **Calling other APIs** with `axios` or `fetch`.
+- **`Promise.all`** to run independent calls in parallel (user + orders together).
+- **`Promise.allSettled`** when some calls may fail but I still need the rest.
+- File reading with `fs.promises`.
+- Errors with `try...catch`, passed to a central error middleware with `next(err)`.
 
-    ```js
-    app.get('/dashboard/:id', async (req, res, next) => {
-      try {
-        const [user, orders] = await Promise.all([
-          User.findById(req.params.id),
-          Order.find({ userId: req.params.id }),
-        ]);
-        res.json({ user, orders });
-      } catch (err) {
-        next(err);
-      }
-    });
-    ```
+```js
+app.get('/dashboard/:id', async (req, res, next) => {
+  try {
+    const [user, orders] = await Promise.all([
+      User.findById(req.params.id),
+      Order.find({ userId: req.params.id }),
+    ]);
+    res.json({ user, orders });
+  } catch (err) {
+    next(err);
+  }
+});
+```
+
+In short: async/await everywhere, `Promise.all` for parallel work, one central error handler.
 
 ---
 
 10. Output: Promise chain that logs, throws, catches and returns 10
-   *(Asked 1×: Kyndryl)*
+
+    *(Asked 1×: Kyndryl)*
 
 ==> Code (from the interview):
 
-    ```js
-    Promise.resolve(1)
-      .then(val => {
-        console.log(val);
-        return val * 2;
-      })
-      .then(val => {
-        console.log(val);
-        throw new Error('oops');
-      })
-      .catch(err => {
-        console.log(err.message);
-        return 10;
-      })
-      .then(val => console.log(val));
-    ```
+```js
+Promise.resolve(1)
+  .then(val => {
+    console.log(val);
+    return val * 2;
+  })
+  .then(val => {
+    console.log(val);
+    throw new Error('oops');
+  })
+  .catch(err => {
+    console.log(err.message);
+    return 10;
+  })
+  .then(val => console.log(val));
+```
 
-    **Output:**
-    ```
-    1
-    2
-    oops
-    10
-    ```
+**Output:**
+```text
+1
+2
+oops
+10
+```
 
-    Why:
-    - First `.then` logs `1` and returns `2`.
-    - Second `.then` logs `2` and throws.
-    - `.catch` logs `oops` and returns `10`.
-    - Last `.then` gets `10` and logs it.
+Why:
+- First `.then` logs `1`, returns `2`.
+- Second `.then` logs `2`, then **throws**.
+- `.catch` logs `oops` and **returns `10`** → chain recovers.
+- Last `.then` receives `10` and logs it.
+
+In short: a throw jumps to `.catch`; `.catch`'s return value continues the chain.
 
 ---
 
 11. Output: async function that awaits a rejected promise inside try/catch, then
     .then(console.log(5))
-   *(Asked 1×: Irpgrammer Solutions)*
+
+    *(Asked 1×: Irpgrammer Solutions)*
 
 ==> Code (from the interview):
 
-    ```js
-    async function processData() {
-      try {
-        return await Promise.reject("Error occurred");
-      } catch (err) {
-        console.log("Caught:", err);
-      }
-    }
-    processData().then(console.log(5))
-    ```
+```js
+async function processData() {
+  try {
+    return await Promise.reject("Error occurred");
+  } catch (err) {
+    console.log("Caught:", err);
+  }
+}
+processData().then(console.log(5))
+```
 
-    **Output:**
-    ```
-    5
-    Caught: Error occurred
-    ```
+**Output:**
+```text
+5
+Caught: Error occurred
+```
 
-    Why:
-    - `processData()` starts, hits `await` and pauses.
-    - `.then(console.log(5))` – `console.log(5)` is **called immediately** (it is not wrapped in a
-      function), so `5` prints first.
-    - Then the awaited rejection is caught → `Caught: Error occurred`.
-    - Trap: to log after the Promise, write `.then(() => console.log(5))`.
+Why:
+- `processData()` starts, hits `await` and **pauses** (the rest is a microtask).
+- `.then(console.log(5))` – `console.log(5)` is **called right now** while building the argument
+  (it's not wrapped in a function), so `5` prints first. `.then` gets `undefined` and ignores it.
+- Then the microtask runs: the rejection is thrown at `await` and caught → `Caught: Error occurred`.
+
+Trap: to log after the Promise, write `.then(() => console.log(5))`.
+
+In short: `.then(fn())` calls fn immediately – pass a function, not a call.
 
 ---
 
 12. What is hoisting?
-   *(Asked 1×: TCS)*
 
-==> **Hoisting** means JavaScript moves declarations to the top of their scope before running the
-    code.
-    - `var` is hoisted and set to `undefined`.
-    - `let` and `const` are hoisted but not initialized (they are in the TDZ), so using them early
-      gives an error.
-    - Function declarations are hoisted fully, so you can call them before they are written.
+    *(Asked 1×: TCS)*
 
-    ```js
-    console.log(a); // undefined
-    var a = 5;
+==> **Hoisting**: before running a scope, the JS engine registers all its declarations first, so
+they behave as if "moved to the top".
+- `var` → hoisted and set to **`undefined`**.
+- `let` / `const` / `class` → hoisted but **not initialized** (in the **TDZ**) → `ReferenceError`
+  if used early.
+- **Function declarations** → hoisted **fully** (name + body), so you can call them early.
+- Function expressions / arrow functions follow their variable's rule (`var` → `undefined`,
+  `const` → TDZ).
 
-    sayHi();        // "Hi" works
-    function sayHi() { console.log("Hi"); }
+```js
+console.log(a); // undefined
+var a = 5;
 
-    console.log(b); // ReferenceError
-    let b = 10;
-    ```
+sayHi();        // Hi
+function sayHi() { console.log('Hi'); }
+
+console.log(b); // ReferenceError: Cannot access 'b' before initialization
+let b = 10;
+```
+
+In short: declarations are set up before the code runs; only `var` and functions are usable early.
 
 ---
 
 13. What is the TDZ (Temporal Dead Zone)?
-   *(Asked 1×: TCS)*
 
-==> The **TDZ** is the time between the start of a block and the line where a `let`/`const` variable
-    is declared. In that time the variable exists but you cannot use it; touching it throws a
-    `ReferenceError`.
+    *(Asked 1×: TCS)*
 
-    ```js
-    {
-      // TDZ for x starts here
-      console.log(x); // ReferenceError
-      let x = 5;      // TDZ ends here
-      console.log(x); // 5
-    }
-    ```
+==> The **TDZ** is the time from the **start of the block** until the line where a `let` / `const`
+/ `class` is declared. The variable exists (it is hoisted) but touching it throws a
+**`ReferenceError`**.
 
-    In short: TDZ stops you from using `let`/`const` before they are declared.
+```js
+{
+  // TDZ for x starts here
+  console.log(x); // ReferenceError: Cannot access 'x' before initialization
+  let x = 5;      // TDZ ends here
+  console.log(x); // 5
+}
+```
+
+Even `typeof x` inside the TDZ throws (while `typeof notDeclared` just gives `"undefined"`).
+
+In short: TDZ = "declared but not ready yet" – it stops you using `let`/`const` too early.
 
 ---
 
 14. What is the difference between find() and filter()?
-   *(Asked 1×: TCS)*
+
+    *(Asked 1×: TCS)*
 
 ==>
-    +--------------------+----------------------------+--------------------------------------+
-    |                    | `find()`                   | `filter()`                           |
-    +====================+============================+======================================+
-    | Returns            | The first matching element | A new array of all matching elements |
-    +--------------------+----------------------------+--------------------------------------+
-    | If nothing matches | `undefined`                | `[]` (empty array)                   |
-    +--------------------+----------------------------+--------------------------------------+
-    | Stops early        | Yes, at first match        | No, checks every element             |
-    +--------------------+----------------------------+--------------------------------------+
+```text
++--------------------+----------------------------+--------------------------------------+
+|                    | find()                     | filter()                             |
++====================+============================+======================================+
+| Returns            | The first matching element | New array of all matching elements   |
++--------------------+----------------------------+--------------------------------------+
+| Nothing matches    | undefined                  | [] (empty array)                     |
++--------------------+----------------------------+--------------------------------------+
+| Stops early        | Yes, at the first match    | No, checks every element             |
++--------------------+----------------------------+--------------------------------------+
+```
 
-    ```js
-    const nums = [1, 5, 8, 12];
-    nums.find(n => n > 4);   // 5
-    nums.filter(n => n > 4); // [5, 8, 12]
-    ```
+```js
+const nums = [1, 5, 8, 12];
+console.log(nums.find(n => n > 4));   // 5
+console.log(nums.filter(n => n > 4)); // [5, 8, 12]
+console.log(nums.find(n => n > 50));  // undefined
+```
+
+In short: `find` → one item; `filter` → an array of items.
 
 ---
 
 15. What is the difference between map, filter and reduce?
-   *(Asked 1×: EZ Works)*
+
+    *(Asked 1×: EZ Works)*
 
 ==>
-    +----------+--------------------------------------+------------------------------------------+
-    | Method   | What it does                         | Returns                                  |
-    +==========+======================================+==========================================+
-    | `map`    | Changes every element                | New array, same length                   |
-    +----------+--------------------------------------+------------------------------------------+
-    | `filter` | Keeps elements that pass a test      | New array, same or shorter               |
-    +----------+--------------------------------------+------------------------------------------+
-    | `reduce` | Combines all elements into one value | Any single value (number, object, array) |
-    +----------+--------------------------------------+------------------------------------------+
+```text
++----------+--------------------------------------+------------------------------------------+
+| Method   | What it does                         | Returns                                  |
++==========+======================================+==========================================+
+| map      | Transforms every element             | New array, same length                   |
++----------+--------------------------------------+------------------------------------------+
+| filter   | Keeps elements that pass a test      | New array, same or shorter               |
++----------+--------------------------------------+------------------------------------------+
+| reduce   | Combines all elements into one value | One value (number, object, array...)     |
++----------+--------------------------------------+------------------------------------------+
+```
 
-    ```js
-    const nums = [1, 2, 3, 4];
-    nums.map(n => n * 2);              // [2, 4, 6, 8]
-    nums.filter(n => n % 2 === 0);     // [2, 4]
-    nums.reduce((sum, n) => sum + n, 0); // 10
-    ```
+```js
+const nums = [1, 2, 3, 4];
+nums.map(n => n * 2);                // [2, 4, 6, 8]
+nums.filter(n => n % 2 === 0);       // [2, 4]
+nums.reduce((sum, n) => sum + n, 0); // 10
+```
+
+Tip: always pass the **initial value** to `reduce` (the `0` above) – on an empty array without it,
+`reduce` throws a TypeError.
+
+In short: map = transform, filter = select, reduce = combine.
 
 ---
 
 16. Do map, filter and reduce mutate the original array?
-   *(Asked 1×: EZ Works)*
 
-==> No. They return a new value and leave the original array unchanged.
-    - But if the array holds **objects** and your callback changes those objects (e.g. `item.price =
-      0`), the original objects change, because objects are shared by reference.
+    *(Asked 1×: EZ Works)*
 
-    ```js
-    const nums = [1, 2, 3];
-    const doubled = nums.map(n => n * 2);
-    console.log(nums);    // [1, 2, 3]  (unchanged)
-    console.log(doubled); // [2, 4, 6]
-    ```
+==> **No.** They return a new value and leave the original array as it was.
+- But if the array holds **objects** and your callback changes them (`item.price = 0`), the
+  original objects change too – objects are shared **by reference**.
 
-    Interview tip: methods that DO mutate include `push`, `pop`, `splice`, `sort`, `reverse`.
+```js
+const nums = [1, 2, 3];
+const doubled = nums.map(n => n * 2);
+console.log(nums);    // [1, 2, 3]  – unchanged
+console.log(doubled); // [2, 4, 6]
+
+const users = [{ name: 'a' }];
+users.map(u => { u.name = 'X'; return u; });
+console.log(users[0].name); // 'X' – the object itself was changed
+```
+
+Methods that **do** mutate: `push`, `pop`, `shift`, `splice`, `sort`, `reverse`. Non-mutating
+versions (ES2023): `toSorted`, `toReversed`, `toSpliced`.
+
+In short: the array isn't mutated, but objects inside it can be.
 
 ---
 
 17. Practical use cases of map, filter and reduce
-   *(Asked 1×: EZ Works)*
+
+    *(Asked 1×: EZ Works)*
 
 ==>
-    - **map**: turn API data into what the UI needs, e.g. get only names: `users.map(u => u.name)`;
-      render a list in React.
-    - **filter**: show only active users, search results, remove an item: `todos.filter(t => t.id
-      !== id)`.
-    - **reduce**: cart total, count items, group by category.
+- **map** – shape API data for the UI: `users.map(u => u.name)`; render a list in React.
+- **filter** – active users, search results, delete an item: `todos.filter(t => t.id !== id)`.
+- **reduce** – cart total, counting, grouping by category.
 
-    ```js
-    const cart = [
-      { name: 'pen', price: 10, qty: 2 },
-      { name: 'book', price: 100, qty: 1 },
-    ];
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0); // 120
+```js
+const cart = [
+  { name: 'pen',  price: 10,  qty: 2, category: 'office' },
+  { name: 'book', price: 100, qty: 1, category: 'books' },
+];
 
-    const byCategory = products.reduce((acc, p) => {
-      (acc[p.category] ||= []).push(p);
-      return acc;
-    }, {});
-    ```
+const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+console.log(total); // 120
+
+const byCategory = cart.reduce((acc, p) => {
+  (acc[p.category] ||= []).push(p.name);
+  return acc;
+}, {});
+console.log(byCategory); // { office: ['pen'], books: ['book'] }
+
+// chain them
+const expensive = cart.filter(i => i.price > 50).map(i => i.name); // ['book']
+```
+
+In short: map for display, filter for search/remove, reduce for totals and grouping.
 
 ---
 
 18. What is the difference between null and undefined?
-   *(Asked 1×: Algoworks)*
+
+    *(Asked 1×: Algoworks)*
 
 ==>
-    +-------------+----------------------+----------------------------+
-    |             | `undefined`          | `null`                     |
-    +=============+======================+============================+
-    | Meaning     | Value not set yet    | "Empty on purpose"         |
-    +-------------+----------------------+----------------------------+
-    | Who sets it | JavaScript (default) | The developer              |
-    +-------------+----------------------+----------------------------+
-    | `typeof`    | `"undefined"`        | `"object"` (an old JS bug) |
-    +-------------+----------------------+----------------------------+
+```text
++-------------+----------------------------+----------------------------------+
+|             | undefined                  | null                             |
++=============+============================+==================================+
+| Meaning     | Value not set yet          | "Empty on purpose"               |
++-------------+----------------------------+----------------------------------+
+| Who sets it | JavaScript (default)       | The developer                    |
++-------------+----------------------------+----------------------------------+
+| typeof      | "undefined"                | "object" (a historic JS bug)     |
++-------------+----------------------------+----------------------------------+
+| In math     | Number(undefined) -> NaN   | Number(null) -> 0                |
++-------------+----------------------------+----------------------------------+
+```
 
-    ```js
-    let a;          // undefined
-    let b = null;   // null
-    null == undefined;  // true
-    null === undefined; // false
-    ```
+```js
+let a;               // undefined – declared, no value
+let b = null;        // null – cleared on purpose
+null == undefined;   // true  (loose equality treats them as equal)
+null === undefined;  // false (different types)
+a ?? 'default';      // 'default' – ?? handles both null and undefined
+```
+
+In short: `undefined` = JS says "nothing here yet"; `null` = you say "intentionally empty".
 
 ---
 
 19. Output: [] == false
-   *(Asked 1×: Algoworks)*
+
+    *(Asked 1×: Algoworks)*
 
 ==> Code (from the interview):
 
-    ```js
-    console.log([] == false);
-    ```
+```js
+console.log([] == false);
+```
 
-    **Output:** `true`
+**Output:** `true`
 
-    Why:
-    - `==` converts both sides to numbers.
-    - `false` → `0`.
-    - `[]` → `""` (empty string) → `0`.
-    - `0 == 0` → `true`. (Use `===` to avoid this: `[] === false` is `false`.)
+Why (**type coercion** with `==`):
+- Boolean is turned into a number: `false` → `0`. Now it's `[] == 0`.
+- Object is turned into a primitive: `[]` → `""` (empty string).
+- String is turned into a number: `""` → `0`.
+- `0 == 0` → `true`.
+
+With `===` there's no conversion: `[] === false` → `false`.
+
+In short: `==` coerces types – always use `===`.
 
 ---
 
 20. Output: undefined > 0
-   *(Asked 1×: Algoworks)*
+
+    *(Asked 1×: Algoworks)*
 
 ==> Code (from the interview):
 
-    ```js
-    let variableName;
-    console.log(variableName > 0);
-    ```
+```js
+let variableName;
+console.log(variableName > 0);
+```
 
-    **Output:** `false`
+**Output:** `false`
 
-    Why:
-    - `variableName` is `undefined`.
-    - For `>`, JavaScript converts `undefined` to a number → `NaN`.
-    - Any comparison with `NaN` is `false`.
+Why:
+- `variableName` is `undefined` (declared, never assigned).
+- For `>`, JavaScript converts `undefined` to a number → **`NaN`**.
+- Every comparison with `NaN` is `false` (even `NaN === NaN`).
+
+Compare: `null > 0` → `false`, but `null >= 0` → `true` (`null` becomes `0`).
+
+In short: undefined → NaN, and NaN compares false with everything.
 
 ---
 
 21. JavaScript data types and how values are stored
-   *(Asked 1×: Fundwave)*
 
-==> JavaScript has 2 groups of types:
-    - **Primitive** (7): `string`, `number`, `boolean`, `undefined`, `null`, `bigint`, `symbol`.
-    - **Non-primitive (reference)**: `object` (includes arrays, functions, Date, Map, etc.).
+    *(Asked 1×: Fundwave)*
 
-    How they are stored:
-    - **Primitives** behave as **values**: copying makes a real copy.
-    - **Objects** are stored in the **heap**; a variable holds a **reference** (address) to it.
-      Copying copies only the reference.
-    - Note: "primitives on the stack" is only a mental model. The JS spec does not define stack or
-      heap; the engine decides (e.g. V8 keeps strings on the heap).
+==> 2 groups of types:
+- **Primitives (7)**: `string`, `number`, `boolean`, `undefined`, `null`, `bigint`, `symbol` –
+  immutable, copied **by value**.
+- **Objects (reference type)**: plain objects, arrays, functions, `Date`, `Map`, `Set`... –
+  copied **by reference**.
 
-    ```js
-    let a = 10; let b = a; b = 20;
-    console.log(a); // 10 (separate copy)
+How they are stored:
+- Objects live in the **heap**; your variable holds a **reference** to it. Copying the variable
+  copies the reference, so both point to the same object.
+- "Primitives on the stack" is only a mental model – the spec doesn't define it. **V8**, for
+  example, keeps strings on the heap and stores small integers (Smis) directly.
 
-    let o1 = { x: 1 }; let o2 = o1; o2.x = 99;
-    console.log(o1.x); // 99 (same object)
-    ```
+```js
+let a = 10; let b = a; b = 20;
+console.log(a);    // 10 – separate copy
+
+let o1 = { x: 1 }; let o2 = o1; o2.x = 99;
+console.log(o1.x); // 99 – same object
+
+typeof null;       // 'object' (historic bug)
+typeof [];         // 'object' – use Array.isArray([]) → true
+```
+
+In short: 7 primitives copied by value; everything else is an object shared by reference.
 
 ---
 
 22. What is the difference between the Promise methods (all, allSettled, race, any)?
-   *(Asked 1×: Deloitte)*
+
+    *(Asked 1×: Deloitte)*
 
 ==>
-    +----------------------+--------------------------------------------+-------------------------------+
-    | Method               | Resolves when                              | Rejects when                  |
-    +======================+============================================+===============================+
-    | `Promise.all`        | All succeed → array of results             | Any one fails (fails fast)    |
-    +----------------------+--------------------------------------------+-------------------------------+
-    | `Promise.allSettled` | All finish (success or fail) → array of    | Never                         |
-    |                      | `{status, value/reason}`                   |                               |
-    +----------------------+--------------------------------------------+-------------------------------+
-    | `Promise.race`       | The first one to finish succeeds           | The first one to finish fails |
-    +----------------------+--------------------------------------------+-------------------------------+
-    | `Promise.any`        | The first one to succeed                   | All fail (`AggregateError`)   |
-    +----------------------+--------------------------------------------+-------------------------------+
+```text
++--------------------+-----------------------------------+--------------------------------+
+| Method             | Resolves when                     | Rejects when                   |
++====================+===================================+================================+
+| Promise.all        | ALL succeed -> array of values    | ANY one fails (fail fast)      |
++--------------------+-----------------------------------+--------------------------------+
+| Promise.allSettled | All finish -> array of            | Never                          |
+|                    | { status, value / reason }        |                                |
++--------------------+-----------------------------------+--------------------------------+
+| Promise.race       | The FIRST to settle succeeds      | The FIRST to settle fails      |
++--------------------+-----------------------------------+--------------------------------+
+| Promise.any        | The FIRST to succeed              | ALL fail (AggregateError)      |
++--------------------+-----------------------------------+--------------------------------+
+```
 
-    ```js
-    const results = await Promise.allSettled([p1, p2]);
-    // [{ status: 'fulfilled', value: ... }, { status: 'rejected', reason: ... }]
-    ```
+```js
+const ok   = v  => new Promise(r => setTimeout(() => r(v), 100));
+const fail = e  => Promise.reject(new Error(e));
+
+await Promise.all([ok(1), ok(2)]);            // [1, 2]
+await Promise.allSettled([ok(1), fail('x')]);
+// [{ status: 'fulfilled', value: 1 }, { status: 'rejected', reason: Error: x }]
+await Promise.race([ok(1), fail('x')]);       // rejects with Error: x (it settled first)
+await Promise.any([ok(1), fail('x')]);        // 1
+```
+
+In short: all = all or nothing; allSettled = report on all; race = first to finish; any = first
+success.
 
 ---
 
 23. How do you call multiple APIs simultaneously (Promise.all)?
-   *(Asked 1×: TCS)*
 
-==> Start all requests at once and wait for all with `Promise.all`. They run in parallel, so total
-    time ≈ time of the slowest one.
+    *(Asked 1×: TCS)*
 
-    ```js
-    async function loadAll() {
-      try {
-        const responses = await Promise.all([
-          fetch('/api/users'),
-          fetch('/api/orders'),
-          fetch('/api/products'),
-        ]);
-        const [users, orders, products] = await Promise.all(responses.map(r => r.json()));
-        console.log(users, orders, products);
-      } catch (err) {
-        console.error('One request failed:', err);
-      }
-    }
-    ```
+==> Start all requests **at the same time**, then wait for all of them with **`Promise.all`**.
+They run in parallel, so total time ≈ the **slowest** request, not the sum.
 
-    Note: if one fails, `Promise.all` rejects. Use `Promise.allSettled` if you still want the
-    others.
+```js
+async function loadAll() {
+  try {
+    const responses = await Promise.all([
+      fetch('/api/users'),
+      fetch('/api/orders'),
+      fetch('/api/products'),
+    ]);
+    const [users, orders, products] = await Promise.all(responses.map(r => r.json()));
+    console.log(users, orders, products);
+  } catch (err) {
+    console.error('One request failed:', err);
+  }
+}
+```
+
+- 3 calls × 300 ms one by one ≈ 900 ms; with `Promise.all` ≈ 300 ms.
+- If one fails, `Promise.all` rejects → use `Promise.allSettled` if you still want the others.
+
+In short: fire all requests first, then `await Promise.all` – time = slowest call.
 
 ---
 
 24. What is the difference between Promise.all and Promise.allSettled?
-   *(Asked 1×: Senior Node.js round (YT))*
+
+    *(Asked 1×: Senior Node.js round (YT))*
 
 ==>
-    +--------------+----------------------------------+--------------------------------------------+
-    |              | `Promise.all`                    | `Promise.allSettled`                       |
-    +==============+==================================+============================================+
-    | If one fails | Rejects immediately (fail fast)  | Waits for all                              |
-    +--------------+----------------------------------+--------------------------------------------+
-    | Result       | Array of values                  | Array of `{ status, value }` or `{ status, |
-    |              |                                  | reason }`                                  |
-    +--------------+----------------------------------+--------------------------------------------+
-    | Use when     | You need all results to continue | You want every result, even if some fail   |
-    +--------------+----------------------------------+--------------------------------------------+
+```text
++--------------+----------------------------------+--------------------------------------------+
+|              | Promise.all                      | Promise.allSettled                         |
++==============+==================================+============================================+
+| If one fails | Rejects immediately (fail fast)  | Still waits for all                        |
++--------------+----------------------------------+--------------------------------------------+
+| Result       | Array of values                  | Array of { status, value } or              |
+|              |                                  | { status, reason }                         |
++--------------+----------------------------------+--------------------------------------------+
+| Use when     | You need every result to go on   | You want each result, even if some fail    |
++--------------+----------------------------------+--------------------------------------------+
+```
 
-    ```js
-    await Promise.all([ok(), fail()]);        // throws
-    await Promise.allSettled([ok(), fail()]); // [{status:'fulfilled',...},{status:'rejected',...}]
-    ```
+```js
+const ok = () => Promise.resolve('ok');
+const fail = () => Promise.reject('no');
+
+await Promise.all([ok(), fail()]);        // throws 'no'
+await Promise.allSettled([ok(), fail()]);
+// [{ status: 'fulfilled', value: 'ok' }, { status: 'rejected', reason: 'no' }]
+```
+
+Note: `Promise.all` failing fast does **not cancel** the other promises – they keep running, you
+just ignore their results.
+
+In short: all = all-or-nothing; allSettled = give me every outcome.
 
 ---
 
 25. What is a callback function?
-   *(Asked 1×: Tech Mahindra (YT))*
 
-==> A **callback** is a function you pass to another function, so it can be called later (for
-    example when a task is done).
+    *(Asked 1×: Tech Mahindra (YT))*
 
-    ```js
-    function greet(name, done) {
-      console.log('Hi ' + name);
-      done();
-    }
-    greet('Ravi', () => console.log('Finished'));
+==> A **callback** is a function you pass to another function so it can **call it later** – for
+example when a click happens, a timer ends or data arrives. It works because functions are
+**first-class values** in JavaScript.
 
-    // Node style: error-first callback
-    fs.readFile('a.txt', 'utf8', (err, data) => {
-      if (err) return console.error(err);
-      console.log(data);
-    });
-    ```
+```js
+function greet(name, done) {
+  console.log('Hi ' + name);
+  done();
+}
+greet('Ravi', () => console.log('Finished'));
+// Output: Hi Ravi  Finished
+
+// async callbacks in the browser
+button.addEventListener('click', () => console.log('clicked'));
+setTimeout(() => console.log('1 second later'), 1000);
+
+// sync callbacks
+[1, 2, 3].forEach(n => console.log(n));
+```
+
+- **Sync callbacks** run right away (`forEach`, `map`).
+- **Async callbacks** run later (`setTimeout`, events, old-style APIs like Node's error-first
+  `(err, data) => {}`).
+
+In short: a callback = "here's a function, call it when you're done".
 
 ---
 
 26. What is callback hell? (what do we call the problem of nesting many callbacks?)
-   *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
-==> **Callback hell** (also called the "pyramid of doom") is when many async callbacks are nested
-    inside each other. The code moves to the right, is hard to read, and error handling is repeated
-    everywhere.
+    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
-    ```js
-    getUser(id, (err, user) => {
-      getOrders(user, (err, orders) => {
-        getDetails(orders, (err, details) => {
-          // ...more nesting
-        });
-      });
+==> **Callback hell** (or the **pyramid of doom**) is when async callbacks are nested inside each
+other. The code drifts to the right, is hard to read, and every level repeats its own error check.
+
+```js
+getUser(id, (err, user) => {
+  if (err) return handle(err);
+  getOrders(user, (err, orders) => {
+    if (err) return handle(err);
+    getDetails(orders, (err, details) => {
+      if (err) return handle(err);
+      // ...more nesting
     });
-    ```
+  });
+});
+```
 
-    Fix: use Promises or async/await, or split code into small named functions.
+Fix: **Promises / async/await** (flat code, one `try...catch`), or small named functions.
 
-    ```js
-    const user = await getUser(id);
-    const orders = await getOrders(user);
-    const details = await getDetails(orders);
-    ```
+```js
+try {
+  const user = await getUser(id);
+  const orders = await getOrders(user);
+  const details = await getDetails(orders);
+} catch (err) {
+  handle(err);
+}
+```
+
+In short: nested callbacks = pyramid of doom; async/await flattens it.
 
 ---
 
 27. What is the difference between a Promise and a callback?
-   *(Asked 1×: EarlyCoder 5-yr Node (YT))*
+
+    *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==>
-    +-----------------------+---------------------------------------+-------------------------------------+
-    |                       | Callback                              | Promise                             |
-    +=======================+=======================================+=====================================+
-    | What it is            | A function passed in, called later    | An object for a future value        |
-    +-----------------------+---------------------------------------+-------------------------------------+
-    | Readability           | Nesting → callback hell               | Flat `.then()` chain or async/await |
-    +-----------------------+---------------------------------------+-------------------------------------+
-    | Error handling        | Check `err` in every callback         | One `.catch()` or `try...catch`     |
-    +-----------------------+---------------------------------------+-------------------------------------+
-    | Run many in parallel  | Hard                                  | Easy with `Promise.all`             |
-    +-----------------------+---------------------------------------+-------------------------------------+
-    | Called how many times | Could be called many times by mistake | Settles only once                   |
-    +-----------------------+---------------------------------------+-------------------------------------+
+```text
++-----------------------+---------------------------------------+-------------------------------------+
+|                       | Callback                              | Promise                             |
++=======================+=======================================+=====================================+
+| What it is            | A function passed in, called later    | An object for a future value        |
++-----------------------+---------------------------------------+-------------------------------------+
+| Readability           | Nesting -> callback hell              | Flat .then() chain or async/await   |
++-----------------------+---------------------------------------+-------------------------------------+
+| Error handling        | Check err in every callback           | One .catch() or try...catch         |
++-----------------------+---------------------------------------+-------------------------------------+
+| Many in parallel      | Hard, manual counting                 | Easy with Promise.all               |
++-----------------------+---------------------------------------+-------------------------------------+
+| How many times called | Could be called 0 or many times       | Settles exactly once                |
++-----------------------+---------------------------------------+-------------------------------------+
+| When it runs          | Depends on the API (sync or async)    | .then always runs async (microtask) |
++-----------------------+---------------------------------------+-------------------------------------+
+```
 
-    In short: Promises are a cleaner, safer way to handle async results than raw callbacks.
+```js
+// callback
+setTimeout(() => console.log('done'), 1000);
+
+// promise
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+wait(1000).then(() => console.log('done'));
+```
+
+In short: Promises give you a value you can chain, combine and catch once – callbacks don't.
 
 ---
 
 28. Output: obj.greet assigned to a variable and called (this binding lost)
-   *(Asked 1×: Hitachi)*
+
+    *(Asked 1×: Hitachi)*
 
 ==> Code (from the interview):
 
-    ```js
-    const obj = {
-      name: "John",
-      greet: function() {
-        console.log(this.name);
-      }
-    };
+```js
+const obj = {
+  name: "John",
+  greet: function() {
+    console.log(this.name);
+  }
+};
 
-    const greet = obj.greet;
-    greet();
-    ```
+const greet = obj.greet;
+greet();
+```
 
-    **Output:** `undefined` (in Node.js, non-strict mode)
+**Output:**
+- **Browser, non-strict**: empty line – `this` is `window`, and `window.name` is `""`.
+- **Node.js, non-strict**: `undefined` – `this` is `globalThis`, which has no `name`.
+- **Strict mode / ES module**: `TypeError: Cannot read properties of undefined (reading 'name')`.
 
-    Why:
-    - `this` depends on **how** a function is called, not where it is written.
-    - `greet()` is called alone (no `obj.` in front), so `this` is the global object, not `obj`.
-    - The global object has no `name`, so it prints `undefined`. (In strict mode `this` is
-      `undefined` → TypeError. In a browser `window.name` is `""`, so an empty line prints.)
+Why:
+- `this` depends on **how a function is called**, not where it is written.
+- `greet()` is a plain call (no `obj.` before it), so `this` is **not** `obj` → the binding is lost.
 
-    Fix:
+Fix – bind `this` (or call it as a method):
 
-    ```js
-    const greet = obj.greet.bind(obj);
-    greet(); // John
-    ```
+```js
+const greet = obj.greet.bind(obj);
+greet();     // John
+obj.greet(); // John
+```
+
+In short: copy a method into a variable and `this` is lost – use `bind`.
 
 ---
 
 29. Write any one AJAX method
-   *(Asked 1×: Bajaj Finserv)*
 
-==> **AJAX** = getting data from the server without reloading the page. The modern way is `fetch`:
+    *(Asked 1×: Bajaj Finserv)*
 
-    ```js
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(res => res.json())
-      .then(data => console.log(data))
-      .catch(err => console.error(err));
-    ```
+==> **AJAX** = the browser fetches data from the server **without reloading the page**. The
+modern way is **`fetch`** (returns a Promise):
 
-    Other ways: `XMLHttpRequest` (old), jQuery `$.ajax()`, and `axios`.
+```js
+fetch('https://jsonplaceholder.typicode.com/users/1')
+  .then(res => res.json())
+  .then(user => console.log(user.name))
+  .catch(err => console.error(err));
+// Output: Leanne Graham
+```
 
-    ```js
-    $.ajax({
-      url: '/api/users',
-      method: 'GET',
-      success: data => console.log(data),
-      error: err => console.error(err),
-    });
-    ```
+Other ways:
+- **`XMLHttpRequest`** – the original AJAX API (callback-based).
+- **jQuery `$.ajax()`** – older projects.
+- **axios** – library; auto-parses JSON and rejects on 4xx/5xx.
+
+```js
+const xhr = new XMLHttpRequest();
+xhr.open('GET', '/api/users');
+xhr.onload = () => console.log(JSON.parse(xhr.responseText));
+xhr.onerror = () => console.error('Network error');
+xhr.send();
+```
+
+In short: AJAX = update the page with server data without a reload; today use `fetch`.
 
 ---
 
 30. Making HTTP requests with async/await in Node.js / Express
-   *(Asked 1×: Capsitech)*
 
-==> Use `fetch` (built into Node 18+) or `axios` inside an `async` route, with `try...catch` for
-    errors.
+    *(Asked 1×: Capsitech)*
 
-    ```js
-    const express = require('express');
-    const axios = require('axios');
-    const app = express();
+==> Use **`fetch`** (built into Node 18+) or **axios** inside an `async` route handler, with
+`try...catch` for errors.
 
-    app.get('/users', async (req, res) => {
-      try {
-        const { data } = await axios.get('https://jsonplaceholder.typicode.com/users');
-        res.json(data);
-      } catch (err) {
-        res.status(500).json({ message: 'Failed to fetch users' });
-      }
-    });
+```js
+const express = require('express');
+const app = express();
 
-    app.listen(3000);
-    ```
+app.get('/users', async (req, res) => {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+    if (!response.ok) throw new Error(`Upstream ${response.status}`);
+    const users = await response.json();
+    res.json(users);
+  } catch (err) {
+    res.status(502).json({ message: 'Failed to fetch users' });
+  }
+});
+
+app.listen(3000);
+// GET /users → JSON array of 10 users
+```
+
+- `fetch` does **not** reject on 404/500 → check `response.ok`.
+- axios rejects on 4xx/5xx and gives the parsed body as `response.data`.
+
+In short: `await fetch(...)` in an async route, check `ok`, and catch errors.
 
 ---
 
 31. Fetch an API so that it completes within 3 seconds (timeout)
-   *(Asked 1×: Capsitech)*
 
-==> Use `AbortController`: start a 3-second timer that aborts the request if it is still running.
+    *(Asked 1×: Capsitech)*
 
-    ```js
-    async function fetchWithTimeout(url, ms = 3000) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), ms);
-      try {
-        const res = await fetch(url, { signal: controller.signal });
-        return await res.json();
-      } catch (err) {
-        if (err.name === 'AbortError') throw new Error('Request timed out after 3s');
-        throw err;
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-    ```
+==> Use **`AbortController`**: start a 3-second timer that **aborts** the request if it's still
+running.
 
-    Shorter (modern): `fetch(url, { signal: AbortSignal.timeout(3000) })`.
-    Other way: `Promise.race([fetch(url), timeoutPromise])` (but this doesn't cancel the request).
+```js
+async function fetchWithTimeout(url, ms = 3000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return await res.json();
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error('Request timed out after 3s');
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+```
+
+Shorter, modern way:
+
+```js
+const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+// on timeout it rejects with a 'TimeoutError'
+```
+
+Avoid relying on `Promise.race([fetch(url), timeout])` alone – it stops **waiting** but does
+**not cancel** the request.
+
+In short: AbortController (or `AbortSignal.timeout`) actually cancels the request.
 
 ---
 
 32. What is function currying? (e.g. multi(4)(5))
-   *(Asked 1×: TCS)*
 
-==> **Currying** turns a function that takes many arguments into a chain of functions that each take
-    one argument. In JavaScript it is built with closures.
+    *(Asked 1×: TCS)*
 
-    ```js
-    function multi(a) {
-      return function (b) {
-        return a * b;
-      };
-    }
-    multi(4)(5); // 20
+==> **Currying** turns `f(a, b)` into `f(a)(b)` – a chain of functions that each take **one
+argument**. It works because of **closures**: the inner function remembers `a`.
 
-    const multiArrow = a => b => a * b;
-    const double = multiArrow(2); // reuse with one argument fixed
-    double(7); // 14
-    ```
+```js
+function multi(a) {
+  return function (b) {
+    return a * b;
+  };
+}
+console.log(multi(4)(5)); // 20
 
-    Uses: reuse (partial application), cleaner function composition.
+const multiArrow = a => b => a * b;
+const double = multiArrow(2); // a is fixed to 2
+console.log(double(7));       // 14
+```
+
+Uses:
+- **Reuse** – make specialised functions (`double`, `withTax`) from a general one.
+- **Partial application** – fix some arguments now, pass the rest later.
+- Cleaner composition (e.g. `logger('ERROR')(message)`).
+
+In short: currying = one argument at a time, powered by closures.
 
 ---
 
@@ -803,39 +1024,38 @@ Ordered by topic priority: questions from the most-asked topics come first.
 ---
 
 33. Sequential vs parallel await: what is wrong with `await` inside a loop, and when should you use
-   Promise.all (and limit concurrency)?
-   *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
+    Promise.all (and limit concurrency)?
 
-==> `await` inside a `for` loop waits for each call to finish before starting the next one. If the
-    calls do not depend on each other, this is slow.
-    - Sequential: 5 calls x 200 ms = about 1000 ms.
-    - Parallel with `Promise.all`: all 5 start together = about 200 ms.
-    - Use sequential `await` only when each step needs the previous result, or when order/rate
-      really matters.
-    - `Promise.all` rejects as soon as one promise rejects. Use `Promise.allSettled` if you want
-      every result (success and failure).
-    - Do not fire 10,000 requests at once with `Promise.all`: you can overload the DB/API or hit
-      rate limits. Limit concurrency (process in batches, or use a library like `p-limit`).
-    - Note: `forEach(async ...)` does not wait at all. Use `for...of` (sequential) or `map` +
-      `Promise.all` (parallel).
+    *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
-    ```js
-    // Slow: one after another
-    for (const id of ids) {
-      const user = await getUser(id);
-    }
+==> `await` inside a `for` loop waits for each call to finish **before starting the next**. If the
+calls don't depend on each other, that's slow.
+- **Sequential**: 5 calls × 200 ms ≈ 1000 ms.
+- **Parallel** with `Promise.all`: all 5 start together ≈ 200 ms.
+- Use sequential `await` only when each step needs the previous result, or order/rate matters.
+- `Promise.all` rejects as soon as one fails → `Promise.allSettled` if you want every result.
+- Don't fire 10,000 requests at once – you'll overload the API/DB or hit rate limits. **Limit
+  concurrency** (batches, or a library like `p-limit`).
+- `forEach(async ...)` does **not wait at all**. Use `for...of` (sequential) or
+  `map` + `Promise.all` (parallel).
 
-    // Fast: all at once
-    const users = await Promise.all(ids.map(id => getUser(id)));
+```js
+// Slow: one after another (~1000 ms)
+for (const id of ids) {
+  const user = await getUser(id);
+}
 
-    // Limited concurrency: 5 at a time
-    import pLimit from 'p-limit';
-    const limit = pLimit(5);
-    const results = await Promise.all(ids.map(id => limit(() => getUser(id))));
-    ```
+// Fast: all at once (~200 ms)
+const users = await Promise.all(ids.map(id => getUser(id)));
 
-    In short: Independent async work -> run in parallel with Promise.all; dependent work ->
-    sequential await; huge lists -> limit concurrency.
+// Limited: at most 5 running at a time
+import pLimit from 'p-limit';
+const limit = pLimit(5);
+const results = await Promise.all(ids.map(id => limit(() => getUser(id))));
+```
+
+In short: Independent async work -> run in parallel with Promise.all; dependent work ->
+sequential await; huge lists -> limit concurrency.
 
 ======================================================================================================================================
 
