@@ -108,8 +108,7 @@ obj.x = 2;      // OK – the object's content can change
 obj = {};       // TypeError: Assignment to constant variable
 ```
 
-Note: `const` means the **binding** can't change, not that the object is frozen (use
-`Object.freeze` for that).
+Note: `const` means the **binding** can't change, not that the object is frozen.
 
 In short: `const` by default, `let` when the value changes, avoid `var`.
 
@@ -170,13 +169,6 @@ Uses:
 - **Function factories / currying** – `multiply(2)` returns a "double" function.
 - Keeping state in **event handlers** and `setTimeout` callbacks.
 - **Memoization** – caching results in a remembered object.
-
-Classic trap: `var` in a loop shares one variable; `let` gives each iteration its own.
-
-```js
-for (var i = 0; i < 3; i++) setTimeout(() => console.log(i)); // 3 3 3
-for (let j = 0; j < 3; j++) setTimeout(() => console.log(j)); // 0 1 2
-```
 
 In short: closure = function + the variables it remembers from where it was born.
 
@@ -261,27 +253,25 @@ In short: sync until the first `await`, async after it – and it never blocks t
 
 *(Asked 1×: Web3Dev)*
 
-==> Sample answer: "In my Node.js/Express backend almost every async task uses Promises with
-async/await:"
-- **Database queries** – Mongoose / mysql2 / Sequelize all return Promises.
-- **Calling other APIs** with `axios` or `fetch`.
+==> Sample answer: "In my backend almost every async task uses Promises with async/await:"
+- **Database queries** – the database client returns Promises.
+- **Calling other APIs** with `fetch`.
 - **`Promise.all`** to run independent calls in parallel (user + orders together).
 - **`Promise.allSettled`** when some calls may fail but I still need the rest.
-- File reading with `fs.promises`.
-- Errors with `try...catch`, passed to a central error middleware with `next(err)`.
+- Errors with `try...catch`, passed to one central error handler.
 
 ```js
-app.get('/dashboard/:id', async (req, res, next) => {
+async function getDashboard(id) {
   try {
     const [user, orders] = await Promise.all([
-      User.findById(req.params.id),
-      Order.find({ userId: req.params.id }),
+      db.getUser(id),
+      db.getOrders(id),
     ]);
-    res.json({ user, orders });
+    return { user, orders };
   } catch (err) {
-    next(err);
+    handleError(err);
   }
-});
+}
 ```
 
 In short: async/await everywhere, `Promise.all` for parallel work, one central error handler.
@@ -493,9 +483,6 @@ users.map(u => { u.name = 'X'; return u; });
 console.log(users[0].name); // 'X' – the object itself was changed
 ```
 
-Methods that **do** mutate: `push`, `pop`, `shift`, `splice`, `sort`, `reverse`. Non-mutating
-versions (ES2023): `toSorted`, `toReversed`, `toSpliced`.
-
 In short: the array isn't mutated, but objects inside it can be.
 
 ---
@@ -505,7 +492,7 @@ In short: the array isn't mutated, but objects inside it can be.
 *(Asked 1×: EZ Works)*
 
 ==>
-- **map** – shape API data for the UI: `users.map(u => u.name)`; render a list in React.
+- **map** – shape API data for the UI: `users.map(u => u.name)`.
 - **filter** – active users, search results, delete an item: `todos.filter(t => t.id !== id)`.
 - **reduce** – cart total, counting, grouping by category.
 
@@ -556,7 +543,6 @@ let a;               // undefined – declared, no value
 let b = null;        // null – cleared on purpose
 null == undefined;   // true  (loose equality treats them as equal)
 null === undefined;  // false (different types)
-a ?? 'default';      // 'default' – ?? handles both null and undefined
 ```
 
 In short: `undefined` = JS says "nothing here yet"; `null` = you say "intentionally empty".
@@ -605,8 +591,6 @@ Why:
 - For `>`, JavaScript converts `undefined` to a number → **`NaN`**.
 - Every comparison with `NaN` is `false` (even `NaN === NaN`).
 
-Compare: `null > 0` → `false`, but `null >= 0` → `true` (`null` becomes `0`).
-
 In short: undefined → NaN, and NaN compares false with everything.
 
 ---
@@ -624,8 +608,8 @@ In short: undefined → NaN, and NaN compares false with everything.
 How they are stored:
 - Objects live in the **heap**; your variable holds a **reference** to it. Copying the variable
   copies the reference, so both point to the same object.
-- "Primitives on the stack" is only a mental model – the spec doesn't define it. **V8**, for
-  example, keeps strings on the heap and stores small integers (Smis) directly.
+- "Primitives on the stack" is only a mental model – the spec doesn't define it. Engines may,
+  for example, keep strings on the heap and store small integers directly.
 
 ```js
 let a = 10; let b = a; b = 20;
@@ -702,7 +686,7 @@ async function loadAll() {
 ```
 
 - 3 calls × 300 ms one by one ≈ 900 ms; with `Promise.all` ≈ 300 ms.
-- If one fails, `Promise.all` rejects → use `Promise.allSettled` if you still want the others.
+- If one fails, `Promise.all` rejects and the `catch` runs.
 
 In short: fire all requests first, then `await Promise.all` – time = slowest call.
 
@@ -735,9 +719,6 @@ await Promise.allSettled([ok(), fail()]);
 // [{ status: 'fulfilled', value: 'ok' }, { status: 'rejected', reason: 'no' }]
 ```
 
-Note: `Promise.all` failing fast does **not cancel** the other promises – they keep running, you
-just ignore their results.
-
 In short: all = all-or-nothing; allSettled = give me every outcome.
 
 ---
@@ -767,8 +748,7 @@ setTimeout(() => console.log('1 second later'), 1000);
 ```
 
 - **Sync callbacks** run right away (`forEach`, `map`).
-- **Async callbacks** run later (`setTimeout`, events, old-style APIs like Node's error-first
-  `(err, data) => {}`).
+- **Async callbacks** run later (`setTimeout`, events).
 
 In short: a callback = "here's a function, call it when you're done".
 
@@ -794,19 +774,7 @@ getUser(id, (err, user) => {
 });
 ```
 
-Fix: **Promises / async/await** (flat code, one `try...catch`), or small named functions.
-
-```js
-try {
-  const user = await getUser(id);
-  const orders = await getOrders(user);
-  const details = await getDetails(orders);
-} catch (err) {
-  handle(err);
-}
-```
-
-In short: nested callbacks = pyramid of doom; async/await flattens it.
+In short: callbacks nested inside callbacks = pyramid of doom – hard to read and maintain.
 
 ---
 
@@ -866,22 +834,14 @@ greet();
 
 **Output:**
 - **Browser, non-strict**: empty line – `this` is `window`, and `window.name` is `""`.
-- **Node.js, non-strict**: `undefined` – `this` is `globalThis`, which has no `name`.
 - **Strict mode / ES module**: `TypeError: Cannot read properties of undefined (reading 'name')`.
 
 Why:
 - `this` depends on **how a function is called**, not where it is written.
 - `greet()` is a plain call (no `obj.` before it), so `this` is **not** `obj` → the binding is lost.
 
-Fix – bind `this` (or call it as a method):
-
-```js
-const greet = obj.greet.bind(obj);
-greet();     // John
-obj.greet(); // John
-```
-
-In short: copy a method into a variable and `this` is lost – use `bind`.
+In short: copy a method into a variable and call it alone – `this` is lost, so `name` isn't
+"John".
 
 ---
 
@@ -893,27 +853,14 @@ In short: copy a method into a variable and `this` is lost – use `bind`.
 modern way is **`fetch`** (returns a Promise):
 
 ```js
-fetch('https://jsonplaceholder.typicode.com/users/1')
+fetch('/api/users/1')
   .then(res => res.json())
   .then(user => console.log(user.name))
   .catch(err => console.error(err));
-// Output: Leanne Graham
+// Output: the user's name, page not reloaded
 ```
 
-Other ways:
-- **`XMLHttpRequest`** – the original AJAX API (callback-based).
-- **jQuery `$.ajax()`** – older projects.
-- **axios** – library; auto-parses JSON and rejects on 4xx/5xx.
-
-```js
-const xhr = new XMLHttpRequest();
-xhr.open('GET', '/api/users');
-xhr.onload = () => console.log(JSON.parse(xhr.responseText));
-xhr.onerror = () => console.error('Network error');
-xhr.send();
-```
-
-In short: AJAX = update the page with server data without a reload; today use `fetch`.
+In short: AJAX = update the page with server data without a reload; `fetch` does it.
 
 ---
 
@@ -921,8 +868,8 @@ In short: AJAX = update the page with server data without a reload; today use `f
 
 *(Asked 1×: Capsitech)*
 
-==> Use **`fetch`** (built into Node 18+) or **axios** inside an `async` route handler, with
-`try...catch` for errors.
+==> Use **`fetch`** (built into Node 18+) inside an `async` route handler, with `try...catch` for
+errors.
 
 ```js
 const express = require('express');
@@ -930,7 +877,7 @@ const app = express();
 
 app.get('/users', async (req, res) => {
   try {
-    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+    const response = await fetch('https://api.example.com/users');
     if (!response.ok) throw new Error(`Upstream ${response.status}`);
     const users = await response.json();
     res.json(users);
@@ -940,11 +887,10 @@ app.get('/users', async (req, res) => {
 });
 
 app.listen(3000);
-// GET /users → JSON array of 10 users
+// GET /users → JSON array of users
 ```
 
 - `fetch` does **not** reject on 404/500 → check `response.ok`.
-- axios rejects on 4xx/5xx and gives the parsed body as `response.data`.
 
 In short: `await fetch(...)` in an async route, check `ok`, and catch errors.
 
@@ -973,17 +919,7 @@ async function fetchWithTimeout(url, ms = 3000) {
 }
 ```
 
-Shorter, modern way:
-
-```js
-const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-// on timeout it rejects with a 'TimeoutError'
-```
-
-Avoid relying on `Promise.race([fetch(url), timeout])` alone – it stops **waiting** but does
-**not cancel** the request.
-
-In short: AbortController (or `AbortSignal.timeout`) actually cancels the request.
+In short: a timer calls `controller.abort()` after 3 s, which cancels the request.
 
 ---
 
@@ -1007,11 +943,6 @@ const double = multiArrow(2); // a is fixed to 2
 console.log(double(7));       // 14
 ```
 
-Uses:
-- **Reuse** – make specialised functions (`double`, `withTax`) from a general one.
-- **Partial application** – fix some arguments now, pass the rest later.
-- Cleaner composition (e.g. `logger('ERROR')(message)`).
-
 In short: currying = one argument at a time, powered by closures.
 
 ---
@@ -1031,9 +962,8 @@ calls don't depend on each other, that's slow.
 - **Sequential**: 5 calls × 200 ms ≈ 1000 ms.
 - **Parallel** with `Promise.all`: all 5 start together ≈ 200 ms.
 - Use sequential `await` only when each step needs the previous result, or order/rate matters.
-- `Promise.all` rejects as soon as one fails → `Promise.allSettled` if you want every result.
-- Don't fire 10,000 requests at once – you'll overload the API/DB or hit rate limits. **Limit
-  concurrency** (batches, or a library like `p-limit`).
+- Don't fire 10,000 requests at once – you'll overload the server or hit rate limits. **Limit
+  concurrency**, e.g. run them in batches.
 - `forEach(async ...)` does **not wait at all**. Use `for...of` (sequential) or
   `map` + `Promise.all` (parallel).
 
@@ -1046,10 +976,12 @@ for (const id of ids) {
 // Fast: all at once (~200 ms)
 const users = await Promise.all(ids.map(id => getUser(id)));
 
-// Limited: at most 5 running at a time
-import pLimit from 'p-limit';
-const limit = pLimit(5);
-const results = await Promise.all(ids.map(id => limit(() => getUser(id))));
+// Limited: batches of 5, at most 5 running at a time
+const results = [];
+for (let i = 0; i < ids.length; i += 5) {
+  const batch = ids.slice(i, i + 5);
+  results.push(...(await Promise.all(batch.map(id => getUser(id)))));
+}
 ```
 
 In short: Independent async work -> run in parallel with Promise.all; dependent work ->

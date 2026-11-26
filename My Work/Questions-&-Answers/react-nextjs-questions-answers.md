@@ -22,7 +22,7 @@ framework** that adds routing, server rendering and a backend on top.
 | Rendering    | Client-side (CSR) only          | SSR, SSG, ISR, CSR + Server           |
 |              |                                 | Components                            |
 +--------------+---------------------------------+---------------------------------------+
-| Routing      | Add React Router                | Built-in file-based routing           |
+| Routing      | Needs a routing library         | Built-in file-based routing           |
 +--------------+---------------------------------+---------------------------------------+
 | SEO          | Weak (first HTML is empty)      | Strong (HTML comes ready from server) |
 +--------------+---------------------------------+---------------------------------------+
@@ -32,8 +32,9 @@ framework** that adds routing, server rendering and a backend on top.
 +--------------+---------------------------------+---------------------------------------+
 ```
 
-"Better" depends on the app: Next.js wins for **public, SEO-heavy** sites (e-commerce, blogs).
-For an internal dashboard behind login, plain React (Vite) is enough.
+Why Next.js is often better: pages come from the server as ready HTML, so the **first load is
+faster** and **SEO is stronger**, and routing and backend code work without extra setup. If the
+app doesn't need SEO or server rendering, plain React is enough.
 
 In short: Next.js = React + routing + server rendering + backend, already set up.
 
@@ -49,7 +50,7 @@ lifecycle features.
 - `useState` – local state (`const [count, setCount] = useState(0)`).
 - `useEffect` – side effects after render: API calls, timers, subscriptions.
 - `useContext` – read a value from Context (no prop drilling).
-- `useReducer` – complex state with actions, like a mini Redux.
+- `useReducer` – complex state updated through actions.
 - `useRef` – DOM access, or a value that survives renders **without** causing a re-render.
 - `useMemo` – cache a computed value.
 - `useCallback` – cache a function reference.
@@ -74,9 +75,6 @@ Class lifecycle vs hooks:
 Key difference: classes split one feature across several lifecycle methods; hooks keep one
 feature's code **together** in one `useEffect`, with no `this`, and logic is reusable via custom
 hooks.
-
-Rule of hooks: call them only at the **top level** of a component or custom hook – never in
-loops, conditions or nested functions.
 
 ---
 
@@ -112,9 +110,6 @@ useEffect(() => {
 // unmount: cleanup
 ```
 
-Note: in development **StrictMode** mounts → unmounts → mounts again once, to catch missing
-cleanups.
-
 ---
 
 ##### 4. How does routing work in React? Why do we need React Router DOM?
@@ -148,8 +143,6 @@ function User() {
   return <p>User {id}</p>;
 }
 ```
-
-In Next.js you don't need it – routes come from **files and folders**.
 
 In short: React Router maps URLs to components on the client, no full reload.
 
@@ -205,7 +198,7 @@ HTML tag.
 ```
 
 Sample answer: "I use **function components with hooks**. I only write a class for an **Error
-Boundary**, or use the `react-error-boundary` package."
+Boundary**."
 
 ---
 
@@ -271,8 +264,7 @@ In short: components + state → React keeps the screen in sync.
 ==> Sample answer: "I chose React because:
 - **Component-based** – I build reusable pieces like buttons, forms and tables once.
 - **Fast updates** thanks to the Virtual DOM and batching.
-- **Huge ecosystem** – React Router, Redux Toolkit, React Query, Next.js.
-- **Same language end-to-end** – JavaScript with my Node.js backend.
+- **Huge ecosystem** – ready libraries for routing, state, forms and more.
 - Big community and lots of jobs."
 
 ---
@@ -282,7 +274,7 @@ In short: components + state → React keeps the screen in sync.
 *(Asked 1×: EZ Works)*
 
 ==> **JSX** (JavaScript XML) lets you write HTML-like markup inside JavaScript.
-- It is **not** HTML – a compiler (Babel / SWC) turns it into JS function calls.
+- It is **not** HTML – a compiler turns it into JS function calls.
 - `{}` puts a JS expression inside.
 - Use `className` instead of `class`, `htmlFor` instead of `for`; every tag must be closed.
 - Return **one root element** (or a Fragment `<>...</>`).
@@ -322,8 +314,6 @@ function Counter() {
 // Output: button shows 0, then 1, 2, 3... on each click
 ```
 
-Good pattern: a few stateful "container" components, many simple stateless ones.
-
 ---
 
 ##### 13. SSR, SSG, CSR; why Next.js is better for SEO; file-based routing, App Router and 'use client'
@@ -332,18 +322,15 @@ Good pattern: a few stateful "container" components, many simple stateless ones.
 
 ==>
 ```text
-+------------------------------+-------------------------------------+--------------------------------+
-|                              | When HTML is built                  | Good for                       |
-+==============================+=====================================+================================+
-| CSR – Client-Side Rendering  | In the browser, by JS               | Dashboards, logged-in apps     |
-+------------------------------+-------------------------------------+--------------------------------+
-| SSR – Server-Side Rendering  | On the server, on every request     | Fresh, personalised data + SEO |
-+------------------------------+-------------------------------------+--------------------------------+
-| SSG – Static Site Generation | Once, at build time                 | Blogs, docs, marketing pages   |
-+------------------------------+-------------------------------------+--------------------------------+
-| ISR – Incremental Static     | Static, regenerated in background   | Product pages                  |
-|       Regeneration           | after N seconds                     |                                |
-+------------------------------+-------------------------------------+--------------------------------+
++------------------------------+-------------------------------------+
+|                              | When HTML is built                  |
++==============================+=====================================+
+| CSR – Client-Side Rendering  | In the browser, by JS               |
++------------------------------+-------------------------------------+
+| SSR – Server-Side Rendering  | On the server, on every request     |
++------------------------------+-------------------------------------+
+| SSG – Static Site Generation | Once, at build time                 |
++------------------------------+-------------------------------------+
 ```
 
 - **SEO**: with SSR/SSG the crawler gets **full HTML** immediately. With CSR the first HTML is an
@@ -376,7 +363,7 @@ In short: server-render for SEO, `'use client'` only where you need interactivit
 React to build the page.
 - **Pros**: smooth app-like navigation, less server load, cheap hosting (static files).
 - **Cons**: slower first paint (blank screen until JS loads), weaker SEO.
-- Plain React apps (Vite, old Create React App) are CSR.
+- A plain React app (no server rendering) is CSR.
 
 ```html
 <!-- what the server sends in CSR -->
@@ -403,15 +390,6 @@ Common causes:
 - Invalid HTML nesting, e.g. `<div>` inside `<p>`.
 - Browser extensions changing the DOM.
 
-Fix: move browser-only values into `useEffect`, or load the component client-only
-(`dynamic(() => import("./Clock"), { ssr: false })` in a Client Component).
-
-```jsx
-const [time, setTime] = useState(null);           // same on server and client
-useEffect(() => setTime(new Date().toLocaleTimeString()), []); // runs only in browser
-return <p>{time ?? "..."}</p>;
-```
-
 In short: server HTML and first client render must match exactly.
 
 ---
@@ -421,7 +399,7 @@ In short: server HTML and first client render must match exactly.
 *(Asked 1×: Capsitech)*
 
 ==> Beyond `useState` / `useEffect`:
-- `useReducer` – state with many actions (cart, multi-step form).
+- `useReducer` – state with many actions.
 - `useMemo` – cache an expensive calculation.
 - `useCallback` – keep the same function reference between renders.
 - `useRef` – DOM access, or a mutable value that doesn't trigger re-render.
@@ -576,15 +554,6 @@ class Clock extends React.Component {
 // Output: the time, updating every second
 ```
 
-Hook version:
-
-```jsx
-useEffect(() => {
-  const t = setInterval(tick, 1000);
-  return () => clearInterval(t);
-}, []);
-```
-
 ---
 
 ##### 22. How do you share state between components without a common parent?
@@ -594,8 +563,7 @@ useEffect(() => {
 ==>
 - **Context API** – put the state in a Provider high in the tree; any component reads it with
   `useContext`.
-- **Global store** – Redux Toolkit or Zustand; any component can read or update it.
-- **Server state** – React Query / RTK Query cache for API data.
+- **Global store** – a state-management library; any component can read or update it.
 - **URL state** – query params (filters, page number).
 
 ```jsx
@@ -616,8 +584,8 @@ function Sidebar() {
 }
 ```
 
-Rule of thumb: Context for small, rarely-changing data (theme, logged-in user); Redux/Zustand for
-big state that changes often – every Context consumer re-renders when the value changes.
+Rule of thumb: Context for small, rarely-changing data (theme, logged-in user); a global store
+for big state that changes often – every Context consumer re-renders when the value changes.
 
 ---
 
@@ -697,9 +665,9 @@ Sample answer: "Yes – thunk through `createAsyncThunk` in Redux Toolkit for AP
 +-------------------------------------------+--------------------------------------------+
 | Shared, rarely changes (theme, auth user) | Context API                                |
 +-------------------------------------------+--------------------------------------------+
-| Big app-wide state, many updates          | Redux Toolkit / Zustand                    |
+| Big app-wide state, many updates          | Global store (state-management library)    |
 +-------------------------------------------+--------------------------------------------+
-| Server data (API responses)               | React Query / RTK Query (cache, refetch)   |
+| Server data (API responses)               | Data-fetching cache (cache, refetch)       |
 +-------------------------------------------+--------------------------------------------+
 | URL state (filters, page)                 | Query params                               |
 +-------------------------------------------+--------------------------------------------+
@@ -720,7 +688,7 @@ Tips:
 ==>
 - `React.memo` – skip re-rendering a child when its props are the same.
 - `useMemo` / `useCallback` – cache heavy calculations and keep callbacks stable.
-- **Virtualise large lists** (`react-window`) – render only the visible rows (e.g. 20 of 10,000).
+- **Virtualise large lists** – render only the visible rows (e.g. 20 of 10,000).
 - **Code splitting / lazy loading** – `React.lazy` + `Suspense`.
 - Correct, stable `key` props.
 - Keep state local; split big contexts.
@@ -788,7 +756,7 @@ function Parent() {
 is expensive, or the value is a prop to a memoised child / a `useEffect` dependency.
 
 **Skip it when**: components are small and cheap – memoization itself costs memory and
-comparisons. Profile first. (The **React Compiler** can add memoization automatically.)
+comparisons. Profile first.
 
 ---
 
@@ -798,12 +766,12 @@ comparisons. Profile first. (The **React Compiler** can add memoization automati
 
 ==>
 1. **Ask & reproduce** – which page, device, network? First load or interactions?
-2. **Measure** – Lighthouse / PageSpeed for **Core Web Vitals** (LCP, INP, CLS); Network tab for
-   big or slow requests; **React Profiler** for slow re-renders.
+2. **Measure** – a browser performance audit for **Core Web Vitals** (LCP, INP, CLS); Network
+   tab for big or slow requests; **React Profiler** for slow re-renders.
 3. **Fix the cause**:
    - Big JS bundle → code splitting, lazy loading, remove unused libraries.
    - Heavy images → compress, WebP/AVIF, lazy-load, right sizes, `next/image`, CDN.
-   - Slow APIs → check the backend (DB indexes, Redis caching), pagination.
+   - Slow APIs → check the backend (database indexes, caching), pagination.
    - Too many re-renders → `React.memo`, `useMemo`, virtualised lists.
    - Slow first paint / SEO → SSR or SSG with Next.js.
    - Third-party scripts → `defer` / `async`, or `next/script` with a lazy strategy.
@@ -852,8 +820,8 @@ In short: props are like function arguments; state is the component's own memory
 - **Parent → child**: props.
 - **Child → parent**: parent passes a **callback** prop; child calls it with data.
 - **Siblings**: **lift state up** to the common parent.
-- **Far-apart components**: Context API or Redux / Zustand.
-- Also: URL params (React Router), refs (rare).
+- **Far-apart components**: Context API or a global store.
+- Also: URL params, refs (rare).
 
 ```jsx
 function Parent() {
@@ -883,13 +851,6 @@ to reach a deep child.
 `App → Layout → Sidebar → Profile` – Layout and Sidebar pass `user` along only so Profile gets it.
 
 - Problem: noisy code, hard to change, extra re-renders.
-- Fix: **Context API**, Redux / Zustand, or **component composition** (pass the ready child as
-  `children`).
-
-```jsx
-// composition: Layout doesn't need to know about user
-<Layout sidebar={<Profile user={user} />} />
-```
 
 ---
 
@@ -943,8 +904,6 @@ export default function App() {
 +-----------------+--------------------------------------------+------------------------------------+
 | Code            | value + onChange                           | defaultValue + useRef              |
 +-----------------+--------------------------------------------+------------------------------------+
-| Good for        | Validation, live formatting, dynamic forms | Simple forms, file inputs          |
-+-----------------+--------------------------------------------+------------------------------------+
 ```
 
 ```jsx
@@ -957,8 +916,7 @@ const ref = useRef(null);
 <input defaultValue="" ref={ref} />   // read ref.current.value on submit
 ```
 
-`<input type="file">` is always uncontrolled. Form libraries like **React Hook Form** use
-uncontrolled inputs for speed.
+`<input type="file">` is always uncontrolled.
 
 ---
 
@@ -1027,8 +985,6 @@ export default function PianoTiles() {
 
 - One boolean per tile; clicking flips only that tile, using a **new array** (no mutation).
 - Index as `key` is fine here – the list never reorders.
-- Only one tile open at a time? Store `openIndex` instead:
-  `setOpenIndex(openIndex === i ? null : i)`.
 
 ---
 
@@ -1065,11 +1021,7 @@ render.
 +----------+-----------------------------------+------------------------------------+
 | Problems | "Wrapper hell", prop name clashes | Nested callbacks                   |
 +----------+-----------------------------------+------------------------------------+
-| Example  | withRouter, connect (Redux)       | Formik children function           |
-+----------+-----------------------------------+------------------------------------+
 ```
-
-Today both are mostly replaced by **custom hooks** (`useAuth()`, `useMouse()`).
 
 ======================================================================================================================================
 

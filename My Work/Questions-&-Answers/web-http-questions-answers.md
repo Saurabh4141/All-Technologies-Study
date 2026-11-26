@@ -14,7 +14,7 @@ Ordered by priority: the question asked by the most interviewers comes first.
 - Client sends a **request**: method (`GET`, `POST`...), URL, **headers**, optional **body**.
 - Server sends a **response**: **status code** (`200`, `404`...), headers, body.
 - It is **stateless**: each request stands alone. To remember the user we add **cookies**,
-  **sessions** or **tokens** (JWT).
+  **sessions** or **tokens**.
 
 ```http
 GET /api/users/1 HTTP/1.1
@@ -49,9 +49,6 @@ In short: HTTP = the stateless request/response language of the web.
 | Certificate  | Not needed                          | TLS certificate proves the server's |
 |              |                                     | identity                            |
 +--------------+-------------------------------------+-------------------------------------+
-| Use          | Local testing only                  | Everything in production (logins,   |
-|              |                                     | payments, SEO, HTTP/2 in browsers)  |
-+--------------+-------------------------------------+-------------------------------------+
 ```
 
 HTTPS gives 3 things: **encryption** (no one can read it), **integrity** (no one can change it),
@@ -77,8 +74,7 @@ In short: HTTPS = HTTP + encryption + server identity check.
    - DOM + CSSOM → **render tree**
    - **Layout** (sizes/positions) → **Paint** → **Composite** on screen.
 6. **Render-blocking resources** – a normal `<script>` pauses HTML parsing until it downloads
-   and runs; CSS blocks rendering until the CSSOM is ready. Fix: `defer`/`async`, small critical
-   CSS.
+   and runs; CSS blocks rendering until the CSSOM is ready.
 7. Images, fonts and other JS load; the page becomes interactive.
 
 Interview tip: say "DNS → TCP/TLS → request → response → DOM/CSSOM → render tree → layout →
@@ -109,13 +105,11 @@ In short: find the server, connect securely, get HTML, then turn HTML + CSS into
 ```
 
 ```html
-<script src="app.js" defer></script>        <!-- needs the DOM, keeps order -->
-<script src="analytics.js" async></script>  <!-- independent, order doesn't matter -->
+<script src="app.js" defer></script>    <!-- runs after parsing, in order -->
+<script src="other.js" async></script>  <!-- runs as soon as it downloads -->
 ```
 
-- `defer` → your app scripts that touch the DOM.
-- `async` → independent scripts like analytics or ads.
-- `type="module"` scripts are deferred by default.
+`type="module"` scripts are deferred by default.
 
 In short: plain script blocks, async runs ASAP, defer runs after parsing in order.
 
@@ -126,7 +120,7 @@ In short: plain script blocks, async runs ASAP, defer runs after parsing in orde
 *(Asked 1×: One97 Paytm)*
 
 ==> Nginx sits **in front of your app** as a **reverse proxy**: it takes client requests and
-forwards them to the backend (Node, PHP-FPM, Python...).
+forwards them to the backend app server.
 - **Load balancing** – spreads traffic across many app instances.
 - **SSL/TLS termination** – Nginx handles HTTPS, the app speaks plain HTTP inside.
 - **Static files** – serves images/JS/CSS very fast, without touching the app.
@@ -174,14 +168,9 @@ handles business logic.
 +------------------+--------------------------------------+-----------------------------------+
 | Config           | Central config only                  | Per-folder .htaccess files        |
 +------------------+--------------------------------------+-----------------------------------+
-| PHP              | Passes to PHP-FPM                    | Can run PHP inside (mod_php)      |
-+------------------+--------------------------------------+-----------------------------------+
-| Common use       | Reverse proxy, load balancer         | Shared hosting, classic PHP apps  |
-+------------------+--------------------------------------+-----------------------------------+
 ```
 
-In short: Nginx wins for high traffic and proxying; Apache is flexible with `.htaccess`. Often
-Nginx sits in front of Apache or Node.
+In short: Nginx wins for high traffic and proxying; Apache is flexible with `.htaccess`.
 
 ---
 
@@ -199,8 +188,6 @@ Nginx sits in front of Apache or Node.
 | Layout | Starts on a new line, takes full width | Stays in the line, takes only the width it |
 |        |                                        | needs                                      |
 +--------+----------------------------------------+--------------------------------------------+
-| Use    | Group big sections / layout            | Style a small piece of text                |
-+--------+----------------------------------------+--------------------------------------------+
 ```
 
 ```html
@@ -210,9 +197,6 @@ Nginx sits in front of Apache or Node.
 
 Output: the div sits on its own full-width line; "red word" turns red but stays inside the
 sentence.
-
-Both have no meaning of their own – prefer semantic tags (`<section>`, `<nav>`, `<strong>`) when
-they fit.
 
 In short: div = block box, span = inline piece of text.
 
@@ -234,10 +218,7 @@ button:hover { background: blue; }
 li:nth-child(odd) { background: #eee; }   /* rows 1, 3, 5... get grey */
 ```
 
-Don't mix up: **pseudo-elements** use **two colons** (`::before`, `::after`) and style a *part*
-of an element, not a state.
-
-In short: `:state` = pseudo-class, `::part` = pseudo-element.
+In short: a pseudo-class (`:hover`, `:focus`...) styles an element in a certain state.
 
 ---
 
@@ -251,7 +232,7 @@ In short: `:state` = pseudo-class, `::part` = pseudo-element.
 - **402 Payment Required** – reserved; rarely used (some APIs return it when a plan/payment is
   needed).
 - **403 Forbidden** – logged in, but **no permission** for this resource.
-- **502 Bad Gateway** – a proxy (like Nginx) got a bad or no response from the app behind it
+- **502 Bad Gateway** – a proxy or gateway got a bad or no response from the app behind it
   (e.g. the app crashed).
 
 Common codes:
@@ -319,21 +300,12 @@ Metrics:
 +--------------------------------+--------------------------------------------+------------+
 | CLS - Cumulative Layout Shift  | How much the page jumps while loading      | < 0.1      |
 +--------------------------------+--------------------------------------------+------------+
-| INP - Interaction to Next      | How fast the page reacts to clicks/typing  | < 200 ms   |
-| Paint                          |                                            |            |
-+--------------------------------+--------------------------------------------+------------+
 ```
 
-The **Core Web Vitals** are **LCP, CLS and INP** (INP replaced FID in 2024). FCP is a helpful
-extra metric.
+**LCP** and **CLS** are **Core Web Vitals**; FCP is a helpful extra metric.
 
-Fixes:
-- LCP → compress / preload the hero image, CDN, caching.
-- CLS → set image `width`/`height`, reserve space for ads/fonts.
-- INP / FCP → code splitting, `defer` scripts, less JS on the main thread.
-
-In short: Profiler finds slow React renders; Lighthouse/GTmetrix measure the page; aim for LCP <
-2.5 s, CLS < 0.1, INP < 200 ms.
+In short: Profiler finds slow React renders; Lighthouse/GTmetrix measure the page; aim for FCP <
+1.8 s, LCP < 2.5 s, CLS < 0.1.
 
 ---
 
@@ -350,20 +322,13 @@ Ordered by topic priority: questions from the most-asked topics come first.
 ==> A **CDN** (Content Delivery Network) is a set of **edge servers** around the world that keep
 **cached copies** of your files. Users get them from the **nearest edge** instead of your
 **origin** server.
-- Used for static files: images, CSS, JS, videos, fonts (sometimes cacheable API responses).
-- Examples: **Cloudflare**, **AWS CloudFront**, **Akamai**.
+- It mostly serves static files: images, CSS, JS, videos, fonts.
 
 Benefits:
 - **Faster** – lower latency, content is close to the user.
 - **Less load** and bandwidth on your origin.
 - **Availability** – if one edge goes down, others serve.
 - **Security** – DDoS protection, TLS at the edge, WAF.
-
-Caching is controlled with headers; use **versioned file names** so a new deploy is picked up:
-
-```http
-Cache-Control: public, max-age=31536000, immutable    (for app.3f2a.js)
-```
 
 In short: a CDN serves cached files from a server near the user – faster, cheaper, more reliable.
 

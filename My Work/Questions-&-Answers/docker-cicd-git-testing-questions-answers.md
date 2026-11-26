@@ -26,8 +26,6 @@ repos and adds team features on top.
 | Main use      | Commits, branches, merges,       | Pull requests, code review, issues,        |
 |               | history                          | GitHub Actions (CI/CD)                     |
 +---------------+----------------------------------+--------------------------------------------+
-| Alternatives  | SVN, Mercurial                   | GitLab, Bitbucket                          |
-+---------------+----------------------------------+--------------------------------------------+
 ```
 
 ```bash
@@ -74,18 +72,15 @@ git bisect start              # binary search for the commit that added a bug
 git tag v1.0.0                # mark a release
 ```
 
-Interview tip: know the difference between **reset** (moves the branch back, rewrites history)
-and **revert** (adds a new undo commit, safe for shared branches).
-
 ---
 
 ##### 3. Have you worked on Docker? Explain
 
 *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
-==> Sample answer: "Yes. I containerized our Node.js APIs with Docker. I wrote the Dockerfiles, used
-**Docker Compose** to run the API with MongoDB and Redis locally, and in CI/CD we build the image,
-push it to a registry (ECR / Docker Hub) and deploy it to ECS."
+==> Sample answer: "Yes. I containerized our APIs with Docker. I wrote the Dockerfiles, used
+**Docker Compose** to run the API with its database locally, and in the CI/CD pipeline we build the
+image, push it to a registry and deploy it."
 
 **Key points:**
 - **Docker** packages the app + runtime + libraries into an **image**, so it runs the same on every
@@ -115,12 +110,12 @@ In short: Docker = build once, run the same everywhere.
   CLI talks to it through a **REST API**.
 - **Images** – read-only templates built from a Dockerfile, made of **layers**.
 - **Containers** – running instances of images.
-- **Registry** – stores images (Docker Hub, AWS ECR).
+- **Registry** – stores images (e.g. Docker Hub).
 
 ```text
 docker CLI --REST API--> Docker Daemon --> Images --run--> Containers
                                |
-                               +--pull / push--> Registry (Docker Hub / ECR)
+                               +--pull / push--> Registry (Docker Hub)
 ```
 
 Example: `docker run nginx` → the CLI asks the daemon → the daemon pulls `nginx` from Docker Hub
@@ -134,8 +129,8 @@ In short: CLI sends commands, the daemon does the work, the registry stores imag
 
 *(Asked 1×: Inorg Global)*
 
-==> A Docker registry is a **storage place for Docker images** – like GitHub, but for images.
-- Public: **Docker Hub**. Private: **AWS ECR**, GitHub Container Registry (GHCR), Azure ACR.
+==> A Docker registry is a **storage place for Docker images**.
+- Public: **Docker Hub**. Private: a registry only your team can access.
 - `docker push` uploads an image, `docker pull` downloads it.
 - Inside a registry, a **repository** holds all versions of one image, marked by **tags** (e.g.
   `my-api:1.0`). No tag means `:latest`.
@@ -164,7 +159,7 @@ In short: registry = image store; repository = one image; tag = its version.
 +---------------------+---------------------------------+-------------------------------------+
 | OS                  | Each VM has a full guest OS     | Containers share the host OS kernel |
 +---------------------+---------------------------------+-------------------------------------+
-| Managed by          | Hypervisor (VMware, VirtualBox) | Container engine (Docker)           |
+| Managed by          | Hypervisor                      | Container engine (Docker)           |
 +---------------------+---------------------------------+-------------------------------------+
 | Size                | GBs                             | MBs                                 |
 +---------------------+---------------------------------+-------------------------------------+
@@ -176,8 +171,6 @@ In short: registry = image store; repository = one image; tag = its version.
 
 - Docker isolates containers with Linux **namespaces** (own processes, network, files) and limits
   resources with **cgroups** (CPU, memory).
-- Because containers share the host kernel, a Linux container needs a Linux kernel (Docker
-  Desktop on Windows/Mac runs a small Linux VM for this).
 
 In short: VMs = many full computers on one machine; containers = isolated apps sharing one
 kernel, so they are lighter and faster.
@@ -248,18 +241,17 @@ In short: small base image, copy package files first, `npm ci`, non-root user, `
 ==> A **volume** is storage **outside the container's writable layer**, so data survives when the
 container is deleted.
 - Without a volume, files written inside a container are lost when you `docker rm` it.
-- Used for database data (MongoDB/MySQL), uploads, logs.
 - Types:
-  - **Named volume** – managed by Docker, best for databases.
-  - **Bind mount** – a host folder mapped in; handy in development for live code reload.
+  - **Named volume** – managed by Docker.
+  - **Bind mount** – a folder from the host mapped into the container.
 
 ```bash
-docker volume create mongo-data
-docker run -d -v mongo-data:/data/db mongo        # named volume
-docker run -d -v $(pwd):/app my-node-app          # bind mount
+docker volume create app-data
+docker run -d -v app-data:/data my-app            # named volume
+docker run -d -v $(pwd):/app my-app               # bind mount
 docker volume ls
 # Output: DRIVER  VOLUME NAME
-#         local   mongo-data
+#         local   app-data
 ```
 
 In short: containers are throwaway; volumes keep the data.
@@ -325,7 +317,6 @@ In short: image = class, container = object.
 
 - In Kubernetes you describe the **desired state** in YAML (e.g. "3 replicas of my-api") and K8s
   keeps it that way.
-- Docker's own orchestrator is **Docker Swarm**, but Kubernetes is the industry standard.
 
 In short: Docker makes the containers; Kubernetes runs and manages lots of them in production.
 They are used together.
@@ -382,20 +373,9 @@ After:   main:    A---B---C
          feature:           D'---E'    (new commit ids)
 ```
 
-```text
-+-------------------------+--------------------------------+--------------------------+
-|                         | Merge                          | Rebase                   |
-+=========================+================================+==========================+
-| History                 | Keeps all, adds a merge commit | Linear, rewrites commits |
-+-------------------------+--------------------------------+--------------------------+
-| Safe on shared branches | Yes                            | No (changes commit ids)  |
-+-------------------------+--------------------------------+--------------------------+
-```
+Because rebase rewrites commit ids, never rebase a branch others are already using.
 
-Interview tip: never rebase a branch others are already using – it rewrites commit ids, and
-they would need a force push.
-
-In short: rebase = clean, linear history; merge = safe, keeps everything.
+In short: rebase = replay your commits on top of another branch for a clean, linear history.
 
 ---
 
@@ -417,13 +397,10 @@ one to keep.
    >>>>>>> feature
    ```
 
-3. Keep the right code (yours, theirs or both) and delete the markers. VS Code shows "Accept
-   Current / Incoming / Both".
+3. Keep the right code (yours, theirs or both) and delete the markers.
 4. `git add <file>` to mark it resolved.
 5. `git commit` (or `git rebase --continue` during a rebase).
 6. Run tests before pushing. To give up: `git merge --abort`.
-
-Interview tip: pull often and keep PRs small to avoid big conflicts.
 
 In short: find the markers, pick the right code, `git add`, commit.
 
@@ -435,8 +412,7 @@ In short: find the markers, pick the right code, `git add`, commit.
 
 ==> **Yes.** Git is a standalone, **distributed** tool – every clone has the full history locally.
 - `git init`, commit, branch, merge, log all work offline with no GitHub.
-- To share code, use any other host (GitLab, Bitbucket, Azure Repos), your own server, or even a
-  shared folder as a remote.
+- To share code, use any other Git host, your own server, or even a shared folder as a remote.
 
 ```bash
 git init --bare /shared/app.git          # a plain folder acting as the "server"
@@ -476,19 +452,19 @@ In short: everything lives in `.git`; your working files are just a checkout of 
 *(Asked 1×: Kyndryl)*
 
 ==> A CI/CD pipeline automatically **builds, tests and deploys** code on every change. Typical
-steps for a Node.js service:
+steps:
 1. **Trigger** – push or pull request.
-2. **Install** dependencies – `npm ci`.
-3. **Lint / static analysis** – ESLint, SonarQube.
-4. **Unit tests** + coverage – Jest.
-5. **Integration / API tests** – Supertest, test DB in a service container.
-6. **Build** – TypeScript compile, Docker image.
-7. **Security scan** – `npm audit`, Trivy for the image.
-8. **Push** the image to a registry (ECR / Docker Hub).
+2. **Install** dependencies.
+3. **Lint / static analysis** – catch style issues and risky code.
+4. **Unit tests** + coverage.
+5. **Integration / API tests** – against a test database.
+6. **Build** – compile and package the app (e.g. a container image).
+7. **Security scan** – check dependencies and the build for known vulnerabilities.
+8. **Publish** the build artifact (e.g. push the image to a registry).
 9. **Deploy** to staging → smoke tests → approval → production.
 10. **Monitor**, and roll back if something breaks.
 
-In short: trigger → install → lint → test → build → scan → push → deploy → monitor.
+In short: trigger → install → lint → test → build → scan → publish → deploy → monitor.
 
 ---
 
@@ -501,46 +477,13 @@ In short: trigger → install → lint → test → build → scan → push → 
 at a manual approval; Deployment goes to production with no manual step).
 
 ```text
-Developer --push--> GitHub --trigger--> CI: install -> lint -> test -> build image
-                                                                  |
-                                                push image to registry (ECR)
-                                                                  |
-                                    CD: deploy staging -> tests -> approve -> deploy prod
-                                                                  |
-                                                        monitor / rollback
-```
-
-Example with **GitHub Actions**:
-
-```yaml
-# .github/workflows/ci-cd.yml
-name: CI-CD
-on:
-  push:
-    branches: [main]
-  pull_request:
-
-jobs:
-  build-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm test
-
-  deploy:
-    needs: build-test                      # runs only if build-test passed
-    if: github.ref == 'refs/heads/main'    # only on main, not on PRs
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: docker build -t my-api:${{ github.sha }} .
-      - run: echo "push image to registry and deploy (e.g. ECS) here"
+Developer --push--> Git repo --trigger--> CI: install -> lint -> test -> build
+                                                                    |
+                                                       publish build artifact
+                                                                    |
+                                      CD: deploy staging -> tests -> approve -> deploy prod
+                                                                    |
+                                                          monitor / rollback
 ```
 
 In short: push → CI tests and builds → CD deploys, each step only if the previous one passed.
@@ -552,9 +495,9 @@ In short: push → CI tests and builds → CD deploys, each step only if the pre
 *(Asked 1×: Hyland Software)*
 
 ==> Sample answer:
-- **CI/CD:** every PR runs a GitHub Actions workflow – install, lint, unit + integration tests,
-  build. Merge to `main` deploys to staging; production after approval.
-- **Test automation:** Jest unit tests and Supertest API tests run on every PR. The PR is blocked
+- **CI/CD:** every PR runs a CI pipeline – install, lint, unit + integration tests, build.
+  Merge to `main` deploys to staging; production after approval.
+- **Test automation:** unit tests and API tests run on every PR. The PR is blocked
   if tests fail or coverage drops.
 - **Code review:** feature branch → pull request → 1–2 reviewers approve → merge. Reviewers check
   logic, naming, error handling, security and tests.
@@ -568,22 +511,14 @@ In short: PR → automatic checks → human review → merge → automatic deplo
 
 *(Asked 1×: Tech Mahindra (YT))*
 
-==> Sample answer: "Yes. I have written **GitHub Actions** workflows for our Node.js services:
-install, lint, test, build the Docker image, push to ECR and deploy to ECS / Lambda (with
-Serverless Framework). Secrets like AWS keys are stored in **GitHub Secrets**, not in code."
+==> Sample answer: "Yes. I have written CI/CD pipelines for our services: install, lint, test,
+build, publish the build and deploy it. Secrets like cloud keys are stored in the CI tool's
+**secret store**, not in code."
 
-**Key point:** a pipeline is a YAML file in the repo – `.github/workflows/*.yml`, `.gitlab-ci.yml`
-or a `Jenkinsfile` – with **triggers** (`on: push`) and **jobs** made of **steps** (see the YAML
-in question 17).
+**Key point:** a pipeline is usually a config file (often YAML) in the repo, with **triggers**
+(e.g. on push) and **jobs** made of **steps**.
 
-```yaml
-- run: aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URL
-  env:
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}       # from GitHub Secrets
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-```
-
-In short: yes – YAML workflows in the repo, secrets kept in the CI tool.
+In short: yes – pipeline config in the repo, secrets kept in the CI tool.
 
 ---
 
@@ -592,18 +527,17 @@ In short: yes – YAML workflows in the repo, secrets kept in the CI tool.
 *(Asked 1×: Tech Mahindra (YT))*
 
 ==> Sample answer:
-1. Each microservice has its own repo/folder, Dockerfile and pipeline.
-2. On merge to `main`, CI runs tests and builds a Docker image **tagged with the commit SHA**.
-3. The image is pushed to **AWS ECR**.
-4. The pipeline updates the **ECS (Fargate) service** (or Kubernetes Deployment) with the new
-   image – a **rolling update**, so there is no downtime.
+1. Each microservice has its own repo/folder, build config and pipeline.
+2. On merge to `main`, CI runs tests and builds a container image **tagged with the commit SHA**.
+3. The image is pushed to a **container registry**.
+4. The pipeline updates the running service with the new image – a **rolling update**, so there
+   is no downtime.
 5. Load balancer **health checks** confirm the new version; if it fails, we roll back to the
    previous image.
-6. Serverless parts are deployed as Lambdas with Serverless Framework / SAM.
 
-Config and secrets come from environment variables / AWS Secrets Manager, never from the image.
+Config and secrets come from environment variables / a secrets manager, never from the image.
 
-In short: test → build image → push to ECR → rolling update on ECS → health check or rollback.
+In short: test → build image → push to registry → rolling update → health check or rollback.
 
 ---
 
@@ -675,7 +609,7 @@ In short: TDD = test first, code second; I use it where bugs are expensive.
 Chai** (with Sinon for mocks)."
 - **Jest** – all-in-one: test runner, assertions, mocks, coverage.
 - **Mocha** – test runner; **Chai** – assertions; **Sinon** – spies/stubs/mocks.
-- **Supertest** – call Express routes in tests without starting a real server.
+- **Supertest** – call HTTP routes in tests without starting a real server.
 - Node.js also has a built-in runner: **`node:test`** (`node --test`).
 
 ```js
@@ -704,12 +638,12 @@ In short: Jest for unit tests, Supertest for APIs.
 *(Asked 1×: Tech Mahindra (YT))*
 
 ==> No code is 100% bug-free, but I reduce bugs with layers of checks:
-- **Tests** – unit, integration and API tests with good coverage (Jest, Supertest).
-- **Linting & formatting** – ESLint + Prettier; **TypeScript** for type safety.
-- **Pre-commit hooks** – Husky + lint-staged run lint/tests before a commit.
+- **Tests** – unit, integration and API tests with good coverage.
+- **Linting & formatting** – a linter and an auto-formatter; **static types** for type safety.
+- **Pre-commit hooks** – run lint/tests before a commit.
 - **Code reviews** – every PR reviewed before merge.
-- **CI checks** – lint, tests and SonarQube quality gate must pass before merge.
-- **Input validation and error handling** – Joi/Zod, central error middleware.
+- **CI checks** – lint, tests and a code-quality gate must pass before merge.
+- **Input validation and error handling** – validate inputs, handle errors in one central place.
 - **Monitoring** – logs and alerts to catch production issues early.
 
 In short: catch bugs early – types, lint, tests, review, CI – and watch production.
@@ -722,17 +656,16 @@ In short: catch bugs early – types, lint, tests, review, CI – and watch prod
 
 ==> Code reusability = **write code once and use it in many places** instead of copy-pasting
 (**DRY**: Don't Repeat Yourself).
-- Ways: functions, modules, classes, middleware, React components, shared npm packages.
+- Ways: functions, modules, classes, shared components, shared packages.
 - Benefits: less code, fewer bugs, fix in one place, faster development.
 
 ```js
-// utils/response.js – reused by every controller
-export const sendSuccess = (res, data, status = 200) =>
-  res.status(status).json({ success: true, data });
+// utils/price.js – written once
+export const withTax = (amount, rate = 0.18) => amount + amount * rate;
 
-// in any controller
-sendSuccess(res, user);        // Output: 200 {"success":true,"data":{...user}}
-sendSuccess(res, order, 201);  // Output: 201 {"success":true,"data":{...order}}
+// reused in cart, checkout and invoice code
+withTax(100);        // Output: 118
+withTax(100, 0.05);  // Output: 105
 ```
 
 In short: write it once, import it everywhere.

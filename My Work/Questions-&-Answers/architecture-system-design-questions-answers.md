@@ -14,15 +14,15 @@ Ordered by priority: the question asked by the most interviewers comes first.
 JavaScript. It's a classic **3-tier architecture**:
 - **React** – presentation tier: the UI running in the browser.
 - **Express.js on Node.js** – application tier: REST API, auth, business logic.
-- **MongoDB** – data tier: stores JSON-like documents, usually accessed through **Mongoose**.
+- **MongoDB** – data tier: stores JSON-like documents.
 
 Request flow:
-1. React calls the API with `fetch` / `axios`.
-2. Express route → controller → service → Mongoose model.
+1. React calls the API with `fetch`.
+2. Express route → controller → model.
 3. MongoDB returns documents → Express sends JSON → React re-renders.
 
 ```text
-React (browser)  --HTTP/JSON-->  Node.js + Express (API)  --Mongoose-->  MongoDB
+React (browser)  --HTTP/JSON-->  Node.js + Express (API)  --query--->  MongoDB
                  <----JSON-----                           <--documents--
 ```
 
@@ -46,10 +46,10 @@ In short: UI (React) → API (Express/Node) → DB (MongoDB), with JSON and Java
 *(Asked 1×: Algoworks)*
 
 ==> Three ways to **split and run** a backend:
-- **Monolith** – one codebase, one deploy (e.g. one Express or Laravel app).
+- **Monolith** – one codebase, one deploy.
 - **Microservices** – many small services (users, orders, payments), each deployed and scaled on
-  its own, usually as Docker containers on ECS/Kubernetes.
-- **Serverless** – small functions (AWS Lambda) that run on events; the cloud manages servers.
+  its own.
+- **Serverless** – small functions that run on events; the cloud manages servers.
 
 ```text
 +------------+---------------------+-----------------------------+---------------------------+
@@ -62,16 +62,11 @@ In short: UI (React) → API (Express/Node) → DB (MongoDB), with JSON and Java
 | Servers    | You manage          | You manage (containers)     | Cloud manages             |
 +------------+---------------------+-----------------------------+---------------------------+
 | Complexity | Simple to start     | High: network, many repos,  | Low ops; cold starts,     |
-|            |                     | tracing, data consistency   | 15-min Lambda limit       |
+|            |                     | tracing, data consistency   | time limit per run        |
 +------------+---------------------+-----------------------------+---------------------------+
 | Cost       | One fixed server    | More infra                  | Pay per use               |
 +------------+---------------------+-----------------------------+---------------------------+
-| Example    | One Express app     | Netflix, Uber               | Lambda + API Gateway      |
-+------------+---------------------+-----------------------------+---------------------------+
 ```
-
-Interview tip: start with a **modular monolith** for a small team; split into microservices only
-when parts need to scale or deploy independently.
 
 In short: monolith = one app; microservices = many small apps; serverless = functions, no servers.
 
@@ -82,22 +77,16 @@ In short: monolith = one app; microservices = many small apps; serverless = func
 *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> **Microservices** = the app is split into small, independent services, each owning **one
-business area** (users, orders, payments) and **its own database**. They talk over REST/gRPC or
-through a message broker (RabbitMQ, Kafka, SQS).
+business area** (users, orders, payments) and **its own database**. They talk over APIs or
+through a message queue.
 
 Why we prefer them:
 - **Independent deploy** – ship the payment service without redeploying orders.
 - **Independent scaling** – run 10 copies of the search service, 2 of the profile service.
 - **Fault isolation** – if the email service crashes, checkout still works.
-- **Team ownership** – each small team owns a service and can pick its stack (Node, PHP, Go).
+- **Team ownership** – each small team owns a service and can pick its own stack.
 
-Downsides (say these too):
-- Network calls can fail or be slow → need retries, timeouts, **circuit breakers**.
-- No cross-service DB transactions → **eventual consistency** (Saga pattern).
-- Harder to debug → need centralized logs and **distributed tracing** (Jaeger, AWS X-Ray).
-
-In short: small, independent services = independent deploy, scale and failure, at the cost of
-more operational complexity.
+In short: small, independent services = independent deploy, scaling and failure.
 
 ---
 
@@ -107,7 +96,7 @@ more operational complexity.
 
 ==> Two ways:
 - **Synchronous** (caller waits for the reply): **REST/HTTP**, **gRPC**, GraphQL.
-- **Asynchronous** (send and move on): **message queues / events** – RabbitMQ, Kafka, AWS SQS/SNS.
+- **Asynchronous** (send and move on): **message queues / events**.
 
 ```text
 +-----------------------+---------------------------------+------------------------------------+
@@ -118,8 +107,7 @@ more operational complexity.
 +-----------------------+---------------------------------+------------------------------------+
 | Coupling              | Tight                           | Loose                              |
 +-----------------------+---------------------------------+------------------------------------+
-| If other side is down | Call fails (needs retry /       | Message waits in the queue         |
-|                       | circuit breaker)                |                                    |
+| If other side is down | Call fails (needs a retry)      | Message waits in the queue         |
 +-----------------------+---------------------------------+------------------------------------+
 | Use when              | You need the answer now         | Background work, fan-out to many   |
 |                       | (check stock, auth)             | services (email, invoice, stats)   |
@@ -128,13 +116,11 @@ more operational complexity.
 
 ```js
 // sync: call another service over HTTP
-const { data } = await axios.get('http://inventory-svc/stock/42');
+const stock = await (await fetch('http://inventory-svc/stock/42')).json();
 
-// async: publish an event to SQS / RabbitMQ and return
+// async: publish an event to a message queue and return
 await queue.send('OrderPlaced', { orderId: 101, userId: 7 });
 ```
-
-Clients usually don't call services directly; they go through an **API Gateway**.
 
 In short: REST/gRPC when you need an answer now; queues/events when you don't.
 
@@ -146,14 +132,13 @@ In short: REST/gRPC when you need an answer now; queues/events when you don't.
 
 ==> A **distributed system** is one app running on **many servers connected over a network**
 that work together and look like one system to the user.
-- Examples: microservices on different servers, a MongoDB **replica set**, a MySQL primary + read
-  replicas, 5 Node.js instances behind a load balancer.
+- Examples: microservices on different servers, a database copied to several machines, 5 app
+  instances behind a load balancer.
 - Benefits: **scalability**, **high availability**, **fault tolerance**.
 - Challenges:
   - the network can fail or be slow → timeouts, retries, idempotent APIs;
-  - keeping data **consistent** across nodes (**CAP theorem**: during a network partition you
-    choose consistency or availability);
-  - tracing one request across many services → correlation IDs, Jaeger / AWS X-Ray.
+  - keeping data **consistent** across nodes;
+  - tracing one request across many services → correlation IDs, distributed tracing.
 
 In short: many machines acting as one system – more scale and uptime, harder consistency and
 debugging.
@@ -176,17 +161,27 @@ the whole system.
   Open again.
 
 ```js
-// Node.js with the "opossum" library
-import CircuitBreaker from 'opossum';
+// minimal circuit breaker around calls to the payment service
+let state = 'CLOSED', failures = 0, openedAt = 0;
+const fallback = { status: 'payment service busy, try later' };
 
-const breaker = new CircuitBreaker(callPaymentService, {
-  timeout: 3000,                 // slower than 3 s = failure
-  errorThresholdPercentage: 50,  // open when 50% of calls fail
-  resetTimeout: 10000,           // go half-open after 10 s
-});
-breaker.fallback(() => ({ status: 'payment service busy, try later' }));
-
-const result = await breaker.fire(orderId);
+async function callPayment(orderId) {
+  if (state === 'OPEN') {
+    if (Date.now() - openedAt < 10000) return fallback;   // fail fast for 10 s
+    state = 'HALF_OPEN';                                  // cooldown over → test call
+  }
+  try {
+    const result = await callPaymentService(orderId);
+    state = 'CLOSED'; failures = 0;                       // success → close
+    return result;
+  } catch {
+    failures++;
+    if (state === 'HALF_OPEN' || failures >= 5) {         // too many failures → open
+      state = 'OPEN'; openedAt = Date.now();
+    }
+    return fallback;
+  }
+}
 // when open → { status: 'payment service busy, try later' }
 ```
 
@@ -208,30 +203,29 @@ In short: like an electric breaker – trip on repeated failures, fail fast, tes
 - Or a random 7-char string with a `UNIQUE` index; retry on collision.
 
 **Storage**
-- Table `urls(id, short_key UNIQUE, long_url, created_at, expires_at)` in MySQL/PostgreSQL, or
-  DynamoDB for huge scale.
+- Table `urls(id, short_key UNIQUE, long_url, created_at, expires_at)` in the database.
 
 **Scale** (reads ≫ writes)
-- Cache `key → long_url` in **Redis**; check cache first, DB on a miss.
+- Cache `key → long_url` in a **cache**; check cache first, DB on a miss.
 - **302** if you want to count clicks (browser comes back every time); **301** is cached by the
   browser, so later clicks never reach you.
 - Count clicks asynchronously through a queue, not inside the redirect.
 
 ```text
 Client --POST /shorten--> API --> DB (short_key UNIQUE)
-Client --GET /aZ3x9Qk---> API --> Redis --miss--> DB
+Client --GET /aZ3x9Qk---> API --> Cache --miss--> DB
        <--302 Location: https://long-url...--
 ```
 
 ```js
 app.get('/:key', async (req, res) => {
-  const url = (await redis.get(req.params.key)) ?? (await db.findLongUrl(req.params.key));
+  const url = (await cache.get(req.params.key)) ?? (await db.findLongUrl(req.params.key));
   if (!url) return res.sendStatus(404);
   res.redirect(302, url);
 });
 ```
 
-In short: base62 key + DB with a unique index + Redis cache + redirect.
+In short: base62 key + DB with a unique index + cache + redirect.
 
 ---
 
@@ -247,8 +241,8 @@ In short: base62 key + DB with a unique index + Redis cache + redirect.
    never passes through our server.
 4. Client calls `POST /uploads/:id/complete` → backend calls `CompleteMultipartUpload`.
 5. S3 fires an **ObjectCreated** event → **SQS** (buffer + retries + DLQ).
-6. A **Lambda** (up to 15 min) or an **ECS Fargate** worker / **Step Functions** (longer jobs)
-   processes the file: virus scan, resize, parse.
+6. A **Lambda** (up to 15 min) or an **ECS Fargate** worker (longer jobs) processes the file:
+   virus scan, resize, parse.
 7. Save status in the DB and notify the user (WebSocket / email).
 
 ```text
@@ -269,51 +263,54 @@ In short: pre-signed multipart upload straight to S3, then event → queue → w
 
 ==> **Flow**
 1. React: `<input type="file">` → add the file to `FormData` → `POST /api/images`.
-2. Express + **multer** receives the file and checks type (jpg/png/webp) and size (e.g. 5 MB max).
-3. Store the **file in S3** (or disk), **not inside MongoDB**.
+2. Node.js reads the multipart upload and checks type (jpg/png/webp) and size (e.g. 5 MB max).
+3. Store the **file in file storage** (disk or cloud storage), **not inside MongoDB**.
 4. Save **metadata + URL** in MongoDB.
 5. Return the record; React shows the image from its `url`.
-
-For big files: the backend returns a **pre-signed URL** and React uploads straight to S3.
 
 **API endpoints**
 - `POST /api/images` – upload
 - `GET /api/images?page=1&limit=20` – list with pagination
 - `GET /api/images/:id` – one image
-- `DELETE /api/images/:id` – delete the S3 object + the record
+- `DELETE /api/images/:id` – delete the stored file + the record
 
 ```text
-React --FormData--> Express (multer) --file------> S3
-                                     --metadata--> MongoDB
+React --FormData--> Node.js API --file------> file storage
+                                --metadata--> MongoDB
 React <-- { _id, url } --
 ```
 
 ```js
-// Express route
-const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
-
+// Node.js route (req.file is filled by the multipart upload middleware)
 app.post('/api/images', auth, upload.single('image'), async (req, res) => {
   const key = `images/${Date.now()}-${req.file.originalname}`;
-  await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: req.file.buffer }));
-  const img = await Image.create({
-    userId: req.user.id, key, url: `https://${BUCKET}.s3.amazonaws.com/${key}`,
+  const url = await storage.save(key, req.file.buffer);            // file → storage
+  const img = {
+    userId: req.user.id, url, key,
     originalName: req.file.originalname, mimeType: req.file.mimetype, size: req.file.size,
-  });
-  res.status(201).json(img);
+    createdAt: new Date(),
+  };
+  const { insertedId } = await db.collection('images').insertOne(img);   // metadata → MongoDB
+  res.status(201).json({ _id: insertedId, ...img });
 });
+```
 
-// Mongoose schema
-const imageSchema = new mongoose.Schema({
-  userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  url:          { type: String, required: true },
-  key:          String,          // S3 object key, used to delete
+**Schema** (`images` collection):
+
+```text
+{
+  _id:          ObjectId,
+  userId:       ObjectId   (owner, indexed),
+  url:          String     (required),
+  key:          String     (storage key, used to delete),
   originalName: String,
   mimeType:     String,
   size:         Number,
-}, { timestamps: true });
+  createdAt:    Date
+}
 ```
 
-In short: file → S3, metadata → MongoDB, React shows it by URL.
+In short: file → file storage, metadata → MongoDB, React shows it by URL.
 
 ---
 
@@ -322,15 +319,14 @@ In short: file → S3, metadata → MongoDB, React shows it by URL.
 *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
 ==> **MVC = Model – View – Controller**: split the code into 3 jobs.
-- **Model** – data and DB logic (Mongoose / Sequelize models, Laravel Eloquent models).
-- **View** – what the user gets back (EJS / Blade template, or JSON for an API).
+- **Model** – data and DB logic.
+- **View** – what the user gets back (an HTML template, or JSON for an API).
 - **Controller** – receives the request, calls the model, returns the view/response.
 
-In Express: `routes/` → `controllers/` → `models/`, usually with a `services/` layer for
-business logic so controllers stay thin.
+Typical folders: `routes/` → `controllers/` → `models/`.
 
 ```text
-Request -> Route -> Controller -> Service -> Model -> DB
+Request -> Route -> Controller -> Model -> DB
                         |
                         v
                 View / JSON response
@@ -357,13 +353,10 @@ In short: Model = data, View = output, Controller = glue between them.
 
 *(Asked 1×: TCS)*
 
-==> Sample answer: "Yes. I've handled performance, deployment and outage issues."
-- **Slow APIs at peak traffic:** CloudWatch showed p95 latency jumping to ~4 s. Logs pointed to a
-  MySQL query doing a full table scan. I added a composite index and a Redis cache for the hot
+==> Sample answer: "Yes. One example:"
+- **Slow APIs at peak traffic:** monitoring showed p95 latency jumping to ~4 s. Logs pointed to a
+  database query doing a full table scan. I added a composite index and a cache for the hot
   endpoint, and latency dropped to ~300 ms.
-- **Bad deployment:** a release broke login because of a missing environment variable. I rolled
-  back to the previous version in minutes, fixed the config, added an env check at startup and
-  redeployed.
 
 My steps for any incident:
 1. Check impact and alerts – who is affected, since when.
@@ -371,8 +364,6 @@ My steps for any incident:
 3. Restore service fast – rollback, restart, feature flag off.
 4. Permanent fix with a test.
 5. Write a short **post-mortem** and add monitoring/alerts so it doesn't happen again.
-
-Interview tip: answer in **STAR** format (Situation, Task, Action, Result) and give numbers.
 
 In short: detect → find root cause → restore fast → fix properly → prevent repeat.
 
@@ -389,10 +380,10 @@ Ordered by topic priority: questions from the most-asked topics come first.
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> Neither one makes you manage physical servers, but they run your code differently:
-- **Serverless** (AWS Lambda, Azure Functions): you upload **functions**; the cloud runs them per
-  event, scales automatically (even to zero), and bills per request + execution time.
-- **Containers** (Docker on ECS, EKS/Kubernetes): you package the **whole app** with its runtime;
-  it runs as a **long-lived process** that you size and scale.
+- **Serverless**: you upload **functions**; the cloud runs them per event, scales automatically
+  (even to zero), and bills per request + execution time.
+- **Containers**: you package the **whole app** with its runtime; it runs as a **long-lived
+  process** that you size and scale.
 
 ```text
 +------------+-----------------------------------+------------------------------------------+
@@ -407,11 +398,8 @@ Ordered by topic priority: questions from the most-asked topics come first.
 +------------+-----------------------------------+------------------------------------------+
 | Cold start | Yes, first call can be slow       | No, process is already running           |
 +------------+-----------------------------------+------------------------------------------+
-| Limits     | Lambda: 15 min max, 10 GB memory, | Few limits, full control                 |
+| Limits     | Max run time and memory per call, | Few limits, full control                 |
 |            | stateless                         |                                          |
-+------------+-----------------------------------+------------------------------------------+
-| Good for   | Webhooks, cron jobs, S3/SQS event | Long-running APIs, WebSockets, heavy or  |
-|            | processing, small APIs            | steady workloads                         |
 +------------+-----------------------------------+------------------------------------------+
 ```
 
@@ -425,28 +413,26 @@ for steady and long-running work.
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> A common setup:
-1. Client (web/mobile) → **CDN** (CloudFront) for static files.
-2. **Load balancer / reverse proxy** (Nginx, AWS ALB) with HTTPS.
-3. Several **stateless Node.js instances** (PM2 cluster, Docker containers on ECS, Kubernetes
-   pods).
-4. **Database** (PostgreSQL / MySQL / MongoDB) with replicas and backups.
-5. **Redis** for cache, sessions and rate limiting.
-6. **Queue + workers** (BullMQ, RabbitMQ, SQS) for background jobs: emails, reports.
-7. **Object storage** (S3) for files.
-8. **Observability + CI/CD**: logs (Pino/Winston → ELK/CloudWatch), metrics (Prometheus/Grafana),
-   alerts, and a GitHub Actions pipeline.
+1. Client (web/mobile) → **CDN** for static files.
+2. **Load balancer / reverse proxy** with HTTPS.
+3. Several **stateless Node.js instances** (one process per CPU core, on several machines).
+4. **Database** with replicas and backups.
+5. **Cache** for hot data and sessions.
+6. **Queue + workers** for background jobs: emails, reports.
+7. **Object storage** for files.
+8. **Monitoring + CI/CD**: central logs, metrics, alerts, and an automated deploy pipeline.
 
 ```text
-Client -> CDN -> ALB / Nginx -> Node instances (x N) -> DB (primary + replicas)
-                                        |-> Redis (cache, sessions)
-                                        |-> Queue -> Workers
-                                        |-> S3
+Client -> CDN -> Load balancer -> Node instances (x N) -> DB (primary + replicas)
+                                          |-> Cache (hot data, sessions)
+                                          |-> Queue -> Workers
+                                          |-> Object storage
 ```
 
-Inside the app: **layers** – routes → controllers → services → repositories/models, plus
-middleware for auth, validation and error handling; config from environment variables.
+Inside the app: **layers** – routes → controllers → services → models, plus middleware for auth,
+validation and error handling; config from environment variables.
 
-In short: CDN + load balancer + many stateless Node instances + DB + Redis + queue/workers +
+In short: CDN + load balancer + many stateless Node instances + DB + cache + queue/workers +
 monitoring.
 
 ---
@@ -462,13 +448,13 @@ is a single point of failure.
 fault tolerant, but the app must be **stateless**.
 
 How to scale a Node.js app:
-- **Use all CPU cores** – Node runs your JS on one thread, so use the `cluster` module or PM2
-  cluster mode (one process per core).
+- **Use all CPU cores** – Node runs your JS on one thread, so use the `cluster` module (one
+  process per core).
 - **Stateless servers** – no sessions or uploads in local memory/disk: sessions in Redis, files
-  in S3, or JWT.
-- **Load balancer** in front of many instances (Nginx, ALB, Kubernetes Service).
+  in shared storage.
+- **Load balancer** in front of many instances.
 - **Cache** hot data in Redis to cut DB load.
-- **Queues** – move slow work (emails, PDFs) to BullMQ / RabbitMQ / SQS workers.
+- **Queues** – move slow work (emails, PDFs) to queue workers.
 - **Scale the DB** – indexes, read replicas, connection pooling, sharding if needed.
 - **worker_threads** for CPU-heavy tasks so the event loop isn't blocked.
 
@@ -496,38 +482,24 @@ stateless servers, Redis, queues and a load balancer.
 ==> A **load balancer** sits in front of many servers and spreads incoming requests across them.
 - Benefits: more capacity, no single point of failure, **health checks** (stops sending traffic
   to dead servers), **SSL termination**.
-- Examples: Nginx, HAProxy, AWS **ALB** (HTTP, L7) / **NLB** (TCP, L4).
 
 ```text
-+----------------------+-------------------------------------+-------------------------------+
-| Strategy             | How it works                        | Good for                      |
-+======================+=====================================+===============================+
-| Round robin          | Servers take turns: 1, 2, 3, 1 ...  | Equal servers, similar        |
-|                      |                                     | requests                      |
-+----------------------+-------------------------------------+-------------------------------+
-| Weighted round robin | Bigger servers get more requests    | Mixed server sizes            |
-+----------------------+-------------------------------------+-------------------------------+
-| Least connections    | Goes to the server with the fewest  | Long or uneven requests       |
-|                      | active connections                  | (WebSockets, uploads)         |
-+----------------------+-------------------------------------+-------------------------------+
-| IP hash              | Hash of client IP picks the server, | Sticky sessions               |
-|                      | so a client keeps the same server   |                               |
-+----------------------+-------------------------------------+-------------------------------+
++----------------------+---------------------------------------------------------+
+| Strategy             | How it works                                            |
++======================+=========================================================+
+| Round robin          | Servers take turns: 1, 2, 3, 1 ...                      |
++----------------------+---------------------------------------------------------+
+| Weighted round robin | Bigger servers get more requests                        |
++----------------------+---------------------------------------------------------+
+| Least connections    | Goes to the server with the fewest active connections   |
++----------------------+---------------------------------------------------------+
+| IP hash              | Hash of client IP picks the server, so a client keeps   |
+|                      | the same server                                         |
++----------------------+---------------------------------------------------------+
 ```
 
-```nginx
-upstream api {
-  least_conn;                 # strategy (default is round robin)
-  server 10.0.0.1:3000;
-  server 10.0.0.2:3000;
-}
-server { listen 80; location / { proxy_pass http://api; } }
-```
-
-Interview tip: sticky sessions are a workaround; better to keep servers stateless and store
-sessions in Redis.
-
-In short: a load balancer spreads traffic; pick the strategy by server sizes and request length.
+In short: a load balancer spreads traffic across servers; the strategy decides which server gets
+the next request.
 
 ---
 
@@ -542,8 +514,6 @@ It routes each request to the right service and handles shared concerns in one p
 - **Routing by path**: `/users` → user service, `/orders` → order service
 - Request/response transformation, combining several services into one response
 - Logging, monitoring, caching
-
-Examples: **AWS API Gateway**, Kong, Nginx, Apigee.
 
 ```text
 +----------------+--------------------------------------+---------------------------------------+
@@ -574,7 +544,7 @@ that routes and secures APIs.
 - **REST**: many endpoints, one per resource (`GET /users/1`, `GET /users/1/posts`); uses
   HTTP methods and status codes.
 - **GraphQL**: one endpoint (`POST /graphql`); the client sends a **query** naming exactly the
-  fields it needs. In Node: Apollo Server.
+  fields it needs.
 
 ```text
 +--------------------+------------------------------------+-------------------------------------+
@@ -591,10 +561,9 @@ that routes and secures APIs.
 +--------------------+------------------------------------+-------------------------------------+
 | Versioning         | /v1, /v2                           | Evolve schema, deprecate fields     |
 +--------------------+------------------------------------+-------------------------------------+
-| Typing             | Optional (OpenAPI)                 | Strongly typed schema built in      |
+| Typing             | Optional                           | Strongly typed schema built in      |
 +--------------------+------------------------------------+-------------------------------------+
-| Watch out          | Over-fetching, many round trips    | N+1 queries (use DataLoader), deep  |
-|                    |                                    | query limits                        |
+| Watch out          | Over-fetching, many round trips    | N+1 queries, very deep queries      |
 +--------------------+------------------------------------+-------------------------------------+
 ```
 
@@ -620,8 +589,7 @@ In short: REST is simple and cache-friendly; GraphQL gets exactly the needed dat
 
 ==> A **webhook** is an HTTP callback: when an event happens in another system, **that system
 sends an HTTP POST to a URL you registered**. Push instead of you polling again and again.
-- Example: Stripe / Razorpay calls `POST /webhooks/payment` when a payment succeeds; GitHub calls
-  your URL on every push.
+- Example: a payment provider calls your `POST /webhooks/payment` when a payment succeeds.
 
 Best practices:
 - **Verify the signature** (HMAC header) so you know the request is genuine.
@@ -630,13 +598,13 @@ Best practices:
   the event ID and skip duplicates.
 
 ```js
-app.post('/webhooks/payment', express.raw({ type: 'application/json' }), async (req, res) => {
-  const event = stripe.webhooks.constructEvent(       // throws if the signature is wrong
-    req.body, req.headers['stripe-signature'], process.env.WEBHOOK_SECRET);
+app.post('/webhooks/payment', async (req, res) => {
+  if (!isValidSignature(req)) return res.sendStatus(401);              // check HMAC header
+  const event = req.body;
 
-  if (await Event.exists({ id: event.id })) return res.sendStatus(200); // duplicate
-  await queue.add('payment', event);                  // process later
-  res.sendStatus(200);
+  if (await alreadyProcessed(event.id)) return res.sendStatus(200);    // duplicate
+  await queue.add('payment', event);                                   // process later
+  res.sendStatus(200);                                                 // reply fast
 });
 ```
 

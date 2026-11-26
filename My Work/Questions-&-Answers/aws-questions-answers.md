@@ -25,7 +25,7 @@ needs more instances.
 How to reduce it:
 - **Provisioned Concurrency** – keeps N instances already initialized (no cold start for them).
 - **SnapStart** (Java, Python, .NET) – Lambda restores a snapshot of an initialized instance.
-- **Small package** – bundle with esbuild, use only the AWS SDK v3 clients you need.
+- **Small package** – bundle and minify the code, use only the AWS SDK v3 clients you need.
 - **Create clients outside the handler** (DB, SDK) so warm calls reuse them.
 - **More memory** – Lambda gives CPU in proportion to memory, so init runs faster.
 
@@ -96,24 +96,17 @@ Calling `GET /hello?name=Saurabh` returns:
 *(Asked 1×: Algoworks)*
 
 ==> Sample answer: "We deploy with **Infrastructure as Code** through a **CI/CD pipeline**."
-- Push to Git → **GitHub Actions** (or **CodePipeline**) runs tests → deploys to the stage.
-- IaC tool: **AWS SAM**, **Serverless Framework**, **AWS CDK** or **Terraform**.
+- Push to Git → **CodePipeline** runs tests → deploys to the stage.
+- IaC tool: **AWS SAM** (a template describes the functions, triggers and permissions).
 - Separate **stages** (dev, staging, prod), and Lambda **versions + aliases** so we can roll
   back by pointing the alias at the previous version.
-- For a quick manual code update, the **AWS CLI** works.
 
 ```bash
 # AWS SAM
 sam build && sam deploy --stack-name my-api --guided
-
-# Serverless Framework
-serverless deploy --stage prod
-
-# AWS CLI (update only the code)
-aws lambda update-function-code --function-name myFunction --zip-file fileb://function.zip
 ```
 
-In short: Git → CI/CD → SAM/Serverless/CDK deploy, with stages and aliases for safe rollback.
+In short: Git → CI/CD → SAM deploy, with stages and aliases for safe rollback.
 
 ---
 
@@ -127,7 +120,6 @@ In short: Git → CI/CD → SAM/Serverless/CDK deploy, with stages and aliases f
   `getRemainingTimeInMillis()`.
 - **`callback`** – the old way to return a result. With `async` handlers you just `return`
   (newer Node.js runtimes support only async handlers).
-- Python handlers take only `event` and `context`.
 
 ```js
 export const handler = async (event, context) => {
@@ -165,9 +157,6 @@ export const handler = async () => {
 };
 ```
 
-Interview tip: direct Lambda-to-Lambda calls make you pay for both while one waits. For chains
-prefer **Step Functions**; for decoupling use **SQS**, **SNS** or **EventBridge**.
-
 In short: SDK `InvokeCommand` + IAM permission; sync or async via `InvocationType`.
 
 ---
@@ -202,9 +191,6 @@ export const handler = async () => {
 // 1st call (cold) → {"count":1}
 // 2nd call (warm, same instance) → {"count":2}
 ```
-
-That's why you reuse DB clients across warm calls, and why you **never keep user state** in
-global variables (another instance won't have it).
 
 In short: cold = new instance + init; warm = reused instance, init skipped.
 
@@ -268,8 +254,7 @@ its `event`.
 - When the first state finishes, the state machine reads its **`"Next"`** field and moves to that
   state.
 - The **output of the first Lambda becomes the input (`event`) of the second**.
-- You can reshape the data with **`InputPath`**, **`ResultPath`** and **`OutputPath`** (or
-  JSONata expressions in newer state machines).
+- You can reshape the data with **`InputPath`**, **`ResultPath`** and **`OutputPath`**.
 - If the first step fails, its **`Retry`** / **`Catch`** rules decide what happens next.
 
 ```text
@@ -289,8 +274,9 @@ events**:
 - **CloudWatch Logs** – every `console.log` from Lambda lands here.
 - **CloudWatch Metrics** – `Invocations`, `Errors`, `Duration`, `Throttles`,
   `ConcurrentExecutions`.
-- **CloudWatch Alarms** – alert through **SNS** (email / Slack) when errors or duration go up.
-- **AWS X-Ray** – trace one request across API Gateway → Lambda → DynamoDB to find the slow part.
+- **CloudWatch Alarms** – alert through **SNS** (e.g. email) when errors or duration go up.
+- **AWS X-Ray** – trace one request across API Gateway → Lambda → DynamoDB to find the slow
+  part.
 - **Dead-letter queue (DLQ)** or **on-failure destination** – failed async events go to SQS so
   nothing is lost.
 - **Structured JSON logs** with the request id, so **CloudWatch Logs Insights** can search them.
@@ -312,8 +298,8 @@ In short: CloudWatch (logs, metrics, alarms) + X-Ray (tracing) + DLQ (failed eve
 - Example: API Gateway → Lambda → DynamoDB → S3; X-Ray shows how many ms each hop took.
 - Helps find **slow calls, errors and bottlenecks** in microservice / serverless apps.
 - Each request gets a **trace ID**; each hop is a **segment** (sub-calls are **subsegments**).
-- In Lambda you just turn on **Active tracing**; wrap SDK clients with the X-Ray SDK (or use
-  OpenTelemetry / ADOT) to trace your own calls.
+- In Lambda you just turn on **Active tracing**; wrap SDK clients with the X-Ray SDK to trace
+  your own calls.
 
 In short: X-Ray = end-to-end request tracing across AWS services, to find where time is spent.
 
@@ -328,8 +314,7 @@ In short: X-Ray = end-to-end request tracing across AWS services, to find where 
 - **X-Ray** – request tracing across services.
 - **CloudTrail** – audit log of **who did what** in the AWS account (every API call).
 - **Health checks** – ALB target health checks and **Route 53** health checks.
-- **Alerts** via **SNS** to email, Slack or PagerDuty.
-- Optional third-party tools: Datadog, New Relic, Grafana.
+- **Alerts** via **SNS** (e.g. email).
 
 In short: CloudWatch for "how is it running", X-Ray for "where is it slow", CloudTrail for "who
 changed what".
@@ -372,8 +357,6 @@ not in your code or `.env` file.
 - Secrets are **encrypted with KMS**.
 - Who can read them is controlled with **IAM**.
 - It can **rotate** secrets automatically (e.g. RDS passwords) using a rotation Lambda.
-- Cheaper option for plain config: **SSM Parameter Store** (SecureString), but it has no built-in
-  rotation.
 
 ```js
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
@@ -384,9 +367,6 @@ const { username, password } = JSON.parse(res.SecretString);
 // username → "admin"
 ```
 
-Tip: in Lambda, fetch it **outside the handler** (or cache it) so you don't call the API on every
-request.
-
 In short: encrypted, IAM-controlled, auto-rotated secrets instead of hard-coded passwords.
 
 ---
@@ -395,7 +375,7 @@ In short: encrypted, IAM-controlled, auto-rotated secrets instead of hard-coded 
 
 *(Asked 1×: Wipro)*
 
-==> Both run **Docker containers** on AWS.
+==> Both run **containers** on AWS.
 
 ```text
 +-------------+-----------------------------+-----------------------------------------+
@@ -411,12 +391,10 @@ In short: encrypted, IAM-controlled, auto-rotated secrets instead of hard-coded 
 +-------------+-----------------------------+-----------------------------------------+
 | Config      | Task definitions, services  | Pods, deployments, YAML manifests       |
 +-------------+-----------------------------+-----------------------------------------+
-| Best for    | Simple AWS-only apps        | Teams already using Kubernetes          |
-+-------------+-----------------------------+-----------------------------------------+
 ```
 
 Both can run on **EC2** (you manage the instances) or **Fargate** (serverless containers, no
-servers to manage). Images usually come from **ECR**.
+servers to manage).
 
 In short: ECS = simple and AWS-native; EKS = Kubernetes on AWS, more power and more work.
 
@@ -462,8 +440,6 @@ and ready to answer.
 - Traffic above 5 still scales normally with on-demand instances (those can get cold starts).
 - It **costs extra**, because the instances are kept ready all the time.
 - It is set on a **version or alias**, not on `$LATEST`.
-- Use it for latency-sensitive APIs; schedule it with **Application Auto Scaling** (e.g. more
-  during office hours).
 
 ```bash
 aws lambda put-provisioned-concurrency-config --function-name myFn \
@@ -484,8 +460,6 @@ reads and processes them later.
 - **Standard queue** – nearly unlimited throughput, **at-least-once** delivery, order not
   guaranteed.
 - **FIFO queue** – strict order, **exactly-once processing** (deduplication), lower throughput.
-- **Visibility timeout** – a received message is hidden while it's processed; if it isn't deleted
-  in time, it shows up again. After too many failures it goes to a **DLQ**.
 
 ```text
 +-----------------+--------------------------------+--------------------------------+
@@ -509,7 +483,7 @@ const res = await sqs.send(new ReceiveMessageCommand({
 }));
 ```
 
-Interview tip: **long polling** is usually preferred — fewer empty calls, lower cost.
+**Long polling** is usually preferred — fewer empty calls, lower cost.
 
 In short: SQS = managed queue; long polling waits for messages instead of asking again and again.
 
@@ -522,7 +496,7 @@ In short: SQS = managed queue; long polling waits for messages instead of asking
 ==> **Amazon SNS** is a **publish/subscribe (pub/sub)** service: you publish one message to a
 **topic**, and every subscriber gets a copy.
 - Subscribers: **Lambda, SQS**, email, SMS, HTTP endpoints, mobile push.
-- **Push based** (SNS sends to subscribers), while **SQS is pull based** (the consumer polls).
+- **Push based**: SNS sends the message to subscribers right away; they don't poll.
 - **Fan-out** pattern: SNS topic → several SQS queues, so each service processes the same event
   on its own.
 - **Message filtering** lets a subscriber get only the events it cares about.
@@ -580,12 +554,12 @@ add other query patterns.
    5 GB, recommended above ~100 MB).
 3. Client uploads **directly to S3**, so the file never passes through our server.
 4. On completion, S3 sends an **`ObjectCreated` event**.
-5. The event goes to **SQS** (buffer + retries) → **Lambda** processes it (or **ECS/Fargate** /
-   **Step Functions** if it takes over 15 minutes).
+5. The event goes to **SQS** (buffer + retries) → **Lambda** processes it (or an **ECS Fargate**
+   task if it takes over 15 minutes).
 6. Save the result/status in the DB and notify the user (SNS / WebSocket).
 
 ```text
-Client ──(1) get pre-signed URL──> API (Node.js)
+Client ──(1) get pre-signed URL──> API
 Client ──(2) multipart upload────> S3 bucket
 S3 ──(3) ObjectCreated event──> SQS ──> Lambda / Fargate ──> DB + notify
 ```

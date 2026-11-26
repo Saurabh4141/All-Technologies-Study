@@ -128,14 +128,13 @@ In short: middleware = a chain of `(req, res, next)` functions that every reques
 *(Asked 2×: EarlyCoder 5-yr Node (YT), Senior Node Ep.32 (YT))*
 
 ==> "Yes. I used **Socket.io** for notifications, chat and live status updates. I
-attached Socket.io to the same HTTP server as Express, checked the JWT once in the
-**handshake** with `io.use()`, and used **rooms** so events go only to the right users."
+attached Socket.io to the same HTTP server as Express and used **rooms** so events go only to
+the right users."
 
 How it is integrated:
 1. Create the HTTP server from the Express app and attach Socket.io to it.
-2. Add `io.use()` middleware to verify the JWT on connect.
-3. Listen with `socket.on`, send with `socket.emit` / `io.to(room).emit`.
-4. Client connects with `io(url, { auth: { token } })`.
+2. Listen with `socket.on`, send with `socket.emit` / `io.to(room).emit`.
+3. Client connects with `io(url, { auth: { userId } })`.
 
 ```js
 const http = require('http');
@@ -157,8 +156,7 @@ io.on('connection', (socket) => {
 server.listen(3000);
 ```
 
-In short: Socket.io on the same server as Express, JWT check in the handshake, rooms to target
-users.
+In short: Socket.io on the same server as Express, rooms to target users.
 
 ---
 
@@ -299,9 +297,6 @@ app.get('/user', async (req, res) => {
 // 1000 requests → 1000 DB queries in flight at once, one JS thread
 ```
 
-Exception: **CPU-heavy** work (big loops, image processing) blocks the thread. Use
-**worker threads** or move it to another service.
-
 In short: Node doesn't wait for I/O, so one thread can juggle thousands of requests.
 
 ---
@@ -347,7 +342,6 @@ In short: Node doesn't wait for I/O, so one thread can juggle thousands of reque
 
 Why **nodemon**: without it you stop and restart `node app.js` after every change. nodemon
 watches your files and restarts the server for you. It's a dev-only tool, so it goes in
-
 **`devDependencies`**:
 
 ```
@@ -371,9 +365,6 @@ servers.
 - Built on Chrome's **V8** engine (compiles JS to machine code).
 - Uses **libuv** for **non-blocking, event-driven I/O**, so one thread handles many requests.
 - Gives server-side APIs the browser doesn't have: `fs`, `http`, `path`, `process`, `crypto`.
-- Comes with **npm**, the largest package registry.
-- Great for REST APIs, real-time apps (chat), microservices, streaming. Not ideal for heavy CPU
-  work.
 
 ```js
 // app.js
@@ -411,11 +402,6 @@ In short: Node.js = V8 + libuv + built-in modules like `fs` and `http`.
 | 6   | Close callbacks   | `close` events, e.g. `socket.on('close')`  |
 +-----+-------------------+--------------------------------------------+
 ```
-
-- After **every callback**, Node empties the **`process.nextTick` queue** first, then the
-  **Promise microtask queue**.
-- Because **check** comes right after **poll**, `setImmediate` inside an I/O callback always
-  runs before `setTimeout(..., 0)`.
 
 Memory trick: **T-P-I-P-C-C** → Timers, Pending, Idle, Poll, Check, Close.
 
@@ -581,9 +567,6 @@ In short: `setTimeout 0` means "as soon as the stack is empty", not "now".
 |                                            | client)                                    |
 +--------------------------------------------+--------------------------------------------+
 | Node: `http` module / Express routes       | Node: `socket.io` or `ws` package          |
-+--------------------------------------------+--------------------------------------------+
-| Good for normal REST APIs                  | Good for chat, notifications, live updates |
-+--------------------------------------------+--------------------------------------------+
 ```
 
 ```js
@@ -604,11 +587,12 @@ In short: HTTP = ask and get one answer; socket = an open two-way phone line.
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
-==> Check the JWT **once, during the handshake**, before the connection is accepted.
-1. Client sends the token in the **`auth`** object when connecting.
-2. Server uses **`io.use()`** middleware to `jwt.verify` it.
-3. Valid → save the user on `socket` and call `next()`. Invalid →
-   `next(new Error('Unauthorized'))` and the connection is refused.
+==> 
+  I authenticate the Socket.IO connection using JWT during the handshake, before accepting the connection.
+    1. The client sends the JWT in the auth object while connecting.
+    2. The server uses io.use() middleware to extract and verify the token using jwt.verify().
+    3. If the token is valid, I attach the user information to socket.data and call next().
+    4. If the token is invalid or missing, I call next(new Error('Unauthorized')), and the connection is rejected.
 
 ```js
 // client
@@ -655,25 +639,10 @@ In short: the client always knocks first; the server opens the door.
 
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
-==> Validation is never done on the front end. The front end only **sends** the token; the
-**Node server** validates it.
-- Socket.io has its own server-side middleware: **`io.use((socket, next) => ...)`**.
-- It runs during the handshake, reads `socket.handshake.auth.token` and calls `jwt.verify`.
-- Bad token → `next(new Error(...))` → connection rejected.
-- For per-event checks (e.g. token expired mid-session), use **`socket.use()`**, which runs
-  for every incoming event.
-
-```js
-io.on('connection', (socket) => {
-  socket.use((packet, next) => {
-    if (socket.user.exp * 1000 < Date.now()) return next(new Error('Token expired'));
-    next();
-  });
-});
-```
-
-In short: the client sends, the server verifies – with `io.use()` on connect and `socket.use()`
-per event.
+==> Token validation does not depend on frontend middleware. The client sends the token to the
+backend with the request. The backend extracts the token and validates it using the
+authentication mechanism configured by the application. If the token is valid, the request is
+allowed; otherwise, it is rejected.
 
 ---
 
@@ -757,9 +726,6 @@ Run `node server.js`:
 - `GET /api/user` → `{"id":1,"name":"Amit"}`
 - anything else   → `404 Not Found`
 
-Note: with raw `http` you do routing, JSON conversion and body parsing yourself – that's why
-people use Express.
-
 In short: `http.createServer((req, res) => ...)` + `res.writeHead()` + `res.end()` +
 `server.listen()`.
 
@@ -820,25 +786,9 @@ In short: `express.json()` + one route per HTTP method + proper status codes.
 
 *(Asked 1×: Tech Mahindra (YT))*
 
-==> Sample answer: "Mainly **Express.js**. It's lightweight, has a huge middleware ecosystem, and I
-structure it as **routes → middleware → controllers → services → models**. I also know
-**NestJS**, which adds TypeScript, modules and dependency injection for bigger projects."
-
-```text
-+-----------+--------------------------------------------+
-| Framework | One line                                   |
-+===========+============================================+
-| Express   | Minimal, flexible, most popular            |
-+-----------+--------------------------------------------+
-| NestJS    | Structured, TypeScript, Angular-like, good |
-|           | for large apps                             |
-+-----------+--------------------------------------------+
-| Fastify   | Very fast, built-in JSON schema validation |
-+-----------+--------------------------------------------+
-| Koa       | From the Express team, modern async        |
-|           | middleware                                 |
-+-----------+--------------------------------------------+
-```
+==> Sample answer: "Mainly **Express.js**, because it's lightweight and has a huge middleware
+ecosystem. I also know **NestJS**, which adds TypeScript, modules and dependency injection for
+bigger projects."
 
 In short: Express for most services, NestJS when the project needs strong structure.
 
@@ -857,20 +807,7 @@ light**.
 - **Most server work is waiting** (DB, files, network). Waiting doesn't need a thread; the
   **event loop** just runs the callback when the result is ready.
 
-Important: only **JS execution** is single-threaded, not the whole of Node.
-- **libuv thread pool** (default **4** threads, `UV_THREADPOOL_SIZE`) runs `fs`, `crypto`,
-  `zlib`, `dns.lookup`.
-- **worker_threads** let you run CPU-heavy JS on other threads.
-
-```js
-const crypto = require('crypto');
-console.log('start');
-crypto.pbkdf2('pwd', 'salt', 100000, 64, 'sha512', () => console.log('hash done')); // thread pool
-console.log('end');
-// Output: start, end, hash done
-```
-
-In short: one JS thread = simple and memory-cheap; the heavy waiting is done by libuv and the OS.
+In short: one JS thread = no locks, low memory, and enough for work that is mostly waiting.
 
 ---
 
@@ -878,15 +815,11 @@ In short: one JS thread = simple and memory-cheap; the heavy waiting is done by 
 
 *(Asked 1×: Wipro)*
 
-==> Main rule: **never block the event loop**. Then spread the load.
+==> Main rule: **never block the event loop**.
 1. Use async APIs only (`fs.promises`, async DB drivers). No `readFileSync`, `crypto.pbkdf2Sync`
    or long loops inside request handlers.
 2. Run independent calls together with `Promise.all` instead of one after another.
-3. Move CPU-heavy work to **worker_threads** or a job queue (e.g. BullMQ).
-4. Use all CPU cores with the **cluster** module or **PM2** cluster mode.
-5. Run several instances behind a **load balancer** (Nginx).
-6. **Cache** hot data in Redis; use a DB **connection pool**.
-7. Use **streams** for big files; add **rate limiting**.
+3. Move CPU-heavy work off the main thread with **worker_threads**.
 
 ```js
 // slow: one after another (~300 ms)
@@ -897,8 +830,7 @@ const orders = await getOrders(id);  // 200 ms
 const [user2, orders2] = await Promise.all([getUser(id), getOrders(id)]);
 ```
 
-In short: keep the one JS thread free, and scale out with cluster/PM2 when one process isn't
-enough.
+In short: keep the one JS thread free, so it can keep accepting new requests.
 
 ---
 
@@ -926,20 +858,11 @@ In short: "single-threaded for running JS, multi-threaded under the hood."
 *(Asked 1×: Bajaj Finserv)*
 
 ==> **I/O = Input/Output**: any time Node talks to something outside the process.
-- Examples in Node: `fs.readFile`, a DB query, an `http`/`fetch` call, a socket, `console.log`.
-- I/O is slow compared to CPU work, so Node does it **asynchronously**: it starts the I/O,
-  serves other requests, and runs your callback when the result is ready.
+- **Input** = data coming in (reading a file, a DB result, an HTTP request).
+- **Output** = data going out (writing a file, sending a response, `console.log`).
+- Examples in Node: `fs.readFile`, a DB query, an `http`/`fetch` call, a socket.
 
-```js
-const fs = require('fs');
-fs.readFile('a.txt', 'utf8', () => console.log('file read'));  // I/O – runs later
-console.log('next line');
-// Output:
-// next line
-// file read
-```
-
-In short: I/O is waiting on the outside world – Node never sits and waits for it.
+In short: I/O = the process reading from or writing to the outside world.
 
 ---
 
@@ -1044,14 +967,13 @@ are per-module.
 *(Asked 1×: Bajaj Finserv)*
 
 ==>
-- **Bad for CPU-heavy work** (image/video processing, big calculations): it blocks the single JS
-  thread, so every other request waits. Needs `worker_threads` or a separate service.
-- **Callback hell** in old callback-style code (fixed with Promises / async-await).
-- One unhandled error can **crash the whole process** (all users affected) – needs PM2 /
-  Docker restarts.
+- **Bad for CPU-heavy work** (big calculations): it blocks the single JS thread, so every
+  other request waits.
+- **Callback hell** in old callback-style code.
+- One unhandled error can **crash the whole process** (all users affected).
 - **npm ecosystem risk**: many small packages, mixed quality, supply-chain security issues.
-- Plain JS has **no types** → runtime bugs (use TypeScript).
-- One process uses **one CPU core** by default – need cluster/PM2 to use all cores.
+- Plain JS has **no types**, so type mistakes show up only at runtime.
+- One process uses **one CPU core** by default.
 
 In short: great for I/O-heavy apps, weak for CPU-heavy ones.
 
@@ -1061,22 +983,14 @@ In short: great for I/O-heavy apps, weak for CPU-heavy ones.
 
 *(Asked 1×: TCS (online))*
 
-==> REST (**Representational State Transfer**) is a style for building APIs over HTTP. In Node
-we usually build them with Express.
+==> REST (**Representational State Transfer**) is a style for building APIs over HTTP.
 - Everything is a **resource** with a URL: `/users`, `/users/5`.
 - **HTTP methods** say the action: GET (read), POST (create), PUT/PATCH (update), DELETE.
-- **Stateless**: each request carries everything it needs (e.g. JWT in the `Authorization`
+- **Stateless**: each request carries everything it needs (e.g. a token in the `Authorization`
   header); the server keeps no session.
-- Responses use **status codes** (200, 201, 400, 401, 404, 500) and **JSON**.
+- Responses use **status codes** (200, 201, 400, 401, 404, 500) and usually **JSON**.
 
-```js
-app.get('/api/users/:id', async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (!user) return res.status(404).json({ message: 'Not found' });
-  res.status(200).json(user);
-});
-// GET /api/users/5  →  200 { "id": 5, "name": "Amit" }
-```
+Example: `GET /users/5` → `200 { "id": 5, "name": "Amit" }`
 
 In short: resources as URLs + HTTP methods as verbs + JSON + status codes, stateless.
 
@@ -1125,9 +1039,6 @@ In short: request in → middleware → logic → response out.
 | DELETE | Remove                     | `app.delete('/users/:id')`    | 200 / 204    |
 +--------+----------------------------+-------------------------------+--------------+
 ```
-
-Interview tip: GET, PUT, DELETE are **idempotent** (calling twice leaves the same result); POST
-is not (it creates a new record each time). PATCH is not guaranteed to be idempotent.
 
 ---
 
@@ -1277,9 +1188,6 @@ app.use((err, req, res, next) => {
 // GET /users/999  →  404 { "message": "User not found" }
 ```
 
-Interview tip: Express 5 forwards rejected promises from async handlers automatically; in
-Express 4 you need try/catch or an `asyncHandler` wrapper.
-
 In short: throw / `next(err)` everywhere, handle in one 4-argument middleware at the end.
 
 ---
@@ -1289,11 +1197,10 @@ In short: throw / `next(err)` everywhere, handle in one 4-argument middleware at
 *(Asked 1×: Tech Mahindra (YT))*
 
 ==>
-- First, catch errors normally: try/catch with async/await, `.catch()` on Promises, and the
-  central Express error handler.
-- As a **last safety net**, listen to `process` events: log the error, then **exit and let
-  PM2 / Docker / Kubernetes restart** the app (after an uncaught error the app may be in a bad
-  state).
+- Listen to the **`process` events**: `uncaughtException` (a thrown error nobody caught) and
+  `unhandledRejection` (a rejected Promise with no `.catch`).
+- In the handler, **log the error, then exit** and let PM2 / Docker / Kubernetes restart the
+  app (after an uncaught error the app may be in a bad state).
 - Since **Node 15**, an unhandled rejection crashes the process by default.
 
 ```js
@@ -1308,7 +1215,7 @@ process.on('unhandledRejection', (reason) => {
 });
 ```
 
-In short: handle errors where they happen; use these events only to log and restart cleanly.
+In short: `process.on('uncaughtException' | 'unhandledRejection')` → log → exit → restart.
 
 ---
 
@@ -1342,13 +1249,13 @@ In short: `(err, result) => { if (err) return ...; }` – error always comes fir
 
 ==>
 1. **Don't block the event loop** – async APIs only; move CPU work to `worker_threads`.
-2. **Cache** frequent data (Redis or in-memory).
+2. **Cache** frequently read data.
 3. **Optimize the DB**: indexes, select only needed fields, pagination, connection pooling,
    avoid N+1 queries.
 4. Run independent tasks in parallel with `Promise.all`.
-5. Use all cores with **cluster / PM2**; scale horizontally behind a load balancer.
+5. Use all CPU cores with the **cluster** module.
 6. Use **compression** (gzip) and **streams** for large data.
-7. **Profile** before fixing: `node --inspect`, `node --prof`, clinic.js, APM tools.
+7. **Profile** before fixing: `node --inspect`, `node --prof`.
 
 In short: free event loop + cache + fast DB + all CPU cores + measure first.
 
@@ -1361,12 +1268,12 @@ In short: free event loop + cache + fast DB + all CPU cores + measure first.
 ==>
 1. Keep handlers **non-blocking** (async I/O only), so one process can juggle thousands of
    requests.
-2. **Cache** repeated reads in Redis so most requests skip the DB.
+2. **Cache** repeated reads so most requests skip the DB.
 3. Use a DB **connection pool** and indexed queries.
-4. Run **multiple Node processes** (cluster / PM2 / containers) behind a **load balancer**.
-5. Push slow work (emails, reports) to a **queue** (BullMQ, RabbitMQ, Kafka) and reply fast.
-6. Add **rate limiting** (`express-rate-limit`) to protect the system.
-7. **Auto-scale** and monitor to add instances under load.
+4. Run **multiple Node processes** behind a **load balancer**.
+5. Push slow work to a **job queue** and reply fast.
+6. Add **rate limiting** to protect the system.
+7. **Auto-scale** to add instances under load.
 
 In short: non-blocking code + cache + pool + more processes + queues.
 
@@ -1383,7 +1290,7 @@ In short: non-blocking code + cache + pool + more processes + queues.
    doesn't help a search on `name` or `age`).
 4. Fetch only needed columns; add pagination; remove N+1 queries.
 5. Run independent calls in **parallel** (`Promise.all`) instead of one by one.
-6. **Cache** results that rarely change (Redis).
+6. **Cache** results that rarely change.
 7. Move heavy work to a **background job** and return early (e.g. 202 Accepted).
 8. Check for **event-loop blocking** (sync code, big `JSON.parse`) and re-test.
 
@@ -1420,27 +1327,7 @@ connectDB();
 // Output: MongoDB connected
 ```
 
-MySQL with a **connection pool** (`mysql2`):
-
-```js
-const mysql = require('mysql2/promise');
-
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: process.env.DB_PASSWORD,
-  database: 'mydb',
-  connectionLimit: 10,
-});
-
-async function getUsers() {
-  const [rows] = await pool.query('SELECT * FROM users');
-  return rows;
-}
-```
-
-Interview tip: keep credentials in `.env` (`process.env`), never in code; connect once at
-startup and reuse the connection / pool.
+Connect once at startup and reuse the same connection everywhere.
 
 ---
 
@@ -1548,9 +1435,7 @@ async function read() {
 }
 ```
 
-While Node waits for the file / DB / API, the **event loop** keeps serving other requests.
-
-In short: callbacks → Promises → async/await; the main thread never sits waiting.
+In short: callbacks → Promises → async/await.
 
 ---
 
@@ -1558,7 +1443,7 @@ In short: callbacks → Promises → async/await; the main thread never sits wai
 
 *(Asked 1×: Tech Mahindra (YT))*
 
-==> Same base tools as Q50 (callbacks, Promises, async/await), plus these Node tools:
+==> Write async code with **async/await** (on top of Promises), and use these Node tools:
 - **`util.promisify`** – turns an old callback API into a Promise one.
 - **`Promise.all` / `Promise.allSettled`** – run independent tasks in parallel.
 - **EventEmitter** – react to events (`on` / `emit`).
@@ -1639,15 +1524,13 @@ without blocking.
 *(Asked 1×: Wipro)*
 
 ==> Streams let Node **process data in small chunks** instead of loading it all into memory.
-- Great for big files, video, uploads, large DB exports.
 - Four types:
   - **Readable** – `fs.createReadStream`, `req`
   - **Writable** – `fs.createWriteStream`, `res`
   - **Duplex** – both, e.g. a TCP socket
   - **Transform** – changes data on the way, e.g. `zlib.createGzip()`
 - Streams are EventEmitters (`data`, `end`, `error`, `finish`).
-- `pipe()` / `pipeline()` connect them and handle **backpressure** (pause the source when the
-  destination is slow).
+- `pipe()` / `pipeline()` connect one stream to the next.
 
 ```js
 const fs = require('fs');
@@ -1707,7 +1590,6 @@ In short: inside I/O, poll → check (immediate) → next loop's timers (timeout
 ==> **Every other request waits** – even `/health` gets no reply for 5 seconds.
 - Your JavaScript runs on **one main thread**.
 - A sync loop **blocks the event loop**, so no other request, callback or timer can run.
-- Load balancers / Kubernetes may mark the server as dead because health checks time out.
 
 ```js
 app.get('/slow', (req, res) => {
@@ -1717,12 +1599,6 @@ app.get('/slow', (req, res) => {
 });
 app.get('/health', (req, res) => res.send('ok')); // waits until /slow finishes
 ```
-
-Fixes:
-1. Move CPU-heavy work to **worker_threads** or a background job queue (e.g. BullMQ).
-2. Split the work into small chunks and yield with `setImmediate`.
-3. Run more processes (**cluster** / PM2) – other processes still answer, but the blocked one
-   is still stuck.
 
 In short: blocking the event loop blocks the whole process, not just one request.
 
@@ -2132,19 +2008,7 @@ state**.
   "increment by 1").
 - `DELETE /users/5` twice → user 5 is gone either way (second call may return 404, but the
   state is the same).
-- Why it matters: idempotent calls are **safe to retry** on network failure. For POST payments,
-  send an **Idempotency-Key** header and store it.
-
-```js
-// Express: POST made safe to retry with an Idempotency-Key
-app.post('/payments', async (req, res) => {
-  const key = req.get('Idempotency-Key');
-  const saved = await Payment.findOne({ key });
-  if (saved) return res.json(saved);          // retry → same result, no double charge
-  const payment = await Payment.create({ key, ...req.body });
-  res.status(201).json(payment);
-});
-```
+- Why it matters: idempotent calls are **safe to retry** on network failure.
 
 In short: same request repeated = same result on the server.
 
@@ -2190,10 +2054,9 @@ In short: nouns in URLs, verbs as HTTP methods, version in the path, always pagi
 *(Not asked in a real interview yet · From: Ajeet Yadav Node.js revision PDF)*
 
 ==> A simple route (e.g. `GET /health`) that tells whether the Node service is up.
-- Called by load balancers, Kubernetes probes, Docker `HEALTHCHECK` and monitoring tools.
-- If it fails, traffic is stopped or the container is restarted.
-- **Liveness**: is the process alive? **Readiness**: can it serve traffic (DB, Redis
-  connected)?
+- Called regularly by load balancers and monitoring tools.
+- If it fails, traffic is stopped or the app is restarted.
+- **Liveness**: is the process alive? **Readiness**: can it serve traffic (DB connected)?
 - Keep it fast; no heavy logic. If the event loop is blocked, it won't answer – which is
   exactly what you want to detect.
 
@@ -2608,8 +2471,6 @@ console.log('2');
 // 2
 ```
 
-- Want async work in a listener? Use `setImmediate()` / `process.nextTick()` inside it.
-
 Two classic bugs:
 1. **`'error'` with no listener**: `e.emit('error', err)` with no `'error'` handler → Node
    throws it and the **process crashes**. Always add `e.on('error', handler)`.
@@ -2692,7 +2553,6 @@ work inside one process.
 ```
 
 - Careful: `exec` with user input → **command injection** risk (it runs in a shell).
-- Related: `execFile` (no shell, buffered) and `fork` (new Node process with an IPC channel).
 
 ```js
 const { exec, spawn } = require('child_process');
@@ -2791,10 +2651,10 @@ In short: process.env holds config as strings; load .env with dotenv or `node --
 current requests and closes connections cleanly instead of dying mid-request.
 
 Steps:
-1. Listen for **`SIGTERM`** (sent by Docker / Kubernetes / PM2) and **`SIGINT`** (Ctrl+C).
+1. Listen for **`SIGTERM`** (the normal "please stop" signal) and **`SIGINT`** (Ctrl+C).
 2. Stop taking new connections: `server.close()`.
 3. Let in-flight requests finish.
-4. Close resources: DB, Redis, message queues.
+4. Close resources such as DB connections.
 5. `process.exit(0)` — plus a timeout that force-exits if cleanup hangs.
 
 ```js
@@ -2803,7 +2663,7 @@ const server = app.listen(3000);
 function shutdown() {
   console.log('Shutting down...');
   server.close(async () => {          // runs after open requests finish
-    await mongoose.connection.close();
+    await db.close();
     process.exit(0);
   });
   setTimeout(() => process.exit(1), 10000).unref(); // force after 10s
@@ -2821,8 +2681,8 @@ In short: on SIGTERM/SIGINT stop new requests, finish old ones, close DB connect
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
-==> 1. **Sync**: `fs.readFileSync()` — blocks until the file is read.
-
+==> Three ways:
+1. **Sync**: `fs.readFileSync()` — blocks until the file is read.
 2. **Callback**: `fs.readFile(path, cb)` — error-first callback.
 3. **Promises**: `fs.promises.readFile()` / `require('fs/promises')` — use with `async/await`.
 
@@ -2847,8 +2707,6 @@ Why not `readFileSync` in a server:
 - It **blocks the event loop** (the single JS thread). While it reads, no other request is
   handled — every user waits.
 - Fine at startup (load config once) or in CLI scripts.
-- For very large files use **streams** (`fs.createReadStream`) instead of loading it all into
-  memory.
 
 In short: use the promise/callback versions in servers; sync blocks the event loop for every
 user.

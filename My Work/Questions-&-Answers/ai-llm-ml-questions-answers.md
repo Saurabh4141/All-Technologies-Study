@@ -79,7 +79,7 @@ collection.add(
 )
 ```
 
-A vector DB (**Pinecone, Chroma, pgvector, FAISS, Weaviate**) finds the "nearest" vectors fast
+A vector DB finds the "nearest" vectors fast
 using an **ANN index** like **HNSW**, instead of comparing against every row.
 
 In short: a normal DB finds exact matches; a vector DB finds **similar meaning**.
@@ -136,7 +136,7 @@ In short: an LLM is a **next-token predictor** that uses attention to understand
 
 How I do it:
 - Build a **golden test set** (questions + expected answers + expected source chunks).
-- Run it on every change (chunk size, model, prompt) and score with **RAGAS**, **DeepEval** or
+- Run it on every change (chunk size, model, prompt) and score it automatically, e.g. with
   **LLM-as-a-judge**.
 - In production also track **latency, cost per query** and user thumbs-up/down.
 
@@ -198,7 +198,8 @@ Example: next-token probabilities `mat 0.6, floor 0.25, roof 0.1, moon 0.05`.
 - Top-P = 0.9 → {mat, floor, roof} (0.6 + 0.25 + 0.1 = 0.95 ≥ 0.9).
 - Temperature 0 → always "mat" (**greedy**).
 
-Interview tip: factual / RAG / code → **low temperature**; brainstorming → higher.
+In short: temperature sets how random the pick is; Top-K and Top-P limit which tokens can be
+picked.
 
 ---
 
@@ -247,11 +248,8 @@ many tools or jobs.
 
 Example: agent A researches competitors while agent B summarises customer reviews; a final
 agent combines both results.
-- **CrewAI** – set `async_execution=True` on independent tasks; the final task lists them in
-  `context=[...]` so it waits for both.
-- **LangGraph** – **fan-out** to several nodes from one node, then **fan-in** (join) at a later
-  node.
-- **Plain Python** – `await asyncio.gather(agent_a(), agent_b())`.
+- **Fan-out** – start the independent agents at the same time.
+- **Fan-in** – the combining step waits until all of them finish, then uses their results.
 
 In short: independent tasks run in parallel; the task that needs their output waits for them.
 
@@ -288,8 +286,8 @@ In short: routing sends each request to the right specialist.
 **How to manage:**
 1. Clear roles, short prompts, few tools per agent.
 2. A **supervisor/orchestrator** with **max-step limits** and timeouts.
-3. **Structured outputs** (JSON + Pydantic validation) between agents.
-4. **Tracing / observability** (LangSmith, Langfuse) to see every step and tool call.
+3. **Structured outputs** (JSON + schema validation) between agents.
+4. **Tracing / observability** to see every step and tool call.
 5. Retries with fallbacks, and **human-in-the-loop** approval for risky actions.
 
 In short: agents are slow, costly and fragile – limit steps, validate outputs and trace
@@ -306,7 +304,7 @@ everything.
 - Simple steps (classify, extract, summarise) → a **small, cheap, fast** model.
 - Data must stay in-house → an **open-weight model** (Llama, Mistral, Qwen) hosted privately.
 
-**Orchestration:** use **LangGraph** or **CrewAI**.
+**Orchestration:** a **supervisor** pattern.
 - A **supervisor** agent receives the request and routes to worker agents.
 - Workers share a common **state** (messages, intermediate results).
 - Stop on goal reached or **max steps**; add logging, retries and **guardrails**.
@@ -324,7 +322,7 @@ In short: right model per step + a supervisor that routes, shares state and enfo
 1. **Don't send all 100** – group tools by domain, **route first**, then expose only the 5–10
    relevant ones. Or retrieve tools by similarity ("**tool RAG**").
 2. **Clear names and descriptions** for each tool, with an example call.
-3. **Strict schemas** – validate arguments with **Pydantic / JSON Schema** before running; if
+3. **Strict schemas** – validate arguments against a **schema** before running; if
    invalid, send the error back and let the model retry.
 4. Split into several **specialist agents**, each with its own small tool set.
 5. **Low temperature**, and test tool selection with an eval set.
@@ -342,14 +340,10 @@ changes**. Treat every tool call like an external API call that can fail.
 
 **Finding the failing tool:**
 - Log every call: **tool name, input, output, error, duration**, with a trace/request ID.
-- Use **tracing** (LangSmith, Langfuse, OpenTelemetry) and a dashboard of **error rate per tool**.
+- Use **tracing** and a dashboard of **error rate per tool**.
 - **Alert** when a tool's failure rate goes up.
 
-**Handling failures:**
-- **Retries with backoff**, timeouts, fallback tools.
-- Return a clear error message to the agent so it can recover instead of guessing.
-
-In short: log and trace every tool call, so failures show up per tool, then retry or fall back.
+In short: log and trace every tool call, so failures show up per tool.
 
 ---
 
@@ -361,8 +355,7 @@ In short: log and trace every tool call, so failures show up per tool, then retr
 the model's free text into **clean, checked data**.
 - Define the expected output shape; if the LLM returns wrong types or missing fields you get a
   **`ValidationError`** and can retry.
-- Used for **tool argument schemas** and **structured output** (LangChain, CrewAI, OpenAI SDK all
-  accept Pydantic models).
+- Used for **tool argument schemas** and **structured output**.
 
 ```python
 from pydantic import BaseModel, ValidationError
@@ -405,9 +398,6 @@ splitters and vector store integrations."
 +----------------+----------------------------------------+-----------------------------------+
 ```
 
-**LangGraph** (from the LangChain team) is the choice when you need fine control over a
-**stateful** agent flow with loops and branches.
-
 In short: LangChain = RAG building blocks; CrewAI = quick role-based agent teams.
 
 ---
@@ -442,8 +432,7 @@ In short: Agents do Tasks with Tools, grouped in a Crew, run by a Process.
 ==> Yes, two ways:
 - **Task level** – `async_execution=True` on a Task, so the crew moves on without waiting. A
   later task waits for it by listing it in `context=[task_a, task_b]`.
-- **Crew level** – `await crew.kickoff_async()` starts the whole crew without blocking (useful
-  inside an async web server like FastAPI).
+- **Crew level** – `await crew.kickoff_async()` starts the whole crew without blocking.
 
 ```python
 research_a = Task(description="Research competitor A", agent=researcher,
@@ -537,9 +526,8 @@ In short: create the tool, give it to an agent, and the agent decides when to se
 ==> Yes. **MCP** is an **open standard from Anthropic (Nov 2024)** for connecting LLM apps to tools
 and data. Think **"USB-C for AI"**: one standard plug instead of custom glue for every tool.
 - **MCP server** – exposes **tools** (actions), **resources** (data) and **prompts**. Example: a
-  GitHub, Jira or database server.
-- **MCP client / host** – the AI app (Claude Desktop, an IDE, your agent) that connects to
-  servers.
+  server for a code repository, a ticket system or a database.
+- **MCP client / host** – the AI app (a chat app, an IDE, your agent) that connects to servers.
 - Transport: **stdio** for local servers, **HTTP** (streamable HTTP / SSE) for remote ones; the
   messages are **JSON-RPC**.
 
@@ -596,7 +584,7 @@ In short: LangChain = toolbox, LangGraph = workflow engine, MCP = standard plug 
 *(Asked 1×: Deloitte USI AI (YT))*
 
 ==> **LangGraph runs the workflow; MCP provides the tools.**
-1. Run MCP servers (e.g. Jira, database, file system).
+1. Run MCP servers (e.g. a ticket system, a database, the file system).
 2. In the LangGraph app, connect as an MCP client – `langchain-mcp-adapters` loads MCP tools as
    LangChain tools.
 3. Give those tools to the agent nodes in your graph.
@@ -606,10 +594,10 @@ In short: LangChain = toolbox, LangGraph = workflow engine, MCP = standard plug 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 
-client = MultiServerMCPClient({"jira": {"url": "http://localhost:8000/mcp",
-                                        "transport": "streamable_http"}})
+client = MultiServerMCPClient({"tickets": {"url": "http://localhost:8000/mcp",
+                                           "transport": "streamable_http"}})
 tools = await client.get_tools()
-agent = create_react_agent("openai:gpt-4.1", tools)
+agent = create_react_agent(llm, tools)   # llm = any chat model
 ```
 
 Benefit: add or swap tools by changing MCP servers – no change to the graph code.
@@ -724,8 +712,7 @@ In short: retrieve well, constrain the prompt, cite sources, verify before showi
 *(Asked 1×: ZS)*
 
 ==> In a Jupyter notebook, step by step:
-1. Install libraries: `langchain`, a vector store (`chromadb` / `faiss`), an embedding model,
-   an LLM SDK.
+1. Install libraries: an LLM framework, a vector store, an embedding model, an LLM SDK.
 2. **Load** documents (PDF / text loaders).
 3. **Split** into chunks (e.g. 500 tokens, 50 overlap).
 4. **Embed** and store in a local vector store.
@@ -735,13 +722,11 @@ In short: retrieve well, constrain the prompt, cite sources, verify before showi
 8. Ask test questions, inspect the retrieved chunks, measure quality, tune chunk size / k.
 
 ```python
-vectordb = Chroma.from_documents(chunks, OpenAIEmbeddings())
+vectordb = VectorStore.from_documents(chunks, embeddings)   # your vector store + embedding model
 retriever = vectordb.as_retriever(search_kwargs={"k": 4})
 docs = retriever.invoke("How many paid leaves do I get?")
 print(len(docs))   # 4
 ```
-
-Then move the working code out of the notebook into an **API service** for production.
 
 In short: load → split → embed → store → retrieve → prompt → LLM → evaluate.
 
@@ -758,8 +743,6 @@ In short: load → split → embed → store → retrieve → prompt → LLM →
 Like hiring: quickly shortlist 20 CVs (K), interview them properly and pick the best 5 (N).
 - Too small → you miss the needed info.
 - Too big → noise, higher cost, confused answers.
-
-Note: Top-K in **sampling** (Q7) is a different thing – it's about picking the next token.
 
 In short: K = fast shortlist from the vector DB, N = final picks after re-ranking.
 
@@ -870,11 +853,6 @@ In short: context = what the model sees now; context window = how much it can se
 +--------------------------------+---------------------------------------------+
 ```
 
-Choose by: **quality** needed, **cost**, **latency**, **data privacy** (self-hosting) and
-**context window** size.
-Cloud platforms – **AWS Bedrock, Azure OpenAI, Google Vertex AI** – give access to many of these
-through one account.
-
 In short: closed APIs for top quality, open-weight for control/privacy, small models for cheap
 and fast.
 
@@ -908,8 +886,7 @@ Example: reference "the cat sat on the mat", output "the cat sat":
 - Unigram precision = 3/3 = 1.0, but BLEU's **brevity penalty** pulls the score down because the
   output is too short.
 
-Limitation: they match **words, not meaning** – "car" vs "vehicle" gets no credit. For LLMs add
-**semantic similarity** or **LLM-as-a-judge**.
+Limitation: they match **words, not meaning** – "car" vs "vehicle" gets no credit.
 
 In short: BLEU = precision, for translation; ROUGE = recall, for summaries.
 
@@ -928,8 +905,6 @@ In short: BLEU = precision, for translation; ROUGE = recall, for summaries.
   tests. Metric: **pass@k**.
 - **BIG-Bench** – **200+** diverse, hard tasks (reasoning, logic, language puzzles).
 
-Interview tip: benchmarks are a starting point – always evaluate on **your own data**.
-
 In short: MMLU = knowledge, HELM = all-round report card, HumanEval = coding, BIG-Bench = hard
 reasoning.
 
@@ -943,9 +918,9 @@ reasoning.
 
 1. **Golden test set** – real questions with expected answers; run it on every prompt or model
    change (like unit tests for the LLM).
-2. **Automatic scores** – semantic similarity, **faithfulness**, answer relevance (RAGAS, or an
+2. **Automatic scores** – semantic similarity, **faithfulness**, answer relevance (e.g. with an
    **LLM-as-a-judge**).
-3. **Structured output** – ask for JSON, validate with **Pydantic**, retry if invalid.
+3. **Structured output** – ask for JSON, validate it against a schema, retry if invalid.
 4. **Guardrails** – block unsafe or off-topic answers, mask PII.
 5. **Grounding** – answer only from retrieved sources, with **citations**.
 6. **Monitoring** – thumbs up/down, traces and logs, humans review a sample.
@@ -977,9 +952,7 @@ print(check_similarity("Paris is the capital of France.",
 # Output (approx.): {'score': 0.97, 'passed': True}
 ```
 
-- Run it over the whole test set and report the **pass rate**.
-- Similarity only checks "same meaning". For "is it true to the sources?" add an
-  **LLM-as-a-judge** faithfulness check.
+Run it over the whole test set and report the **pass rate**.
 
 In short: embeddings + cosine similarity + threshold = a quick automatic quality score.
 
@@ -996,8 +969,6 @@ In short: embeddings + cosine similarity + threshold = a quick automatic quality
 - **Safety** – **hallucination rate**, policy violations.
 - **Speed and cost** – **time to first token**, total latency, tokens and cost per request.
 - **User signals** – thumbs up/down, resolution rate, escalations to a human.
-
-For chatbots also track intent accuracy and the fallback ("I didn't understand") rate.
 
 In short: quality, safety, speed/cost and user feedback – measure all four.
 
@@ -1046,12 +1017,6 @@ In short: delimiters reduce the risk; permissions and approvals limit the damage
 ==> A **jailbreak** is a trick prompt that makes the model **break its own safety rules** – e.g.
 role-play ("pretend you are an AI with no rules…"), hypothetical stories, or encoding the request.
 
-- **Jailbreak** attacks the **model's safety training**.
-- **Prompt injection** attacks **your app's instructions**.
-
-Defence: safety-tuned models, input and output guardrails, content moderation, monitoring and
-**red-teaming**.
-
 In short: jailbreak = get the model to say what it shouldn't.
 
 ---
@@ -1067,8 +1032,6 @@ In short: jailbreak = get the model to say what it shouldn't.
   leaks.
 - **Action guardrails (agents)** – allowed-tool list, argument validation, step and spend limits,
   human approval for risky actions.
-
-Tools: **NeMo Guardrails**, **Guardrails AI**, **AWS Bedrock Guardrails**, or your own rules.
 
 In short: check what goes in, what comes out, and what the agent is allowed to do.
 
@@ -1119,8 +1082,8 @@ In short: filter by permission before the LLM ever sees a chunk.
 
 - Build an **internal RAG system** – documents are indexed once inside the company network;
   employees only send questions.
-- Use a **self-hosted model** (Llama, Mistral) or an **enterprise cloud deployment** (Azure
-  OpenAI, AWS Bedrock) where your data isn't used for training and stays in your region.
+- Use a **self-hosted model** or an **enterprise cloud deployment** where your data isn't used
+  for training and stays in your region.
 - Apply **RBAC at retrieval** so each person sees only allowed content.
 - Mask PII, log access, and stop answers from dumping whole documents.
 
@@ -1187,8 +1150,7 @@ A: Book = 3 x 10 = 30. Two books = 60. Plus pen = 70. Answer: 70
 - Helps with maths, logic and multi-step questions: each written step becomes context for the
   next one.
 - Cost: more tokens and slower.
-- Modern **reasoning models** (e.g. OpenAI o-series, Claude extended thinking) do this
-  internally.
+- Modern **reasoning models** do this internally.
 
 In short: "show your working" makes multi-step answers more accurate.
 
@@ -1200,8 +1162,8 @@ In short: "show your working" makes multi-step answers more accurate.
 
 ==> Treat prompts like code:
 
-1. Store prompts in **files in Git** (or a prompt registry like **LangSmith / Langfuse**), not
-   hard-coded strings.
+1. Store prompts in **files under version control** (or a **prompt registry**), not hard-coded
+   strings.
 2. Give each a **version** (v1, v2…) and log which version produced each response.
 3. Run the **eval test set** before releasing a new version; compare scores.
 4. Roll out gradually / **A/B test**, with easy rollback.
@@ -1293,9 +1255,6 @@ In short: guess → measure error → adjust weights → repeat.
 |            | Decision Tree Regressor, Random     | Random Forest, SVM, KNN,            |
 |            | Forest, XGBoost                     | Naive Bayes, XGBoost                |
 +------------+-------------------------------------+-------------------------------------+
-| Metrics    | MAE, MSE, RMSE, R²                  | Accuracy, Precision, Recall, F1,    |
-|            |                                     | ROC-AUC                             |
-+------------+-------------------------------------+-------------------------------------+
 ```
 
 Trap: **Logistic Regression is a classification algorithm** despite its name.
@@ -1325,8 +1284,6 @@ Train accuracy: 99%   Test accuracy: 72%   -> overfitting
 - **Early stopping**.
 - **Cross-validation** to choose settings.
 - For trees: limit depth, or use ensembles like Random Forest.
-
-Opposite: **underfitting** – too simple, bad on both training and test.
 
 In short: great on training, bad on new data = overfitting.
 
@@ -1385,9 +1342,8 @@ Recall    = 60 / 100 = 0.60
 F1        = 2 x 0.75 x 0.60 / (0.75 + 0.60) = 0.67
 ```
 
-- **Use recall** when missing a positive is costly: cancer or fraud detection – better a few
-  false alarms than a missed case.
-- **Use precision** when false alarms are costly: spam filter (don't bin real emails).
+**Use recall** when missing a positive is costly: cancer or fraud detection – better a few
+false alarms than a missed case.
 
 In short: precision = "am I right when I say yes?"; recall = "did I catch them all?".
 
@@ -1404,9 +1360,6 @@ In short: precision = "am I right when I say yes?"; recall = "did I catch them a
 
 They train together: the discriminator gets better at catching fakes, the generator gets better
 at fooling it. In the end the generator makes very realistic data.
-
-Uses: image generation, face ageing, data augmentation. Today **diffusion models** are more common
-for images.
 
 In short: counterfeiter vs police, both improving until the fakes look real.
 
@@ -1426,8 +1379,6 @@ In short: counterfeiter vs police, both improving until the fakes look real.
 token id 42 ("cat") -> row 42 -> [0.12, -0.83, 0.45, ...]
 ```
 
-Embeddings power **semantic search**, RAG, recommendations and clustering.
-
 In short: embedding = meaning as numbers; the matrix = one learned vector per token.
 
 ---
@@ -1437,7 +1388,7 @@ In short: embedding = meaning as numbers; the matrix = one learned vector per to
 *(Asked 1×: 20+ MNC AI interviews (YT))*
 
 ==> They are the **number of dimensions** – how many numbers each embedding vector has.
-OpenAI `text-embedding-3-small` gives **1536**; `text-embedding-3-large` gives **3072**.
+A model with **1536** dimensions outputs 1536 numbers per text; one with **3072** outputs 3072.
 
 - More dimensions → can capture finer meaning (often better quality).
 - But → more storage, more memory and slower search.
@@ -1590,8 +1541,8 @@ Request 2: [system prompt 5,000 tokens][question B]  -> prefix read from cache
 ```
 
 Tip: put **fixed content first** and changing content (the user question) last – caching only
-matches an **identical prefix**. OpenAI, Anthropic, Gemini and Bedrock all support it; details
-differ (some need explicit cache markers, and caches expire after a few minutes).
+matches an **identical prefix**. Details differ by provider (some need explicit cache markers,
+and caches expire after a few minutes).
 
 In short: pay once for the long fixed prefix, reuse it on every call.
 
@@ -1634,15 +1585,13 @@ In short: managed models + managed RAG + guardrails, inside your AWS account.
 
 ==> A POC works on 10 happy-path questions; production has thousands of messy real users.
 
-- **Quality** – hallucinations and edge cases → eval sets and guardrails.
-- **Latency and cost** at scale → caching, smaller models, streaming.
+- **Quality** – hallucinations and edge cases.
+- **Latency and cost** at scale.
 - **Data** – messy documents, keeping the index fresh, access control.
 - **Security** – prompt injection, PII, compliance.
-- **Reliability** – rate limits, provider outages → retries, **fallback models**.
-- **Observability** – tracing, logging, feedback loops.
-- **Change management** – prompt / model versioning and regression tests.
-
-Interview tip: say "I start measuring quality from day one with a test set."
+- **Reliability** – rate limits, provider outages.
+- **Observability** – seeing what happened in each request, collecting feedback.
+- **Change management** – prompt / model changes can break answers that used to work.
 
 In short: the demo is easy; quality, cost, security and reliability at scale are the real work.
 
@@ -1683,12 +1632,6 @@ w_new    = w - learning_rate x gradient
 
 Example: `w = 0.5`, gradient `= 2`, learning rate `= 0.1` → `w_new = 0.5 − 0.1 × 2 = 0.3`.
 We move **opposite** to the gradient to reduce the error.
-
-Problems:
-
-- **Vanishing gradient** – derivatives shrink through many layers and learning stops.
-- **Exploding gradient** – they grow huge and training becomes unstable.
-- Fixes: ReLU, normalisation, residual connections, **gradient clipping**.
 
 In short: chain rule passes the blame back; each weight steps against its gradient.
 
@@ -1759,7 +1702,7 @@ matching and detection.**
 1. **Idempotency key** per payment – a retry with the same key never pays twice.
 2. **Transactions + state machine** (initiated → debited → credited → done), so each payment is
    applied exactly once.
-3. **Unique payee IDs** (UPI ID / account number) – never names alone.
+3. **Unique payee IDs** (account ID) – never names alone.
 4. **Reconciliation jobs** compare ledgers and auto-reverse duplicates.
 
 **Probabilistic (handles ambiguity):**
@@ -1786,7 +1729,7 @@ In short: rules decide, AI suggests and flags.
    per language) instead of hard-coding them.
 4. Detect the user's language automatically, or let the user pick.
 5. Test each language with **batch utterance tests**.
-6. Publish and connect **channels** (web, mobile, WhatsApp, Teams), then monitor with
+6. Publish and connect **channels** (web, mobile, messaging apps), then monitor with
    **Insights**.
 
 In short: skills + native language or translation service + resource bundles + per-language

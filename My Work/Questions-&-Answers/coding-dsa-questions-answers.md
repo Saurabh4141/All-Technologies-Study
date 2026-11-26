@@ -17,18 +17,9 @@ Ordered by priority: the question asked by the most interviewers comes first.
 const arr = [1, 2, 3, 4, 5];
 const result = arr.filter(n => n % 2 === 0).map(n => n * 2);
 console.log(result); // Output: [4, 8]
-
-// Plain loop version (if they say "no built-ins")
-const out = [];
-for (let i = 0; i < arr.length; i++) {
-  if (arr[i] % 2 === 0) out.push(arr[i] * 2);
-}
-console.log(out); // Output: [4, 8]
 ```
 
 - **Time:** O(n). **Space:** O(n) for the result.
-- Bonus: `reduce` does it in one pass:
-  `arr.reduce((acc, n) => (n % 2 === 0 ? [...acc, n * 2] : acc), [])`.
 
 In short: filter the evens, map them to double.
 
@@ -45,14 +36,6 @@ In short: filter the evens, map them to double.
 const words = ["hello", "world", "javascript"];
 const reversed = words.map(word => word.split("").reverse().join(""));
 console.log(reversed); // Output: ["olleh", "dlrow", "tpircsavaj"]
-
-// Without built-ins: swap from both ends
-function reverseWord(w) {
-  let res = "";
-  for (let i = w.length - 1; i >= 0; i--) res += w[i];
-  return res;
-}
-console.log(reverseWord("hello")); // Output: "olleh"
 ```
 
 - **Time:** O(total characters). **Space:** O(total characters).
@@ -71,7 +54,7 @@ In short: split → reverse → join, inside a map.
 leader.
 
 **Approach:** walk from **right to left** and keep the max seen so far. If the current element is
-bigger than that max, it's a leader. (This was asked in a Python coding round.)
+bigger than that max, it's a leader.
 
 ```python
 def leaders(arr):
@@ -87,8 +70,6 @@ print(leaders([16, 17, 4, 3, 5, 2]))  # Output: [17, 5, 2]
 ```
 
 - **Time:** O(n), one pass. **Space:** O(1) extra (besides the result).
-- Brute force (check every element against everything on its right) is O(n²) – mention it, then
-  give the one-pass version.
 
 In short: scan from the right, track the max, anything bigger than the max is a leader.
 
@@ -154,8 +135,6 @@ console.log(isEqual({ name: "John", age: 25 }, { name: "John", age: 25 })); // O
 console.log(isEqual({ a: { b: 1 } }, { a: { b: 2 } }));                   // Output: false
 ```
 
-- Quick trick: `JSON.stringify(a) === JSON.stringify(b)`. It only works if the keys are in the same
-  order, and it drops `undefined` and functions.
 - **Time:** O(total number of keys). **Space:** O(depth).
 
 In short: `===` compares references; compare key count and values recursively for content.
@@ -188,8 +167,6 @@ console.log(longestRepeatedSubstring("abcd"));   // Output: ""
 ```
 
 - **Time:** O(n³) worst case (n lengths × n windows × slicing up to n chars). **Space:** O(n²).
-- Better: **binary search on the length** (if a length-k repeat exists, a shorter one does too)
-  → O(n² log n), or a **suffix array** for large inputs.
 
 In short: longest length first, Set of windows, first duplicate wins.
 
@@ -226,7 +203,6 @@ console.log(hasCycle(a)); // Output: true
 
 - Why they meet: inside the loop, fast gains 1 step on slow every move, so it must catch up.
 - **Time:** O(n). **Space:** O(1).
-- Simpler alternative: store visited nodes in a **Set** – O(n) time, O(n) space.
 
 In short: slow 1 step, fast 2 steps; if they meet, there's a cycle.
 

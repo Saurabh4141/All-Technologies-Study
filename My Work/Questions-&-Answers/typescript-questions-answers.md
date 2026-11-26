@@ -11,7 +11,7 @@ Ordered by priority: the question asked by the most interviewers comes first.
 *(Asked 1×: Algoworks)*
 
 ==> **TypeScript** = JavaScript + **static types**. The TypeScript compiler (**`tsc`**) checks your
-types and then outputs plain JavaScript. Browsers and Node run that JS; the types are removed.
+types and then outputs plain JavaScript. That JS is what actually runs; the types are removed.
 - Catches bugs at **compile time** (wrong type, typo in a property, missing argument) instead of
   at runtime in production.
 - Better editor help: autocomplete, go-to-definition, safe rename/refactor.
@@ -26,9 +26,6 @@ add(2, 3);   // ok -> 5
 add(2, "3"); // Compile error: Argument of type 'string' is not assignable
              //   to parameter of type 'number'.
 ```
-
-Note: types are **compile-time only**. They don't validate data at runtime (API input still needs
-a validator like Zod).
 
 In short: same JavaScript, but checked before it runs – fewer bugs, easier maintenance.
 
@@ -49,7 +46,7 @@ value.foo.bar();   // no compile error, but crashes at runtime:
 ```
 
 - `any` also spreads: assign an `any` to another variable and that one loses checking too.
-- Use it rarely, e.g. while migrating old JS to TS. Prefer **`unknown`** or a real type.
+- Use it rarely; prefer a real type.
 - `"noImplicitAny": true` (part of `strict`) makes TS complain when it would silently guess `any`.
 
 In short: `any` = "trust me", TypeScript stops checking.
@@ -87,8 +84,6 @@ if (typeof b === "string") {
 }
 ```
 
-Common use: `catch (err: unknown)` and `JSON.parse` results – check the type before using them.
-
 In short: `unknown` is the safe version of `any` – you must check before you use.
 
 ---
@@ -103,7 +98,7 @@ In short: `unknown` is the safe version of `any` – you must check before you u
 +-------------------------------+------------------------+-------------------------------+
 |                               | interface              | type                          |
 +===============================+========================+===============================+
-| Best for                      | Object shapes, classes | Anything: unions, tuples,     |
+| Can describe                  | Object shapes only     | Anything: unions, tuples,     |
 |                               |                        | primitives, objects           |
 +-------------------------------+------------------------+-------------------------------+
 | Extend                        | extends                | & (intersection)              |
@@ -127,9 +122,6 @@ type Person = { name: string };
 type Employee = Person & { salary: number };
 type Status = "active" | "inactive";  // union – only possible with type
 ```
-
-Interview tip: use **`interface`** for object/API shapes (and when you need merging, e.g. extending
-a library's types); use **`type`** for unions, tuples and computed types.
 
 In short: interface = extendable object shapes; type = any type, including unions.
 
@@ -170,10 +162,6 @@ type A = Result<User>; // { success: boolean; data: User }
 type B = Result<null>; // { success: false; error: string }
 ```
 
-- `as T` is a promise to the compiler, not a runtime check. For untrusted API data, validate it
-  (e.g. Zod) and infer the type from the schema.
-- Constrain generics with `extends`: `function getId<T extends { id: number }>(x: T) { return x.id; }`.
-
 In short: generics make one helper work for every response type; conditional types pick the right
 type from the input.
 
@@ -184,52 +172,44 @@ type from the input.
 *(Asked 1×: Web3Dev)*
 
 ==> Steps (MERN = MongoDB, Express, React, Node):
-1. **Backend setup**: `npm i express mongoose cors` and `npm i -D typescript ts-node
-   @types/express @types/node @types/cors`, then `npx tsc --init` (turn on `"strict": true`).
-2. **Model**: a `Todo` interface + a Mongoose schema typed with it (`Schema<ITodo>`).
+1. **Backend setup**: `npm i express mongodb` and `npm i -D typescript @types/express
+   @types/node`, then `npx tsc --init` (turn on `"strict": true`).
+2. **Model**: a `Todo` interface, used to type the MongoDB collection (`collection<Todo>`).
 3. **Routes**: REST API: `GET /todos`, `POST /todos`, `PUT /todos/:id`, `DELETE /todos/:id`,
    with typed `Request<Params, ResBody, ReqBody>`.
-4. **Frontend**: `npm create vite@latest client -- --template react-ts`. Share the same `Todo`
-   type, call the API with `fetch`/`axios`, keep todos in `useState<Todo[]>`.
-5. **Extras**: input validation, error-handling middleware, `.env` for the Mongo URL.
-
-```ts
-// server/models/Todo.ts
-import { Schema, model } from "mongoose";
-
-export interface ITodo { title: string; completed: boolean; }
-
-const todoSchema = new Schema<ITodo>({
-  title: { type: String, required: true },
-  completed: { type: Boolean, default: false },
-});
-export const Todo = model<ITodo>("Todo", todoSchema);
-```
+4. **Frontend**: a React + TypeScript project. Share the same `Todo` type, call the API with
+   `fetch`, keep todos in `useState<Todo[]>`.
 
 ```ts
 // server/index.ts
 import express, { Request, Response } from "express";
-import mongoose from "mongoose";
-import { Todo } from "./models/Todo";
+import { MongoClient, ObjectId } from "mongodb";
+
+interface Todo { title: string; completed: boolean; }
+
+const client = new MongoClient(process.env.MONGO_URL as string);
+const todos = client.db("app").collection<Todo>("todos");
 
 const app = express();
 app.use(express.json());
 
 app.get("/todos", async (_req: Request, res: Response) => {
-  res.json(await Todo.find());
+  res.json(await todos.find().toArray());
 });
 
 app.post("/todos", async (req: Request<{}, {}, { title: string }>, res: Response) => {
-  const todo = await Todo.create({ title: req.body.title });
-  res.status(201).json(todo); // -> { _id: "...", title: "Buy milk", completed: false }
+  const todo: Todo = { title: req.body.title, completed: false };
+  const result = await todos.insertOne(todo);
+  res.status(201).json({ _id: result.insertedId, ...todo });
+  // -> { _id: "...", title: "Buy milk", completed: false }
 });
 
 app.delete("/todos/:id", async (req: Request<{ id: string }>, res: Response) => {
-  await Todo.findByIdAndDelete(req.params.id);
+  await todos.deleteOne({ _id: new ObjectId(req.params.id) });
   res.sendStatus(204);
 });
 
-mongoose.connect(process.env.MONGO_URL as string).then(() => app.listen(5000));
+client.connect().then(() => app.listen(5000));
 ```
 
 ```tsx
@@ -245,7 +225,8 @@ function App() {
 }
 ```
 
-In short: typed Mongoose model + typed Express routes + typed React state, sharing one `Todo` type.
+In short: typed MongoDB collection + typed Express routes + typed React state, sharing one `Todo`
+type.
 
 ======================================================================================================================================
 

@@ -12,10 +12,10 @@ Ordered by priority: the question asked by the most interviewers comes first.
 
 ==> Two steps: first **find** the slow query, then **fix** it.
 
-**Find it (MySQL):**
-- **Slow query log** – logs every query slower than `long_query_time`.
+**Find it:**
+- **Slow query log** – logs every query slower than a set time.
 - **`EXPLAIN` / `EXPLAIN ANALYZE`** – shows the plan and the real time.
-- **Performance Schema** / APM tools (New Relic, Datadog) – top slow queries in production.
+- **Monitoring tools** – show the top slow queries in production.
 
 **Fix it:**
 - Add the right **index** (columns used in `WHERE`, `JOIN`, `ORDER BY`).
@@ -24,17 +24,17 @@ Ordered by priority: the question asked by the most interviewers comes first.
 - Don't wrap an indexed column in a function: `WHERE YEAR(created_at) = 2024` can't use the
   index; `WHERE created_at >= '2024-01-01' AND created_at < '2025-01-01'` can.
 - Fix **N+1 queries** (a query inside a loop) with one `JOIN` or `IN (...)`.
-- **Cache** hot reads in Redis.
+- **Cache** hot reads.
 - Very big tables: **partitioning**, **read replicas**.
 
 ```sql
--- slow: full table scan (EXPLAIN shows type = ALL)
+-- slow: full table scan (EXPLAIN shows no index used)
 SELECT * FROM orders WHERE customer_id = 42;
 
 -- fix: index + only needed columns + limit
 CREATE INDEX idx_orders_customer ON orders(customer_id);
 SELECT id, total, created_at FROM orders WHERE customer_id = 42 LIMIT 50;
--- EXPLAIN now shows type = ref, key = idx_orders_customer
+-- EXPLAIN now shows an index lookup on idx_orders_customer
 ```
 
 In short: measure with the slow log and EXPLAIN, then fix with indexes, leaner queries and caching.
@@ -45,23 +45,20 @@ In short: measure with the slow log and EXPLAIN, then fix with indexes, leaner q
 
 *(Asked 1×: Deloitte)*
 
-==> In MySQL, four quick ways:
+==> Four quick ways:
 - **Slow query log** – turn it on and it records every query slower than N seconds.
-- **`SHOW FULL PROCESSLIST`** – shows queries running *right now* and how long (`Time` column).
-- **`EXPLAIN ANALYZE`** (MySQL 8.0.18+) – runs the query and shows **actual** time and rows per
-  step.
-- **App side** – log query time in the ORM (e.g. Sequelize `benchmark: true`) or use an APM tool.
+- **Running-queries list** – the database's process/activity list shows queries running *right
+  now* and how long they have been running.
+- **`EXPLAIN ANALYZE`** – runs the query and shows **actual** time and rows per step.
+- **App side** – log how long each query takes, or use a monitoring tool.
 
 ```sql
-SET GLOBAL slow_query_log = 'ON';
-SET GLOBAL long_query_time = 1;   -- log queries slower than 1 second
-
-SHOW FULL PROCESSLIST;            -- what is running now
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 42;
+-- shows each step with its actual time and row count
 ```
 
-In MongoDB the same job is done by the **database profiler** and `.explain('executionStats')`.
-
-In short: slow query log for history, PROCESSLIST for now, EXPLAIN ANALYZE for the why.
+In short: slow query log for history, the running-queries list for now, EXPLAIN ANALYZE for the
+why.
 
 ---
 
@@ -70,11 +67,11 @@ In short: slow query log for history, PROCESSLIST for now, EXPLAIN ANALYZE for t
 *(Asked 1×: Tech Mahindra (YT))*
 
 ==> My step-by-step approach:
-1. **Confirm** – find it in the slow query log / APM. How slow? How often does it run?
-2. **Explain** – run `EXPLAIN ANALYZE`. Red flags in MySQL: `type: ALL` (full scan), a huge
-   `rows` estimate, `Using filesort`, `Using temporary`.
-3. **Check the data** – did the table grow a lot? Are statistics stale (`ANALYZE TABLE`)? Is the
-   query waiting on **locks** from other transactions?
+1. **Confirm** – find it in the slow query log / monitoring. How slow? How often does it run?
+2. **Explain** – run `EXPLAIN ANALYZE`. Red flags: a full table scan, a huge rows estimate, an
+   extra sort or a temporary table.
+3. **Check the data** – did the table grow a lot? Are the table statistics stale? Is the query
+   waiting on **locks** from other transactions?
 4. **Fix** – add or adjust an index, rewrite the query (no `SELECT *`, no function on an indexed
    column, better `JOIN`), add pagination or caching.
 5. **Test** – on staging with production-like data; compare plan and time before/after.
@@ -92,14 +89,13 @@ In short: confirm → explain → check data and locks → fix → test → moni
 reading the whole table** – like the index at the back of a book.
 - No index → **full table scan** (reads every row).
 - With index → jumps almost straight to the matching rows.
-- In MySQL **InnoDB**, indexes are **B+Trees**.
-- Main types in MySQL:
-  - **Primary key** – the **clustered** index; the table rows are stored in this order.
+- Most indexes are **B-Trees** (sorted trees), so a lookup takes a few steps instead of a scan.
+- Main types:
+  - **Primary key** – created automatically on the primary key column.
   - **Unique** – also blocks duplicate values.
   - **Secondary** (normal) – on any column you search by.
   - **Composite** – on several columns, e.g. `(name, age)`.
   - **Full-text** – for word search in text.
-- MongoDB also uses B-Tree indexes (single field, compound, text...).
 - **Cost:** extra disk space and slower `INSERT` / `UPDATE` / `DELETE`, so don't index every column.
 
 ```sql
@@ -120,7 +116,8 @@ In short: an index trades some write speed and disk for much faster reads.
 2. See **how** each column is used: equality (`=`), range (`>`, `BETWEEN`), or `ORDER BY`, and how
    **selective** it is (many distinct values or few).
 3. Usually **one composite index** beats three single-column ones. Order: **equality columns
-   first, range column last** (MySQL can't use columns after a range in the index).
+   first, range column last** (columns after a range column in the index can't be used to
+   narrow the search).
 4. Check existing indexes to avoid duplicates – every index slows down writes.
 5. Run `EXPLAIN` again to confirm the improvement.
 
@@ -142,14 +139,11 @@ In short: EXPLAIN first, then usually one well-ordered composite index.
 ==> **No.** The primary key index is sorted by `id`, so it only helps lookups on `id`.
 - `WHERE name = 'Ravi'` → **full table scan** unless `name` has its own index.
 - Add a **secondary index** on the column you search (`name`, `age`, or a composite).
-- In InnoDB, a secondary index stores the **primary key** next to each value. MySQL finds the id
-  there, then fetches the full row from the clustered (primary) index.
-
 ```sql
 CREATE INDEX idx_users_name ON users(name);
 EXPLAIN SELECT * FROM users WHERE name = 'Ravi';
--- before: type = ALL   key = NULL
--- after:  type = ref   key = idx_users_name
+-- before: full table scan, no index used
+-- after:  index lookup using idx_users_name
 ```
 
 In short: an index only helps the columns it is built on.
@@ -161,15 +155,14 @@ In short: an index only helps the columns it is built on.
 *(Asked 1×: Deloitte)*
 
 ==> You don't calculate it by hand – the **query optimizer estimates** it from rows to read,
-index use, disk I/O, CPU, joins and sorting. In MySQL you can read the number:
-- **`EXPLAIN FORMAT=JSON`** → shows `query_cost`.
+index use, disk I/O, CPU, joins and sorting. You can read the number:
+- **`EXPLAIN`** → the plan shows the **estimated cost** of each step and of the whole query.
 - **`EXPLAIN ANALYZE`** → estimated cost plus **actual** time and rows.
-- **`SHOW STATUS LIKE 'Last_query_cost'`** right after running a query.
 - The cost is a relative number – lower is cheaper. Use it to **compare** two versions of a query.
 
 ```sql
-EXPLAIN FORMAT=JSON SELECT * FROM orders WHERE customer_id = 42;
--- "cost_info": { "query_cost": "1.20" }
+EXPLAIN SELECT * FROM orders WHERE customer_id = 42;
+-- plan output includes an estimated cost, e.g. cost = 1.20
 ```
 
 In short: the optimizer gives the cost; EXPLAIN shows it so you can compare queries.
@@ -183,26 +176,17 @@ In short: the optimizer gives the cost; EXPLAIN shows it so you can compare quer
 ==> The **execution plan** is the step-by-step route the database picks to run your query: which
 table first, which index, how to join, and how many rows it expects.
 - See it with `EXPLAIN <query>` (or `EXPLAIN ANALYZE` for real timings).
-- Key columns in MySQL:
-  - `type` → `ALL` = full scan (bad); `range` / `ref` / `eq_ref` / `const` = index used (good).
-  - `key` → the index actually used.
-  - `rows` → estimated rows to read.
-  - `Extra` → `Using filesort` / `Using temporary` = extra work; `Using index` = covering index
-    (great).
+- What to look for:
+  - **Access type** → full table scan (bad) or index lookup / index range (good).
+  - **Index used** → the index the database actually picked.
+  - **Rows** → estimated rows to read.
+  - **Extra work** → an extra sort or temporary table is costly; reading only from the index
+    (covering index) is best.
 
 ```sql
 EXPLAIN SELECT name FROM users WHERE email = 'a@b.com';
+-- plan: index lookup on users using idx_users_email, estimated rows = 1
 ```
-
-```text
-+----+-------------+-------+-------+-----------------+-----------------+------+-------+
-| id | select_type | table | type  | possible_keys   | key             | rows | Extra |
-+====+=============+=======+=======+=================+=================+======+=======+
-| 1  | SIMPLE      | users | const | idx_users_email | idx_users_email | 1    | NULL  |
-+----+-------------+-------+-------+-----------------+-----------------+------+-------+
-```
-
-(`const` here because `email` has a **unique** index.)
 
 In short: the plan tells you whether the database uses an index or scans everything.
 
@@ -215,7 +199,7 @@ In short: the plan tells you whether the database uses an index or scans everyth
 ==>
 ```text
 +--------------+------------------------------------+------------------------------------+
-|              | SQL (MySQL, PostgreSQL)            | NoSQL (MongoDB, Redis, DynamoDB)   |
+|              | SQL                                | NoSQL                              |
 +==============+====================================+====================================+
 | Data shape   | Tables, rows, fixed schema         | Documents, key-value, graph;       |
 |              |                                    | flexible schema                    |
@@ -223,16 +207,11 @@ In short: the plan tells you whether the database uses an index or scans everyth
 | Relations    | JOINs, foreign keys                | Embed data; few or no joins        |
 +--------------+------------------------------------+------------------------------------+
 | Transactions | Strong ACID                        | Often eventual consistency         |
-|              |                                    | (MongoDB does support multi-doc    |
-|              |                                    | ACID transactions)                 |
 +--------------+------------------------------------+------------------------------------+
-| Query        | SQL language                       | DB-specific API (find, aggregate)  |
+| Query        | SQL language                       | DB-specific API                    |
 +--------------+------------------------------------+------------------------------------+
 | Scaling      | Mostly vertical; read replicas     | Built for horizontal scaling       |
 |              |                                    | (sharding)                         |
-+--------------+------------------------------------+------------------------------------+
-| Best for     | Banking, orders, structured data   | Fast-changing or huge data, logs,  |
-|              |                                    | catalogs, real-time apps           |
 +--------------+------------------------------------+------------------------------------+
 ```
 
@@ -244,7 +223,7 @@ SELECT u.name, o.total FROM users u JOIN orders o ON o.user_id = u.id;
 ```
 
 ```js
-// MongoDB: one document with orders embedded
+// NoSQL (document database): one document with orders embedded
 { _id: 1, name: 'Ravi', orders: [{ total: 500 }, { total: 250 }] }
 ```
 
@@ -257,14 +236,10 @@ In short: SQL = structure and consistency; NoSQL = flexibility and easy scale-ou
 *(Asked 1×: TechM)*
 
 ==> Horizontal scaling = add **more database servers** instead of a bigger one.
-- **Read replicas** – one **primary** takes writes, **replicas** copy it and serve reads (MySQL
-  replication). Good when reads ≫ writes. Note: replicas can lag a little behind.
+- **Read replicas** – one **primary** takes writes, **replicas** copy it and serve reads. Good
+  when reads ≫ writes. Replicas can lag a little behind.
 - **Sharding** – split rows across servers by a **shard key** (e.g. `user_id % 4` decides the
   server). Each shard holds part of the data, so writes scale too.
-- **Partitioning** – splits a big table into parts *inside one server*. Not real scale-out, but
-  often used together with it.
-- **Use a DB that shards for you** – MongoDB sharding, Cassandra, DynamoDB, Vitess for MySQL.
-- **Cache** hot reads in Redis to cut DB load.
 
 In short: replicas scale reads, sharding scales reads and writes.
 
@@ -293,27 +268,18 @@ Sample data:
 SELECT email, COUNT(*) FROM users GROUP BY email HAVING COUNT(*) > 1;
 -- a@x.com | 2
 
--- 2a) delete with a self join (MySQL)
-DELETE u1
-FROM users u1
-JOIN users u2
-  ON u1.email = u2.email
- AND u1.id > u2.id;          -- deletes id 3, keeps id 1
-
--- 2b) or with ROW_NUMBER (MySQL 8+)
+-- 2) number the rows in each email group and delete all but the first
 DELETE FROM users
 WHERE id IN (
   SELECT id FROM (
     SELECT id, ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn
     FROM users
-  ) t     -- derived table: MySQL can't select from the table it deletes from directly
+  ) t
   WHERE rn > 1
-);
+);                           -- deletes id 3, keeps id 1
 ```
 
-Interview tip: after cleaning, add `UNIQUE(email)` so duplicates can't come back.
-
-In short: find with GROUP BY + HAVING, delete with a self join or ROW_NUMBER, then add a UNIQUE key.
+In short: find with GROUP BY + HAVING, then delete every row except the first in each group.
 
 ---
 
@@ -343,13 +309,6 @@ DELIMITER ;
 CALL GetOrdersByCustomer(42, @total);   -- returns the customer's orders
 SELECT @total;                          -- e.g. 1250.00
 ```
-
-Why use one:
-- **Reusable** logic kept in one place.
-- **Fewer round trips** – many statements in one call.
-- **Security** – grant `EXECUTE` on the procedure without giving direct table access.
-
-Downside: business logic is harder to version, test and debug than app code.
 
 In short: saved, parameterised SQL you run with CALL.
 
@@ -384,8 +343,6 @@ db.orders.aggregate([
 // [ { _id: 'Ravi', totalSpent: 4200 }, { _id: 'Asha', totalSpent: 1800 } ]
 ```
 
-Interview tip: put **`$match` first** so fewer documents reach `$lookup` (and it can use an index).
-
 In short: aggregation is a stage-by-stage pipeline; $lookup is MongoDB's LEFT JOIN.
 
 ---
@@ -401,7 +358,7 @@ Common uses:
 - **Caching** DB/API results to take load off the main database.
 - **Sessions**, refresh tokens, token blacklist (with **TTL** so keys expire on their own).
 - **Rate limiting** – counters shared by all app servers (`INCR` + `EXPIRE`).
-- **Pub/Sub** and **queues** (BullMQ), **leaderboards** with sorted sets.
+- **Pub/Sub** and **queues**, **leaderboards** with sorted sets.
 
 ```js
 const { createClient } = require('redis');
@@ -417,9 +374,6 @@ async function getUser(id) {
   return user;
 }
 ```
-
-Note: Redis can persist to disk (**RDB** snapshots / **AOF** log), but treat it mainly as a fast
-layer, not your main database.
 
 In short: Redis = super-fast shared memory for caching, sessions, rate limits and queues.
 
@@ -437,21 +391,19 @@ Ordered by topic priority: questions from the most-asked topics come first.
 
 ==> You run **1 query** to get a list, then **1 more query for each item**. 100 posts = 101
 queries – slow because of all the round trips.
-- Very common with ORMs (Sequelize, TypeORM, Prisma) and Mongoose `populate` inside loops.
+- Very common with ORMs, when related data is loaded inside a loop.
 
 ```js
 // N+1: 1 query for posts + 1 query per post
-const posts = await Post.findAll();
+const posts = await db.query('SELECT * FROM posts');
 for (const p of posts) {
-  p.author = await User.findByPk(p.userId);
+  p.author = await db.query('SELECT * FROM users WHERE id = ?', [p.user_id]);
 }
 ```
 
 Fixes:
-1. **Eager loading / JOIN** – `Post.findAll({ include: User })` → one query with a `JOIN`.
+1. **Eager loading / JOIN** – load posts and authors in one query with a `JOIN`.
 2. **Batch** – collect the ids, run one `WHERE id IN (...)`, then map results back.
-3. **MongoDB** – one `populate()` on the list query, or `$lookup` in an aggregation.
-4. **GraphQL** – use **DataLoader** to batch and cache lookups.
 
 ```sql
 -- what the fix runs instead of 101 queries
@@ -471,7 +423,7 @@ memory lives.
 
 ```text
 +-----------------------+------------------------------------+------------------------------------+
-| Point                 | In-memory (Map, node-cache)        | Redis                              |
+| Point                 | In-memory                          | Redis                              |
 +=======================+====================================+====================================+
 | Where                 | Inside the app process             | Separate server                    |
 +-----------------------+------------------------------------+------------------------------------+
@@ -481,8 +433,7 @@ memory lives.
 +-----------------------+------------------------------------+------------------------------------+
 | Survives restart      | No                                 | Can (RDB / AOF persistence)        |
 +-----------------------+------------------------------------+------------------------------------+
-| Extras                | None                               | TTL, pub/sub, rate limiting,       |
-|                       |                                    | sessions, queues                   |
+| Extras                | None                               | TTL, data structures, pub/sub      |
 +-----------------------+------------------------------------+------------------------------------+
 ```
 
@@ -496,7 +447,7 @@ async function getUser(id) {
   const cached = await redis.get(`user:${id}`);
   if (cached) return JSON.parse(cached);                     // hit
 
-  const user = await User.findById(id);                      // miss -> DB
+  const user = await db.query('SELECT * FROM users WHERE id = ?', [id]); // miss -> DB
   await redis.set(`user:${id}`, JSON.stringify(user), { EX: 300 }); // 5 min TTL
   return user;
 }
@@ -570,7 +521,7 @@ await User.create({ name: 'Kid', email: 'k@x.com', age: 12 });
 // ValidationError: Path `age` (12) is less than minimum allowed value (18).
 ```
 
-Interview tip: validation runs on `save()` / `create()` by default; for `updateOne` /
+Validation runs on `save()` / `create()` by default; for `updateOne` /
 `findOneAndUpdate` pass `{ runValidators: true }`.
 
 In short: Mongoose gives MongoDB schemas, models, validation and helpers like populate and hooks.

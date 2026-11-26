@@ -46,7 +46,7 @@ In short: nested `foreach` to loop, `$arr[i][key]` to read, string functions to 
 
 ==> Three functions to know:
 - **`unset()`** removes an element by key. The other keys are **not** re-numbered.
-- **`implode()`** joins the values into one string; **`explode()`** does the opposite.
+- **`implode()`** joins the values into one string.
 - **`array_values()`** re-indexes the keys to 0, 1, 2...
 
 ```php
@@ -56,10 +56,9 @@ unset($fruits[1]);                 // remove "banana" → keys are now 0, 2, 3
 echo implode(", ", $fruits);       // Output: apple, mango, grapes
 
 $fruits = array_values($fruits);   // keys back to 0, 1, 2
-print_r(explode(", ", "a, b"));    // Array ( [0] => a [1] => b )
 ```
 
-In short: `unset` removes, `implode` joins, `explode` splits.
+In short: `unset` removes an element (keys stay as they were), `implode` joins the rest.
 
 ---
 
@@ -210,23 +209,8 @@ session_start();
 $_SESSION["user_id"] = 42;          // save
 echo $_SESSION["user_id"];          // Output: 42 (on any page after session_start())
 
-session_regenerate_id(true);        // new ID after login (stops session fixation)
 session_unset();                    // logout: clear data
 session_destroy();                  //         delete the session
-```
-
-```text
-+--------------------------------+------------------------------------+
-| Cookie                         | Session                            |
-+================================+====================================+
-| Stored in the browser          | Stored on the server               |
-+--------------------------------+------------------------------------+
-| User can see / edit it         | User sees only the ID              |
-+--------------------------------+------------------------------------+
-| Size limit ~4 KB               | No small limit                     |
-+--------------------------------+------------------------------------+
-| Read with $_COOKIE             | Read with $_SESSION                |
-+--------------------------------+------------------------------------+
 ```
 
 In short: data on the server, only `PHPSESSID` in the browser cookie.
@@ -240,17 +224,16 @@ In short: data on the server, only `PHPSESSID` in the browser cookie.
 ==> On the server, in the folder set by **`session.save_path`** in `php.ini`. Each file is named
 **`sess_<session_id>`**.
 - Linux: usually `/var/lib/php/sessions` or `/tmp`.
-- Windows (XAMPP): `C:\xampp\tmp`.
 - Check it with `echo session_save_path();` or `phpinfo()`.
-- With **`session.save_handler`** you can store sessions in **Redis**, Memcached or a database
-  instead. You need that when you run several servers behind a load balancer.
+- With **`session.save_handler`** you can store sessions somewhere else (e.g. a database) instead
+  of files.
 
 ```php
 <?php
 echo session_save_path();   // e.g. /var/lib/php/sessions
 ```
 
-In short: `session.save_path`, one `sess_<id>` file per user; use Redis for many servers.
+In short: in the `session.save_path` folder, one `sess_<id>` file per session.
 
 ---
 
@@ -288,9 +271,6 @@ echo $_GET["q"] ?? "";                               // Output: php
 $email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL);
 echo $_SERVER["REQUEST_METHOD"];                    // POST
 ```
-
-Interview tip: POST is not encrypted by itself; only HTTPS makes it safe. Never send passwords with
-GET.
 
 In short: GET = URL, for reading; POST = body, for changing; `$_GET` / `$_POST`.
 
@@ -356,8 +336,6 @@ class Child extends Base {        // OK: Base is not final
 }
 echo (new Child)->id();           // Output: 1 (inherited and usable)
 ```
-
-Use `final` to lock important logic (payments, security checks) so nobody changes it by extending.
 
 In short: final class = no child class; final method = no override, but it can still be called.
 

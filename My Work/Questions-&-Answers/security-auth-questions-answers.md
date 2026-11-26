@@ -44,29 +44,17 @@ it.
 
 ==> Think in layers:
 - **HTTPS** everywhere.
-- **Authentication** (JWT/OAuth) + **authorization** (role checks) on every protected route.
-- **Validate input** (Joi / Zod / express-validator) and use **parameterized queries** → stops
-  SQL/NoSQL injection.
-- **Helmet** → security headers.
-- **Rate limiting** (`express-rate-limit`) → stops brute force.
+- **Authentication** (token or session) + **authorization** (role checks) on every protected
+  route.
+- **Validate input** and use **parameterized queries** → stops SQL/NoSQL injection.
+- **Security headers** (CSP, HSTS, nosniff...).
+- **Rate limiting** → stops brute force.
 - **CORS** only for trusted origins.
-- **bcrypt** for passwords; secrets in env variables / a secrets manager, never in code.
+- **Hash passwords** with a slow, salted hash; secrets in env variables / a secrets manager, never
+  in code.
 - **Body size limit** so huge payloads can't crash the server.
 - Hide stack traces from clients; log them on the server.
 - `npm audit` and keep packages updated.
-
-```js
-const express = require('express');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const cors = require('cors');
-
-const app = express();
-app.use(helmet());
-app.use(cors({ origin: 'https://myapp.com' }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 100 }));
-app.use(express.json({ limit: '10kb' }));
-```
 
 In short: HTTPS + auth + validation + headers + rate limit + safe secrets.
 
@@ -76,8 +64,8 @@ In short: HTTPS + auth + validation + headers + rate limit + safe secrets.
 
 *(Asked 2×: Web3Dev, EarlyCoder 5-yr Node (YT))*
 
-==> Sample answer: "I used **jsonwebtoken** to sign and verify tokens and **bcrypt** to hash
-passwords. I have also used **Passport.js** for social login."
+==> Sample answer: "I used **jsonwebtoken** to sign and verify tokens. I have also used
+**Passport.js** for social login."
 
 **Passport** is auth middleware for Express. Each login method is a **strategy**:
 - `passport-local` → email + password
@@ -94,7 +82,7 @@ passport.use(new GoogleStrategy(
 ));
 ```
 
-In short: jsonwebtoken for tokens, bcrypt for passwords, Passport for plug-in login strategies.
+In short: jsonwebtoken for tokens, Passport for plug-in login strategies.
 
 ---
 
@@ -111,18 +99,12 @@ In short: jsonwebtoken for tokens, bcrypt for passwords, Passport for plug-in lo
 +--------------+---------------------------------+----------------------------------+
 | When         | First                           | After authentication             |
 +--------------+---------------------------------+----------------------------------+
-| How          | Password, OTP, JWT, OAuth login | Roles, permissions (admin, user) |
+| How          | Password, OTP, token, login     | Roles, permissions (admin, user) |
 +--------------+---------------------------------+----------------------------------+
 | Failure code | 401 Unauthorized                | 403 Forbidden                    |
 +--------------+---------------------------------+----------------------------------+
-| Example      | Logging in to Gmail             | Only admin can delete users      |
+| Example      | Logging in to your email        | Only admin can delete users      |
 +--------------+---------------------------------+----------------------------------+
-```
-
-```js
-app.delete('/users/:id', auth, allowRoles('admin'), deleteUser);
-// no / bad token     → 401 (auth failed)
-// valid token, role 'user' → 403 (not allowed)
 ```
 
 In short: **authentication = identity (401)**, **authorization = permission (403)**.
@@ -150,10 +132,10 @@ app.use('/api/login', rateLimit({ windowMs: 15 * 60 * 1000, limit: 5 }));
 // 6th login try in 15 min → 429 Too Many Requests
 ```
 
-- Many servers? Use a shared **Redis store** (`rate-limit-redis`) so all servers share one count.
+- Many servers? Use a **shared store** so all servers share one count.
 - Behind a proxy/load balancer, set `app.set('trust proxy', 1)` so the real client IP is used.
 
-In short: `express-rate-limit` + Redis store → 429 after the limit.
+In short: `express-rate-limit` → 429 after the limit.
 
 ---
 
@@ -240,10 +222,7 @@ In short: never trust `decode` for security; always `verify`.
    matching signature.
 3. `jwt.verify` re-computes the signature for the new payload → doesn't match → **401**.
 
-Catch: if the attacker steals the **unchanged** token, it still works until it expires. That's why
-access tokens are **short-lived** and only sent over **HTTPS**.
-
-In short: changing the payload breaks the signature; stealing the token is the real risk.
+In short: changing the payload breaks the signature, so the server rejects the token.
 
 ---
 
@@ -251,23 +230,14 @@ In short: changing the payload breaks the signature; stealing the token is the r
 
 *(Asked 1×: Senior Node.js round (YT))*
 
-==> Check **who** the caller is and **what** they may do, on the server, on every request. In
-Express this is middleware:
-1. User logs in → gets a short-lived **access token** (JWT).
+==> Check **who** the caller is and **what** they may do, on the server, on every request:
+1. User logs in → gets a short-lived **access token**.
 2. Client sends it in `Authorization: Bearer <token>` (or an HttpOnly cookie).
-3. **Auth middleware** runs `jwt.verify` → missing/invalid → **401**.
-4. **Role middleware** checks permission → not allowed → **403**.
+3. **Auth check** verifies the token → missing/invalid → **401**.
+4. **Role check** → not allowed → **403**.
 5. Also check **ownership** (user 5 can't read `/orders` of user 6).
-6. Plus HTTPS, rate limiting, CORS whitelist, input validation.
 
-```js
-const allowRoles = (...roles) => (req, res, next) =>
-  roles.includes(req.user.role) ? next() : res.status(403).json({ message: 'Forbidden' });
-
-app.delete('/users/:id', auth, allowRoles('admin'), deleteUser);
-```
-
-In short: auth middleware (401) → role/ownership check (403) → route.
+In short: auth check (401) → role/ownership check (403) → route.
 
 ---
 
@@ -314,9 +284,7 @@ In short: no token or bad token → 401; good token → `req.user` + `next()`.
 3. When it expires, the frontend silently calls **`POST /auth/refresh`** and gets a new access
    token.
 4. The user is only logged out when the refresh token expires or is revoked.
-5. Store refresh tokens (hashed) in DB/Redis so you can **revoke** them on logout.
-6. **Rotate** them: every refresh gives a new refresh token. If an old one is reused, someone
-   stole it → revoke the whole family.
+5. Store refresh tokens (hashed) in the database so you can **revoke** them on logout.
 
 In short: short access token for calls, long revocable refresh token to get new ones silently.
 
@@ -328,22 +296,23 @@ In short: short access token for calls, long revocable refresh token to get new 
 
 ==> Yes, a separate API like **`POST /auth/refresh`**.
 - An expired access token → the API returns **401**.
-- An **Axios interceptor** catches the 401, calls `/auth/refresh`, then **retries the original
-  request**.
+- A wrapper around the frontend's API calls catches the 401, calls `/auth/refresh`, then
+  **retries the original request** once.
 - Refresh also fails → log the user out.
 
 ```js
-axios.interceptors.response.use(null, async (error) => {
-  if (error.response?.status === 401 && !error.config._retry) {
-    error.config._retry = true;   // avoid an endless loop
-    await axios.post('/auth/refresh', {}, { withCredentials: true });
-    return axios(error.config);   // retry the original request
+async function apiFetch(url, options = {}) {
+  let res = await fetch(url, { ...options, credentials: 'include' });
+  if (res.status === 401) {
+    const refresh = await fetch('/auth/refresh', { method: 'POST', credentials: 'include' });
+    if (!refresh.ok) return logout();                                // refresh failed
+    res = await fetch(url, { ...options, credentials: 'include' }); // retry once
   }
-  return Promise.reject(error);
-});
+  return res;
+}
 ```
 
-In short: 401 → interceptor → refresh → retry once.
+In short: 401 → refresh → retry once.
 
 ---
 
@@ -352,14 +321,15 @@ In short: 401 → interceptor → refresh → retry once.
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==> Don't poll. Two good ways:
-- **On demand:** refresh only when an API returns 401 (interceptor, see Q13).
-- **Just before expiry:** read `exp` from the token (`jwt-decode` on the frontend is fine for
-  this) and set **one timer** ~1 minute before it expires.
+- **On demand:** refresh only when an API returns 401.
+- **Just before expiry:** read `exp` from the token's payload (decoding without the secret is fine
+  for this) and set **one timer** ~1 minute before it expires.
 - If many requests get 401 at the same time, trigger **only one** refresh call and make the others
   wait for it.
 
 ```js
-const { exp } = jwtDecode(accessToken);            // seconds
+const payload = accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+const { exp } = JSON.parse(atob(payload));         // seconds
 const ms = exp * 1000 - Date.now() - 60_000;       // 1 min before expiry
 setTimeout(refreshToken, ms);
 ```
@@ -375,7 +345,7 @@ In short: refresh on 401 or just before `exp`, never on a fixed poll.
 ==>
 - **Refresh token → HttpOnly + Secure + SameSite cookie.** JavaScript can't read it, so **XSS**
   can't steal it.
-- **Access token → in memory** (a JS variable / React state). Lost on reload, but you just call
+- **Access token → in memory** (a JS variable). Lost on reload, but you just call
   `/auth/refresh` again.
 - Avoid **localStorage** for tokens: any injected script can read it.
 
@@ -406,17 +376,9 @@ In short: refresh token in an HttpOnly cookie, access token in memory, nothing i
 - A **CSRF token** for POST/PUT/DELETE as an extra layer.
 - Never change data with GET.
 
-```js
-res.cookie('refreshToken', token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: 'strict',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-});
+```text
+Set-Cookie: refreshToken=<token>; HttpOnly; Secure; SameSite=Strict; Max-Age=604800
 ```
-
-Note: **CORS does not stop the cookie from being sent**; it only stops the other site reading the
-response.
 
 In short: SameSite + HttpOnly + Secure, and a CSRF token for writes.
 
@@ -448,8 +410,6 @@ In short: short access token = small damage if stolen; long refresh token = user
 - **Malicious browser extensions / malware** on the user's device.
 - **Shared by mistake:** pasted into chats, tickets, screenshots.
 
-Prevention: HTTPS, HttpOnly cookies, short expiry, no tokens in URLs or logs, sanitize output.
-
 In short: XSS, sniffing, logs, malware, careless sharing.
 
 ---
@@ -462,7 +422,6 @@ In short: XSS, sniffing, logs, malware, careless sharing.
 - **BroadcastChannel API:** post a `'logout'` message; every tab listens and clears the user.
 - Or the **`storage` event:** write a key to localStorage; other tabs (not the current one) get a
   `storage` event.
-- On the server, **revoke the refresh token** / clear the cookie so the session really ends.
 
 ```js
 const channel = new BroadcastChannel('auth');
@@ -478,7 +437,7 @@ useEffect(() => {
 }, []);
 ```
 
-In short: BroadcastChannel (or storage event) to sync tabs + revoke on the server.
+In short: BroadcastChannel (or storage event) tells every tab to log out.
 
 ---
 
@@ -488,12 +447,13 @@ In short: BroadcastChannel (or storage event) to sync tabs + revoke on the serve
 
 ==>
 1. **Design:** roles/permissions, **least privilege**, HTTPS only.
-2. **Auth:** bcrypt passwords, short JWT access token + refresh token in an HttpOnly cookie.
-3. **Input:** validate every request (Joi/Zod), parameterized queries / ORM.
-4. **Middleware:** Helmet, CORS whitelist, rate limiting, body size limit.
-5. **Secrets:** env variables / AWS Secrets Manager, never in Git.
+2. **Auth:** slow, salted password hashes, short access token + refresh token in an HttpOnly
+   cookie.
+3. **Input:** validate every request, parameterized queries.
+4. **Request layer:** security headers, CORS whitelist, rate limiting, body size limit.
+5. **Secrets:** env variables / a secrets manager, never in source control.
 6. **Errors & logs:** generic messages to users, detailed logs inside, alerts.
-7. **Dependencies:** `npm audit`, Dependabot, regular updates.
+7. **Dependencies:** dependency scanning, regular updates.
 8. **Review & test:** code review against the **OWASP Top 10**, security tests.
 
 In short: secure by design, then layer auth, validation, headers, secrets, monitoring.
@@ -504,14 +464,14 @@ In short: secure by design, then layer auth, validation, headers, secrets, monit
 
 *(Asked 1×: EarlyCoder 5-yr Node (YT))*
 
-==> Same idea as Q20, as layers:
-- **Who:** authentication (JWT/OAuth) + authorization (roles) on every route.
+==> Think in layers:
+- **Who:** authentication (token or session) + authorization (roles) on every route.
 - **What comes in:** validate and sanitize input; parameterized queries.
 - **How it travels:** HTTPS, secure cookies, CORS whitelist.
 - **Abuse:** rate limiting, request size limits.
-- **Headers:** Helmet.
+- **Headers:** security headers (CSP, HSTS...).
 - **Secrets & data:** secrets manager, hashed passwords, encrypted sensitive fields.
-- **Watch:** logging, monitoring, `npm audit`.
+- **Watch:** logging, monitoring, dependency scanning.
 
 In short: who → what comes in → how it travels → abuse → headers → secrets → watch.
 
@@ -523,10 +483,10 @@ In short: who → what comes in → how it travels → abuse → headers → sec
 
 ==> You can't promise zero flaws, but you can catch most of them:
 - **Code reviews** with an **OWASP Top 10** checklist.
-- **Static analysis (SAST):** `eslint-plugin-security`, SonarQube.
-- **Dependency scanning:** `npm audit`, Snyk, Dependabot.
+- **Static analysis (SAST):** tools that scan the code for unsafe patterns.
+- **Dependency scanning:** flag libraries with known vulnerabilities.
 - **Tests** for auth cases, e.g. user A can't read user B's data.
-- **Secret scanning** in CI (e.g. gitleaks) so no keys reach Git.
+- **Secret scanning** in the CI pipeline so no keys reach the repo.
 - Regular **penetration testing** and production monitoring.
 
 In short: review + automated scanning + auth tests + pen tests.
@@ -557,19 +517,16 @@ In short: XSS = attacker's script running as your user on your site.
 *(Asked 1×: Senior Node Ep.32 (YT))*
 
 ==>
-- **Escape output:** React escapes `{value}` by default; avoid `dangerouslySetInnerHTML` /
-  `innerHTML`.
-- **Sanitize HTML** if you must render it (**DOMPurify**).
+- **Escape output:** show user data as text, not HTML; avoid `innerHTML`.
+- **Sanitize HTML** with an HTML sanitizer if you must render it.
 - **Validate input** on the server.
-- **Content-Security-Policy** header (via Helmet) to block inline/unknown scripts.
+- **Content-Security-Policy** header to block inline/unknown scripts.
 - **HttpOnly cookies** so scripts can't read tokens even if XSS happens.
 
-```jsx
-import DOMPurify from 'dompurify';
-
-const dirty = '<img src=x onerror="alert(1)">Hi';
-<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(dirty) }} />
-// Renders: <img src="x">Hi   (onerror removed)
+```js
+const input = '<img src=x onerror="alert(1)">';
+el.textContent = input;   // safe: shown as plain text
+el.innerHTML = input;     // unsafe: onerror runs
 ```
 
 In short: escape, sanitize, CSP, HttpOnly.
@@ -587,9 +544,6 @@ In short: escape, sanitize, CSP, HttpOnly.
   every POST/PUT/DELETE. The attacker's site can't read it, so forged requests fail.
 - Also: no data changes on GET, and check the **`Origin`** header.
 
-Note: CORS is not the answer; it controls who can **read responses**, not whether cookies are
-sent.
-
 In short: SameSite cookie + CSRF token for writes.
 
 ---
@@ -601,34 +555,9 @@ In short: SameSite cookie + CSRF token for writes.
 ==> Sample answer: "Yes. Our auth cookie was `HttpOnly; Secure; SameSite=Lax`, and for writes we
 used a CSRF token with the **double-submit cookie** pattern."
 1. Server creates a random token and sets it in a **readable** cookie (`XSRF-TOKEN`).
-2. Frontend reads it and sends it back in the `X-XSRF-TOKEN` header (Axios can do this
-   automatically).
+2. Frontend reads it and sends it back in the `X-XSRF-TOKEN` header on every POST/PUT/DELETE.
 3. Server checks header === cookie. Another site can't read our cookie, so it can't send the
-   header.
-
-```js
-const crypto = require('crypto');
-app.use(require('cookie-parser')());
-
-app.get('/csrf', (req, res) => {
-  const token = crypto.randomBytes(32).toString('hex');
-  res.cookie('XSRF-TOKEN', token, { secure: true, sameSite: 'strict' });
-  res.json({ ok: true });
-});
-
-function checkCsrf(req, res, next) {
-  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
-  const token = req.headers['x-xsrf-token'];
-  if (!token || token !== req.cookies['XSRF-TOKEN']) {
-    return res.status(403).json({ message: 'Bad CSRF token' }); // forged request → 403
-  }
-  next();
-}
-app.use(checkCsrf);
-```
-
-- Stronger version: **sign** the token (HMAC tied to the session) so it can't be planted.
-- `csurf` is deprecated; `csrf-csrf` is a common replacement.
+   header → mismatch → **403**.
 
 In short: random token in a cookie + same value in a header; mismatch → 403.
 
@@ -644,14 +573,10 @@ In short: random token in a cookie + same value in a header; mismatch → 403.
 - **`X-Content-Type-Options: nosniff`** → don't guess file types.
 - **`X-Frame-Options` / CSP `frame-ancestors`** → stop **clickjacking** (your site in an iframe).
 - **`Referrer-Policy`** → don't leak full URLs.
-- Remove **`X-Powered-By: Express`** → don't reveal the stack.
+- Remove **`X-Powered-By`** → don't reveal the stack.
 - **CORS** headers (`Access-Control-Allow-Origin`) → only trusted origins.
 
-```js
-app.use(helmet()); // sets most of these in one line
-```
-
-In short: headers = free browser-side protection; Helmet sets them for you.
+In short: headers = free browser-side protection.
 
 ---
 
@@ -673,8 +598,6 @@ app.use(helmet.contentSecurityPolicy({
 // Response now has: Content-Security-Policy: default-src 'self'; script-src 'self'
 ```
 
-Interview tip: Helmet is only one layer; you still need auth, validation and rate limiting.
-
 In short: `app.use(helmet())` = secure headers in one line.
 
 ---
@@ -690,7 +613,7 @@ Ordered by topic priority: questions from the most-asked topics come first.
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF, Ajeet Yadav Node.js revision PDF)*
 
 ==> Both keep a user logged in. The difference is **where the login state lives**.
-- **Session:** the server stores the user data (memory, Redis, DB); the client only gets a
+- **Session:** the server stores the user data (memory, cache, DB); the client only gets a
   **session ID** cookie. **Stateful.**
 - **JWT:** the user data (claims) lives **inside a signed token**; the server just verifies the
   signature. **Stateless.**
@@ -699,19 +622,19 @@ Ordered by topic priority: questions from the most-asked topics come first.
 +-----------------+--------------------------------------+-------------------------------------+
 | Point           | Session                              | JWT                                 |
 +=================+======================================+=====================================+
-| State stored    | On the server (Redis/DB)             | Inside the token (client side)      |
+| State stored    | On the server (cache/DB)             | Inside the token (client side)      |
 +-----------------+--------------------------------------+-------------------------------------+
 | Logout / revoke | Easy: delete the session             | Hard: valid till it expires (use    |
 |                 |                                      | short expiry + refresh / blocklist) |
 +-----------------+--------------------------------------+-------------------------------------+
-| Scaling         | Needs a shared store (Redis)         | Any server can verify with the key  |
+| Scaling         | Needs a shared store (cache/DB)      | Any server can verify with the key  |
 +-----------------+--------------------------------------+-------------------------------------+
 | Best for        | Classic server-rendered web apps     | APIs, mobile apps, microservices    |
 +-----------------+--------------------------------------+-------------------------------------+
 ```
 
 ```js
-// session (express-session)
+// session
 req.session.userId = user.id;        // stored on the server, cookie holds only the ID
 
 // JWT
@@ -734,8 +657,6 @@ In short: session = server remembers you (easy to revoke); JWT = token proves wh
 - bcrypt adds a **random salt** automatically → same password, different hashes → **rainbow
   tables** don't work.
 - Plain SHA-256 has no salt and no work factor.
-- Other good choices: **argon2** (modern recommendation), **scrypt**.
-- Note: bcrypt only uses the first **72 bytes** of the password.
 
 ```js
 const bcrypt = require('bcrypt');
@@ -761,16 +682,12 @@ a page read a response from a different **origin** (protocol, domain or port).
 - The server allows it with headers like **`Access-Control-Allow-Origin`**.
 - For non-simple requests (PUT/DELETE, custom headers, `Content-Type: application/json`) the
   browser first sends a **preflight `OPTIONS`** request.
-- Only browsers enforce CORS. Postman, curl and server-to-server calls ignore it → **CORS is not
-  authentication**.
+- Only browsers enforce CORS. API tools, curl and server-to-server calls ignore it → **CORS is
+  not authentication**.
 
-```js
-const cors = require('cors');
-app.use(cors({
-  origin: ['https://myapp.com'], // never '*' together with credentials
-  credentials: true,
-}));
-// Response header: Access-Control-Allow-Origin: https://myapp.com
+```text
+Access-Control-Allow-Origin: https://myapp.com
+Access-Control-Allow-Credentials: true
 ```
 
 In short: CORS = the server's response headers tell the browser which other origins may read it.
@@ -781,7 +698,7 @@ In short: CORS = the server's response headers tell the browser which other orig
 
 *(Not asked in a real interview yet · From: Gaurav Sharma Node.js notes PDF)*
 
-==> **NoSQL injection** = user input changes the meaning of a MongoDB query.
+==> **NoSQL injection** = user input changes the meaning of a NoSQL database query.
 - Usual trick: send a **query operator** (`$ne`, `$gt`, `$where`) instead of a plain value.
 - Login attack body: `{ "email": "a@b.com", "password": { "$ne": null } }` → "password not equal
   to null" matches every user → attacker logs in.
@@ -792,16 +709,15 @@ User.findOne({ email: req.body.email, password: req.body.password });
 ```
 
 How to prevent:
-1. **Validate types** (Joi / Zod / express-validator): password must be a string.
-2. **Strip `$` and `.` keys** from input, or turn on Mongoose's
-   `mongoose.set('sanitizeFilter', true)`.
+1. **Validate types:** password must be a string.
+2. **Strip `$` and `.` keys** from input.
 3. **Cast values:** `String(req.body.email)`.
 4. Never use `$where` or build queries from raw strings.
-5. Compare passwords with **bcrypt**, never inside the query.
+5. Compare the password hash in code, never inside the query.
 
 ```js
 const user = await User.findOne({ email: String(req.body.email) });
-const ok = user && await bcrypt.compare(String(req.body.password), user.passwordHash);
+const ok = user && await verifyPassword(String(req.body.password), user.passwordHash);
 ```
 
 In short: never pass raw user objects into queries; validate types and strip `$` operators.
